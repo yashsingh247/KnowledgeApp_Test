@@ -1,0 +1,153 @@
+﻿@model KnowledgeApp_Test.Models.Lab.Hourly
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Common;
+@using KnowledgeApp_Test.Models.Parameters;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Hourly";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Unit> UnitList = dropdownListSevices.GetUnitddl();
+    List<CrushingSeason> CrushingSeasonsList = dropdownListSevices.GetCrushingSeasonddl();
+    List<Parameter> ParameterList = dropdownListSevices.GetParemeterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+     Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditHourly", "Lab", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+
+        <div class="row">
+            <div class="col-md-4">
+                Entry Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.HourlyId)
+                    @Html.TextBoxFor(m => m.EntryDate, new { Value = Model.EntryDate.ToString("dd-MM-yyyy"), @class = "form-control date", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Entry Hour
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.EntryHour, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(UnitList, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Parameter
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ParameterId, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Crushing Season
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.CrushingSeasonId, new SelectList(CrushingSeasonsList, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Hour Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.HourValue, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Day Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DayValue, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Prev Day Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.PrevHourValue, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Prev To Date Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.PrevDayValue, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div><div class="row">
+            <div class="col-md-4">
+                @if (Model.HourlyId == 0 && right[0].BtnAdd==true)
+                {<button class="btn btn-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="btn btn-primary">Update</button>
+                }
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".date").datepicker({ dateFormat: 'dd-mm-yy', });
+            if ($("#EntryDate").val() == '01-01-0001') {
+
+                $("#EntryDate").val('');
+            }
+            $(".ddl").select2({
+                placeholder: "select ",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

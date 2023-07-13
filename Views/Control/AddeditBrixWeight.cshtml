@@ -1,0 +1,68 @@
+﻿@model KnowledgeApp_Test.Models.Control.BrixWeight
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Brix Weight";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditBrixWeight", "Control", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { onsubmit = "return SubmitForm(this)" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Brix Value
+            </div>
+            <div class="col-md-8">
+                @Html.HiddenFor(m => m.BrixWeightId)
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.BrixValue, new { @class = "form-control", @oninput = "validatetwodecimal(this)", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                ValueAt 20:
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ValueAt20, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Value At27:
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ValueAt27, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                @if (Model.BrixWeightId == 0 && right[0].BtnAdd==true)
+                {
+                    <button class="form-control btn btn-success">Save</button>
+
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control btn btn-info">Update</button>
+                }
+            </div>
+        </div>
+    }
+}

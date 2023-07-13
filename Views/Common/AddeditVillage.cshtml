@@ -1,0 +1,131 @@
+﻿@model KnowledgeApp_Test.Models.Common.Village
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Common;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Village";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Unit> UnitList = dropdownListSevices.GetUnitddl();
+    List<Centre> centrelist = dropdownListSevices.GetCentreddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditVillage", "Common", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { onsubmit = "return SubmitForm(this)" }))
+    {
+        <div class="row">
+            @Html.HiddenFor(m => m.VId)
+            <div class="col-md-4">
+                V Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.TextBoxFor(m => m.VCode, new { @class = "form-control Smint Code", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                V Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.VName, new { @class = "form-control", @required = "required", @maxlength = "30" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                V Hname
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.VHname, new { @class = "form-control", @maxlength = "30" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Centre
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.Centreid, new SelectList(centrelist, "CId", "CName"), "Select Centre ", new { @class = "form-control ddl", @required = "required" })
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                V Created By
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.VCreatedBy, new { @class = "form-control", @required = "required", @maxlength = "3" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                V EditedBy
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.VEditedBy, new { @class = "form-control", @maxlength = "3" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(UnitList, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                @if (Model.VId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control btn btn-success">Save</button>
+
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control btn btn-info">Update</button>
+                }
+            </div>
+        </div>
+
+    }
+}
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select ",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#VCode").val() == 0) {
+                $("#VCode").val('');
+            }
+        });
+    </script>
+

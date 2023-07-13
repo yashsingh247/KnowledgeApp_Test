@@ -1,0 +1,93 @@
+﻿@model KnowledgeApp_Test.Models.BenchMarking.YearlyBenchMark
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.BenchMarking
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+}
+@{
+    DropdownListSevices ds = new DropdownListSevices();
+    List<BenchMarkParameter> BMP = ds.GetBenchMarkParameterddl();
+    ViewBag.Title = "Yearly Bench Mark";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditYearlyBenchMarkParameter", "BenchMarking", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Bench Mark Parameter
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.YearlyBenchMarkId)
+                    @Html.DropDownListFor(m => m.BenchMarkParameterId, new SelectList(BMP, "BenchMarkParameterId", "BenchMarkName"), "Select Bench Mark Parmeter", new { @class = "form-control ddl", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Year Serial
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.YearSerial, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Applicable Year
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ApplicableYear, new { @class = "form-control Smint", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Applicable Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ApplicableValue, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                @if (Model.YearlyBenchMarkId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select ",
+                allowClear: true,
+                theme: "classic"
+            });
+
+          
+        });
+    </script>

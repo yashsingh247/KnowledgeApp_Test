@@ -1,0 +1,70 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.Pan
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Pan";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+    using (Html.BeginForm("AddeditPan", "PlantData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Pan Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.PanId)
+                    @Html.TextBoxFor(m => m.PanCode, new { @class = "form-control Sint", @onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Pan Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.PanName, new { @class = "form-control", @maxlength = "40" })
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.PanId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+            </div>
+
+        </div>
+    }
+}
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#PanCode").val() == 0) {
+                $("#PanCode").val('');
+            }
+
+        });
+    </script>
+

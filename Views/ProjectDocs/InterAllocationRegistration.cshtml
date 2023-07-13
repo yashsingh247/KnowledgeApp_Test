@@ -1,0 +1,187 @@
+﻿@model KnowledgeApp_Test.Models.ProjectDocs.InterAllocationRegistration
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "Inter Allocation Registration";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> Unit = ds.GetUnitddl();
+    List<Employee> Employee = ds.Employeeddl();
+    List<PlantDepartment> PlantDepartment = ds.PlantDepartmentddl();
+    List<PlantSubDepartment> PlantSubDepartment = ds.PlantSubDepartmentddl();
+}
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">Inter Allocation Registration</h3>
+    </div>
+</div>
+<hr />
+
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddInterAllocationRegistration","ProjectDocs")')"><i class="fa fa-plus"></i> New Inter Allocation Registration</a>
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+
+<div class="row" style="background-color: #f0f3f5">
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit
+            @Html.DropDownListFor(m => m.UnitId, new SelectList(Unit, "UnitId", "UnitName"),"Select Unit", new { @class = "form-control ddl ", @Id = "Unit2" })
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Intiator
+            @Html.DropDownListFor(m => m.IntiatorId, new SelectList(Employee, "EmployeeId", "EmployeeName"), "Select Intiator", new { @class = "form-control ddl", @id = "Intiator2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            DocumentDepartment
+            @Html.DropDownListFor(m => m.DocumentDepartmentId, new SelectList(PlantDepartment, "PlantDepartmentId", "DepartmentName"),"Select Department", new { @class = "form-control ddl", @id = "DocumentDepartment2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            DocumentSubDepartment
+            @Html.DropDownListFor(m => m.DocumentSubDepartmentId, new SelectList(PlantSubDepartment, "PlantSubDepartmentId", "SubDepartmentName"),"Select Sub Department", new { @class = "form-control ddl", @Id = "DocumentSubDepartment2" })
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="InterAlocationRegistration" width="100%" cellspacing="0">
+                <thead>
+                    <tr><th width="15%"></th>
+                        <th>Id</th>
+                        <th>Registration Number</th>
+                        <th>Registration Date</th>
+                        <th>UnitName</th>
+                        <th>Subject</th>
+                        <th>Intiator Employee Name</th>
+                        <th>Remarks</th>
+                        <th>OldNumber</th>
+                        <th>Approval Status</th>
+                        <th>Document Department Department Name</th>
+                        <th>Document  Sub Department Name</th>
+                        <th>Document Department Id</th>
+                        <th>Document Sub Department Id</th>
+                        <th>Intiator Id</th>
+                        <th>Unit Id</th>
+
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+        $(".ddl").select2({
+            placeholder: "Select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $(".ddl").on('change', function () {
+            var Unit = $("#Unit2").val();
+            var Intiator = $("#Intiator2").val();
+            var DocumentDepartment = $("#DocumentDepartment2").val();
+            var DocumentSubDepartment = $("#DocumentSubDepartment2").val();
+            getAddInterAllocationRegistration(Unit, Intiator, DocumentDepartment, DocumentSubDepartment)
+        });
+        getAddInterAllocationRegistration("","","","");
+    });
+    function getAddInterAllocationRegistration(Unit, Intiator, DocumentDepartment, DocumentSubDepartment) {
+        
+        var URL = '/ProjectDocs/InterAllocationRegistrationData?Unit=' + Unit + '&Intiator=' + Intiator + '&DocumentDepartment=' + DocumentDepartment + '&DocumentSubDepartment=' + DocumentSubDepartment;
+        console.log(URL)
+        $("#InterAlocationRegistration").DataTable().clear().draw();
+        $("#InterAlocationRegistration").DataTable().destroy();
+        $('#InterAlocationRegistration').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "InterAlocationRegistrationId", "render": function (data) {return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddInterAllocationRegistration", "ProjectDocs")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>";},},
+                { "data": "InterAlocationRegistrationId" },
+                { "data":"RegistrationNumber"},
+                { "data": "RegistrationDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "UnitUnitName" },
+                { "data": "Subject" },
+                { "data": "IntiatorEmployeeName" },
+                { "data": "Remarks" },
+                { "data": "OldNumber" },
+                { "data": "ApprovalStatus" },
+                { "data": "DocumentDepartmentDepartmentName" },
+                { "data": "DocumentSubDepartmentSubDepartmentName" },
+                { "data": "DocumentDepartmentId" },
+                { "data": "DocumentSubDepartmentId" },
+                { "data": "IntiatorId" },
+                { "data":"UnitId"},
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    title: 'Inter Allocation Registration',
+                    orientation: 'landscape',
+                    pageSize: 'LEGAL',
+                    extend: 'pdf',
+                },
+                {
+                    title: 'Inter Allocation Registration',
+                    extend: 'excel',
+                },
+                {
+                    title: 'Inter Allocation Registration',
+                    extend: 'print',
+                },
+               
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Inter Allocation Registration',
+                    height: 500,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+</script>

@@ -1,0 +1,98 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.ChemicalConsumptionDetails
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.HouseData
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Chemical Consumption";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Chemical> chemicals = ds.Chemicalddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditChemicalConsumptionDetails", "HouseData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    SerialNo
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.HiddenFor(m => m.ChemicalConsumptionDetailID)
+                    @Html.HiddenFor(m => m.ChemicalConsumptionID, new { Value = @ViewBag.CunsumstionId })
+                    @Html.TextBoxFor(m => m.SerialNumber, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    Chemical
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ChemicalID, new SelectList(chemicals, "ChemicalId", "ChemicalName"), "Select Chemical", new { @class = "form-control ddl", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    IssuedQuantity
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.TextBoxFor(m => m.IssuedQuantity, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    ConsumedQuantity
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.TextBoxFor(m => m.ConsumedQuantity, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.ChemicalConsumptionDetailID == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+
+                }
+
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

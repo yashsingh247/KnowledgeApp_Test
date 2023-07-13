@@ -1,0 +1,175 @@
+﻿@model KnowledgeApp_Test.Models.Lab.SampleSlip
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Administration
+@using KnowledgeApp_Test.Models.Common;
+@{
+    Layout = null;
+    ViewBag.Title = "Sample Slip";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Unit> unit = dropdownListSevices.GetUnitddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+     Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditSampleSlip", "Lab", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.SampleSlipId)
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Sample Slip Number
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.SampleSlipNumber, new { @class = "form-control", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Sample Slip Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.SampleSlipDate, new { Value = Model.SampleSlipDate.ToString("dd-MM-yyyy"), @class = "form-control date", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Grower Id
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.GrowerId, new { @class = "form-control", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Variety Id
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.VarietyId, new { @class = "form-control", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Slip Typle
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.SlipTyple, new { @class = "form-control", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Brix
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Brix, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Pol
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Pol, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Java Ratio
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.JavaRatio, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Losses
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Losses, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Village Id
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.VillageId, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.SampleSlipId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="btn btn-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="btn btn-primary">Update</button>
+                }
+            </div>
+        </div>
+    }
+}
+<script>
+    $(document).ready(function () {
+        $(".date").datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "select Unit",
+            allowClear: true,
+            theme: "classic"
+        });
+        if ($("#SampleSlipNumber").val() == 0) {
+            $("#SampleSlipNumber").val('');
+        }
+        if ($("#SampleSlipDate").val() == '01-01-0001') {
+            $("#SampleSlipDate").val('');
+        }
+        if ($("#GrowerId").val() == 0) {
+            $("#GrowerId").val('');
+        }
+        if ($("#VarietyId").val() == 0) {
+            $("#VarietyId").val('');
+        }
+    });
+</script>

@@ -1,0 +1,90 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.MillLogDetails
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Services
+@{
+    Layout = null;
+    DropdownListSevices Ds = new DropdownListSevices();
+    List<MillParameter> millParameter = Ds.MillParameterddl();
+    List<Mill> mill = Ds.Millddl();
+}
+@using(Html.BeginForm("AddeditMilllogDetails", "PlantData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+{
+    <div class="row">
+        <div class="col-md-4">
+            Serial Number
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.HiddenFor(m => m.MillLogDetailID)
+                @Html.HiddenFor(m => m.MillLogID,new { Value=ViewBag.Milllogid })
+                @Html.TextBoxFor(m => m.SerialNumber, new { @class = "form-control", @required = "required" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            MillParameter
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.DropDownListFor(m => m.MillParameterId, new SelectList(millParameter, "MillParameterId", "MillParameterName"), "Select Mill Parameter", new { @class = "form-control ddl", @required = "required" })
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            Mill
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.DropDownListFor(m => m.MillId, new SelectList(mill, "MillId", "MillName"), "Select Mill", new { @class = "form-control ddl" })
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            Log Value
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.LogValue, new { @Class = "form-control" })
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            @if (Model.MillLogDetailID == 0)
+            {
+                <button class="form-control bg-success">Save</button>
+            }
+            else
+            {
+                <button class="form-control bg-info">Update</button>
+            }
+
+
+        </div>
+
+    </div>
+}
+<script>
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        if ($("#SerialNumber").val()==0) {
+            $("#SerialNumber").val('');
+        }
+    });
+</script>

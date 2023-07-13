@@ -1,0 +1,133 @@
+﻿@model KnowledgeApp_Test.Models.Administration.RolePermisssion
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "AddeditRoleRight";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<MenuMaster> menuMaster = DS.MenuMasterddl();
+    List<Unit> unit = DS.GetUnitddl();
+    List<Role> role = DS.Roleddl();
+
+}
+@using (Html.BeginForm("AddeditRoleRight", "Administration", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Assign Roles</h3>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.UnitID, new SelectList(unit, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl",@required="required" })
+
+            </div>
+        </div>
+
+
+        <div class="col-md-2">
+            <div class="form-group">
+                Role
+                @Html.DropDownListFor(m => m.RoleId, new SelectList(role, "RoleId", "RoleName"), "select Role", new { @class = "form-control ddl Table", @Id = "Role" })
+
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Menu
+                @Html.DropDownListFor(m => m.MenuId, new SelectList(menuMaster, "MenuID", "MenuName"), "select Menu", new { @class = "form-control ddl Table", @Id = "Menu" })
+
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Sub  Menu
+                <select class="form-control ddl Table" id="SubMenu">
+                    <option></option>
+                </select>
+
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="btn-group">
+                <br />
+                <button class="form-control bg-success">Save</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="form-group">
+                <div id="myChart" class="col-md-12 col-xs-12">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        
+
+    </div>
+
+}
+<script>
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+            $('#myChart').hide();
+            $('#Rolerights').DataTable({
+                searching: true,
+                retrieve: true,
+                dom: 'Blfrtip',
+                buttons: [
+                    , 'excel', 'print'
+                ]
+            });
+        });
+
+    $("#Menu").on("change", function () {
+        $("#SubMenu").empty();
+        var Menu = $("#Menu").val();
+        var URL = "/Administration/SubmenuDropdown?menu=" + Menu;
+            console.log(URL)
+            $.ajax({
+                url: URL,
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (data) {
+                    console.log(data)
+                    $.each(data, function (key, item) {
+                        var option = "<option value='" + item.SubMenuID + "'>" + item.SubMenuName + "</option>";
+                        $('#SubMenu').append(option);
+                    })
+                },
+            });
+    });
+
+    $(".Table").change(function () {
+            var Menu = $("#Menu").val();
+            var Role = $("#Role").val();
+            var SubMenu = $("#SubMenu").val();
+             $.ajax({
+                  url: "@Url.Action("RoleWiseRight", "Administration")",
+                    dataType: 'HTML',
+                 data: { Role: Role, Menu: Menu, SubMenu: SubMenu},
+                    asycs: false,
+                 success: function (returnData) {
+                     $("#myChart").html(returnData);
+                    }
+             });
+           
+            $('#myChart').show();
+
+  });
+
+</script>
+
+
+

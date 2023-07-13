@@ -1,0 +1,169 @@
+﻿@model List<KnowledgeApp_Test.Models.Parameters.ParameterTypeModel>
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = TempData["Name"];
+}
+@{
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Unit> unit = dropdownListSevices.GetUnitddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+     Response.Redirect("/Login/Access");
+}
+
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+<h2>Daily Entry - @ViewBag.Name</h2>
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Custom Tabs -->
+
+            <div class="panel">
+
+                <div class="panel-body">
+                    <div class="col-sm-1 ">
+                        <button type="submit" id="btnParametertab" onclick='return saveparavalue()' class=" from-control btn btn-success">Save</button>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="text" id="EntryDate" onchange="return getAllParaValue()" class="form-control date" />
+                    </div>
+                    <div class="col-sm-3">
+                        @Html.DropDownList("Unit", new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", onchange = "return getAllParaValue()", @id = "Unit2" })
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    @foreach (var ptype in Model)
+                    {
+                        <li class="@ptype.TabClass"><a href="#@ptype.ParameterTypeID" data-toggle="tab">@ptype.ParameterTypeName</a></li>
+                    }
+                    @*<li class="pull-right"><a href="ParameterList" class="text-muted"><i class="fa fa-gear"></i></a></li>*@
+                </ul>
+                <div class="tab-content">
+                    @foreach (var ptype in Model)
+                    {
+                        <div class="@ptype.TabPaneClass" id="@ptype.ParameterTypeID">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">@ptype.ParameterTypeName</h3>
+                                <div id="divPara" class="col-sm-12 box-body">
+                                    @Html.Raw(ptype.tablehtml)
+                                </div>
+                            </div>
+
+                        </div><!-- /.tab-pane -->
+                    }
+                </div><!-- /.tab-content -->
+            </div><!-- nav-tabs-custom -->
+        </div><!-- /.col -->
+    </div>
+}
+    <script>
+        $(document).ready(function () {
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+            $(".ddl").select2({
+                width: 'resolve',
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+
+        function saveparavalue() {
+
+            if ($('#Unit2').val() != 0) {
+                var mainarr = [];
+                $(".table tr .columnName").each(function () {
+                    if ($(this).find(".parametervalueclass").val() != "") {
+                        mainarr.push({
+                            entrydate: $("#EntryDate").val(),
+                            unitid: $("#Unit2").val(),
+                            parameterid: $(this).find(".parameterid").val(),
+                            dayvalue: $(this).find(".parametervalueclass").val(),
+
+                        });
+
+                    }
+                });
+
+                console.log(mainarr);
+                var s = '';
+                $.ajax({
+                    type: "post",
+                    url: "/Lab/SaveAllDailyEntry",
+                    datatype: "json",
+                    data: { jsondata: mainarr },
+                    success: function (result) {
+                        s = result;
+                        alert(s);
+                        location.reload();
+                    },
+                    error: function (result) {
+                        alert('error occured!!');
+                    }
+                });
+
+            }
+            else {
+                alert('select unit');
+                return false;
+            }
+        }
+
+
+        function getAllParaValue() {
+
+            var EntryDate = $("#EntryDate").val();
+            var UnitId = $("#Unit2").val();
+            var URL = "/Lab/AllParameterDailyValue?EntryDate=" + EntryDate + "&UnitId=" + UnitId;
+            if (EntryDate != "" && UnitId != 0) {
+                $.ajax({
+                    type: "POST",
+                    url: URL,
+                    dataType: "Json",
+
+                    success: function (result) {
+                        console.log(URL, result)
+                        $.each(result, function (key, item) {
+                            $(".table tr .columnName").each(function () {
+                                if ($(this).find(".parameterid").val() == item.ParameterID) {
+                                    $(this).find(".parametervalueclass").val(item.DayValue);
+                                }
+                            })
+                        })
+                    },
+                    error: function (result) {
+                        console.log(URL, result)
+                        alert('Error Occured!!');
+                    }
+                })
+            }
+            else {
+                alert("Please Select Entry Date Or Unit ")
+            }
+
+        }
+
+
+        $(".parametervalueclass").bind('keypress', function (e) {
+            if ($('#Unit2').val() == 0) {
+                alert('Select Unit');
+                return false;
+            }
+
+            var code;
+            if (e.keycode) code = e.keycode;
+            else if (e.which) code = e.which;
+            if (e.which == 46)
+                return true;
+            if (code > 57)
+                return false;
+        });
+
+    </script>

@@ -1,0 +1,165 @@
+﻿@model KnowledgeApp_Test.Models.Stoppages.StoppageStation
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Stoppages
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Stoppage Station";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Parameter> parameter = ds.GetParemeterddl();
+    List<StoppageDepartment> stoppageDepartment = ds.GetStoppageDepartmentddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Stoppage Station</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditStoppageStation", "Stoppages")')"><i class="fa fa-plus"></i> Add New Station</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-3">
+            <div class="form-group">
+                StoppageDepartment
+                @Html.DropDownListFor(m => m.DepartmentId, new SelectList(stoppageDepartment, "DepartmentId", "DepartmentName"), "Select Department", new { @class = "form-control ddl", @Id = "Department2" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                Parameter
+                @Html.DropDownListFor(m => m.ParameterId, new SelectList(parameter, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @Id = "Parameter2" })
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="Station" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th>Station Code</th>
+                            <th>Station Name</th>
+                            <th>Department Name</th>
+                            <th>Parameter Name</th>
+                            <th>Parameter Id</th>
+                            <th>Department Id</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+
+        $(".ddl").on('change', function () {
+            var Parameter = $("#Parameter2").val();
+            var Department = $("#Department2").val();
+            getStoppageStation(Parameter, Department)
+        });
+        getStoppageStation('','')
+    });
+
+    function getStoppageStation(Parameter, Department) {
+        var Url = '/Stoppages/StoppageStationData?Parameter=' + Parameter + '&Department=' + Department;
+        $("#Station").DataTable().clear().draw();
+        $("#Station").DataTable().destroy();
+        $('#Station').DataTable({
+            "ajax": {
+                "url": Url,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "StationId", "render": function (data) {return "@if (right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditStoppageStation", "Stoppages")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "StationId" },
+                { "data": "StationCode" },
+                { "data":"StationName"},
+                { "data": "DepartmentName" },
+                { "data": "ParameterName" },
+                { "data": "ParameterId" },
+                { "data": "DepartmentId" },
+             ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    title: 'Stoppage Station',
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                    title: 'Stoppage Station',
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    title: 'Stoppage Station',
+                    extend: 'print',
+                    action: newexportaction,
+                },
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Stoppage Station',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+</script>

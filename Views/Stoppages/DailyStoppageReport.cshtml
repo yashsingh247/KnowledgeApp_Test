@@ -1,0 +1,81 @@
+﻿@model KnowledgeApp_Test.Models.Stoppages.DailyStoppageReport
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Services
+@{
+    ViewBag.Title = "DailyStoppageReport";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unit = ds.GetUnitddl();
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h2>Daily Stoppage Report</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit
+            @Html.DropDownList("UnitId", new SelectList(unit, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Stoppage Date
+           
+            @Html.TextBoxFor(m => m.Stoppagedate, new { @Class = "form-control date Tabledata" })
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div id="myChart" class="col-md-12 col-xs-12">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        
+        $('#Stoppagedate').datepicker('setDate', 'today');
+        
+       
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        
+    });
+    $(".Tabledata").on("change", function () {
+        GetData()
+    });
+
+    function GetData() {
+      
+            var Unit = $("#Unit2").val();
+            var Stoppagedate = $("#Stoppagedate").val();
+
+            $.ajax({
+                url: "@Url.Action("PartialDailyStoppageReport", "Stoppages")",
+                dataType: 'HTML',
+                data: { UnitId: Unit, StartDate: Stoppagedate },
+                asycs: false,
+                success: function (returnData) {
+                
+                    $("#myChart").html(returnData);
+
+                }
+            });
+
+            $('#myChart').show();
+        }
+        
+
+  
+</script>
+

@@ -1,0 +1,387 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.ShiftEngineerLogbook
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Shift Engineer Logbook";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<Unit> unit = DS.GetUnitddl();
+    List<Parameter> parameters = DS.GetParemeterddl();
+    List<PlantDepartment> plantDepartment = DS.PlantDepartmentddl();
+    List<PlantSubDepartment> plantSubDepartments = DS.PlantSubDepartmentddl();
+    List<Employee> employee = DS.Employeeddl();
+    List<Shift> shifts = DS.Shiftddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditShiftEngineerLogbook", "PlantData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.EngineerLogbookId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if (right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+            </div>
+
+        </div>
+
+        <!--DocumentNumber-->
+        <div class="row">
+            <div class="col-md-6">
+                <dic class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            DocumentNumber
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.HiddenFor(m => m.EngineerLogbookId, new { @Id = "bookId" })
+                            @Html.TextBoxFor(m => m.DocumentNumber, new { @Class = "form-control Code", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </dic>
+            </div>
+            <div class="col-md-6">
+                <dic class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Unit
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select", new { @class = "form-control ddl Tabledata", @required = "required" })
+                        </div>
+                    </div>
+                </dic>
+            </div>
+        </div>
+        <!--LogDate-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        LogDate
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.LogDate, new { Value = Model.LogDate.ToString("dd-MM-yyyy"), @Class = "form-control date", @required = "required" })
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Plant Department
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.PlantDepartmentId, new SelectList(plantDepartment, "PlantDepartmentId", "DepartmentName"), "Select", new { @class = "form-control ddl", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!---PlantSubDepartment-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        PlantSubDepartment
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.PlantSubDepartmentId, new SelectList(plantSubDepartments, "PlantSubDepartmentId", "SubDepartmentName"), "Select", new { @class = "form-control ddl", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Shift
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.ShiftId, new SelectList(shifts, "ShiftId", "ShiftName"), "Select", new { @class = "form-control ddl", @required = "required" })
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!--ShiftIncharge-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        ShiftIncharge
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.ShiftInchargeId, new SelectList(shifts, "ShiftId", "ShiftName"), "Select", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">ISChemist</div>
+                    <div class="col-md-1">
+
+                        @Html.CheckBoxFor(m => m.IsChemist, new { })
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <!-- SectionHead -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Section Head
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.SectionHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Department Head
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.DepartmentHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select", new { @class = "form-control ddl" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!--EntryUserId-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Entry User Id
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.EntryUserId, new { @class = "form-control Code", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">EntryDate</div>
+                    <div class="col-md-8">
+                        <div>
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.EntryDate, new { Value = Model.EntryDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                Details
+            </div>
+            <div class="col-md-10">
+                @if (Model.EngineerLogbookId != 0 && right[0].BtnAdd == true)
+                {
+                    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditShiftEngineerLogbookDetails", "PlantData")')"><i class="fa fa-plus"></i> New Shift Engineer Logbook</a>
+                }
+            </div>
+
+        </div>
+        <hr />
+        if (right[0].btnView == true)
+        {
+            <div class="row">
+                <div class="col-md-2">
+
+                </div>
+                <div class="col-md-10">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-responsive" id="logbookdetails" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th width="15%"></th>
+                                    <th>Id</th>
+                                    <th width="15%">Serial No</th>
+                                    <th width="15%">Obserbation</th>
+                                    <th width="15%">Work Done</th>
+                                    <th width="15%">Work To Be Done</th>
+                                    <th width="15%">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+
+<script type="text/javascript">
+        $(document).ready(function () {
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+            if ($("#LogDate").val() == '01-01-0001')
+            {
+                $('#LogDate').datepicker('setDate', 'today');
+            }
+            if ($("#EntryDate").val() == '01-01-0001')
+            {
+                $('#EntryDate').datepicker('setDate', 'today');
+            }
+
+            if ($("#DocumentNumber").val() == 0)
+            {
+                $("#DocumentNumber").val('');
+            }
+
+            $(".ddl").select2({
+                placeholder: "select Option ",
+                allowClear: true,
+                theme: "classic"
+            });
+            var bookId = $("#bookId").val();
+            GetlogdetailsData(bookId)
+        });
+         function GetlogdetailsData(bookId)
+        {
+             $("#logbookdetails").DataTable().clear().draw();
+             $("#logbookdetails").DataTable().destroy();
+             var Urllink = '/PlantData/ShiftEngineerLogbookDataDetails?EngineerLogbook=' + bookId;
+             $('#logbookdetails').DataTable({
+                "ajax": {
+                    "url": Urllink,
+                    "type": "post",
+                    "datatype": "json"
+                },
+                 "columns": [{
+                     "data": "DetailsId", "render": function (data) { return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditShiftEngineerLogbookDetails", "PlantData")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=DeleteDetailTable(" + data + ")><i class='fa fa-trash'></i></a>}"; },
+                 },
+                    { "data": "DetailsId" },
+                    { "data": "SerialNo" },
+                    { "data": "Observations" },
+                    { "data": "WorkDone",},
+                    { "data": "WorkToBeDone" },
+                    { "data":"Remarks"},],
+                columnDefs: [
+                    {
+                        targets: 1,
+                        className: 'noVis'
+                    }
+                ],
+                dom: 'Blfrtip',
+                buttons: ['excel', 'pdf', 'print',
+                    {
+                        extend: 'colvis',
+                        columns: ':not(.noVis)'
+                    }
+                ],
+                "serverSide": "true",
+                "order": [0, "asc"],
+                 "processing": "true",scrollX: true,scrollY: true,paging: true,
+                "language":
+                {
+                    "processing": "Processing Please Wait....."
+                }
+            });
+        }
+        function PopupForm(url) {
+            console.log(url)
+
+            var formDiv = $('<div/>');
+            $.get(url)
+                .done(function (response) {
+                    formDiv.html(response);
+                    Popup = formDiv.dialog({
+                        autoOpen: true,
+                        resizable: false,
+                        title: 'Fill Shift Engineering Log Book Details',
+                        height: 700,
+                        width: 1200,
+                        close: function () {
+                            Popup.dialog('destroy').remove();
+                        }
+
+                    });
+                });
+        }
+    function DeleteDetailTable(Id) {
+        var TableName = "ShiftEngineerLogbookDetails";
+
+
+        var URL = '/Login/DeleteDatabyId?TableName=' + TableName + '&Id=' + Id;
+        $.ajax({
+            url: URL,
+            dataType: 'HTML',
+            //data: { UserId: UserId, Unit: unitId, Role: Role },
+            //asycs: false,
+            success: function (returnData) {
+                console.log(returnData)
+                var A = []
+                A = JSON.parse(returnData)
+
+                var Status = A["hasError"];
+                var Msg = A["message"];
+                if (Status == true) {
+                    $("#DeleteMessge").append(Msg);
+                    location.reload();
+
+                }
+                else {
+                    console.log(Msg)
+                    console.log(Status)
+                    $("#DeleteMessge").append(Msg);
+                }
+            },
+
+        });
+    }
+</script>
+
+

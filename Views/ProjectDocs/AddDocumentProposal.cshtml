@@ -1,0 +1,73 @@
+﻿@model KnowledgeApp_Test.Models.ProjectDocs.DocumentProposal
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    var Id = "Document Proposal";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+
+    using (Html.BeginForm("AddDocumentProposal", "ProjectDocs", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Proposal Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.DocumentProposalId)
+                    @Html.TextBoxFor(m => m.ProposalCode, new { @class = "form-control Tint", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Proposal Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ProposalName, new { @class = "form-control", @maxlength = "40" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.DocumentProposalId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-primary">Update</button>
+                }
+
+
+            </div>
+
+        </div>
+    }
+}
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#ProposalCode").val() == 0) {
+                $("#ProposalCode").val('');
+            }
+
+        });
+    </script>

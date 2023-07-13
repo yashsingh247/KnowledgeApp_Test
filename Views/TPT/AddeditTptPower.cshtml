@@ -1,0 +1,131 @@
+﻿@model KnowledgeApp_Test.Models.TPT.TptPower
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices DS = new DropdownListSevices();
+    List<ParameterUnit> parameterUnit = DS.GetParameterUnitddl();
+    List<Parameter> parameter = DS.GetParemeterddl();
+    var Id = "Tpt Power";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+    using (Html.BeginForm("AddeditTptPower", "TPT", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Tpt Power Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.TptPowerParameterId)
+                    @Html.TextBoxFor(m => m.TptPowerCode, new { @class = "form-control", maxlength = "5", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Tpt Power Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.TptPowerName, new { @class = "form-control", @maxlength = "40" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.ParameterType, new List<SelectListItem>{
+          new SelectListItem { Text = "Assumption/Input", Value = "1", Selected=true},
+          new SelectListItem { Text = "Balance", Value = "2"},
+          new SelectListItem { Text = "Calcilation", Value = "3"}}, "Select Parameter Type", new { @Class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Formula
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Formula, new { @class = "form-control", @maxlength = "100" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Parameter Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ParameterUnitId, new SelectList(parameterUnit, "ParameterUnitId", "ParameterUnitName"), "Select Parameter Unit", new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Descriptive Formula
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DescriptiveFormula, new { @class = "form-control", @maxlength = "500" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Parameter
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ParameterId, new SelectList(parameter, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @id = "Parameter2" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.TptPowerParameterId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+
+            </div>
+
+        </div>
+    }
+}
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

@@ -1,0 +1,195 @@
+﻿@model KnowledgeApp_Test.Models.Targets.SeasonMonth
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    ViewBag.Title = "Season Month";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> Unitlist = ds.GetUnitddl();
+    List<CrushingSeason> CrushingSeason = ds.GetCrushingSeasonddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditSeasonMonth", "Targets")')"><i class="fa fa-plus"></i> New Season Month</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                Crushing Season
+                @Html.DropDownListFor(m => m.CrushingSeasonId, new SelectList(CrushingSeason, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl", @Id = "CrushingSeason2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.Unit, new SelectList(Unitlist, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @Id = "Unit2" })
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="Month" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th>Crushing Season Name</th>
+                            <th>Unit Name</th>
+                            <th>Year Number</th>
+                            <th>Month Number</th>
+                            <th>StartDate</th>
+                            <th>EndDate</th>
+                            <th>Days</th>
+                            <th>Target Days</th>
+                            <th>MonthName</th>
+                            <th>Month Serial</th>
+                            <th>Crushing Season Id</th>
+                            <th>Unit Id</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $(".ddl").select2({ placeholder: "select Option ", allowClear: true, theme: "classic" });
+        $(".ddl").on('change', function () {
+
+            var CrushingSeason = $("#CrushingSeason2").val();
+            var Unit = $("#Unit2").val();
+            GetSeasonMonthData(CrushingSeason, Unit)
+        });
+
+
+        GetSeasonMonthData("", "");
+    });
+
+    function GetSeasonMonthData(CrushingSeason, Unit) {
+        $("#Month").DataTable().clear().draw();
+        $("#Month").DataTable().destroy();
+        var Urllink = '/Targets/SeasonMonthData?CrushingSeason=' + CrushingSeason + '&Unit=' + Unit;
+
+
+        $('#Month').DataTable({
+            "ajax": {
+                "url": Urllink,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "MonthId", "render": function (data)
+                {
+                    return "@if (right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditSeasonMonth", "Targets")/" + data + "')><i class='fa fa-pencil'></i></a>}@if(right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";
+                },},
+                { "data": "MonthId" },
+                { "data": "CrushingSeasonName" },
+                { "data": "UnitName" },
+                { "data": "YearNumber",},
+                { "data": "MonthNumber" },
+                { "data": "StartDate" , 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "EndDate" , 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "Days" },
+                { "data": "TargetDays" },
+                { "data": "MonthName" },
+                { "data": "MonthSerial" },
+                { "data":"CrushingSeasonId"},
+                { "data": "UnitId" },
+
+            ],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+                 buttons: [
+                    {
+                        extend: 'pdf',
+                         orientation: 'landscape',
+                         action: newexportaction,
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6,7,8,9,10,11,12,13]
+                        }
+                    },
+                    {
+                        extend: 'excel',
+                        action: newexportaction,
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        action: newexportaction,
+                     },
+                     {
+                         extend: 'colvis',
+                         columns: ':not(.noVis)'
+                     }
+
+                ],
+
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Season Month Details',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+    </script>
+

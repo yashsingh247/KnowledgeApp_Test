@@ -1,0 +1,112 @@
+﻿@model KnowledgeApp_Test.Models.Stoppages.GroupWiseStoppageReport
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Stoppages
+@using KnowledgeApp_Test.Services
+@{
+    ViewBag.Title = "Group Wise Stoppage Report";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unit = ds.GetUnitddl();
+    List<StoppageStation> stations = ds.GetStoppageStationddl();
+    List<StoppageDepartment> department = ds.GetStoppageDepartmentddl();
+}
+<style>
+    body {
+        padding-top: 50px;
+        background-color: #34495e;
+    }
+
+
+
+    .hiddenRow {
+        padding: 0 !important;
+    }
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <h2>Group Wise Stoppage Report</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit
+            @Html.DropDownList("UnitId", new SelectList(unit, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Station
+            @Html.DropDownList("StationId", new SelectList(stations, "StationId", "StationName"), "select Station", new { @class = "form-control ddl Tabledata", @Id = "Station2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Department
+            @Html.DropDownList("DepartmentId", new SelectList(department, "DepartmentId", "DepartmentName"), "select DepartmentName", new { @class = "form-control ddl Tabledata", @Id = "Department2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Stoppage Date
+            @*<input type="date" class="form-control Tabledata" id="Stoppagedate" name="StoppageDate" value="StoppageDate.Tostring(" yyyy-MM-dd")" />*@
+            @Html.TextBoxFor(m => m.StoppageDate, new { @Class = "form-control date Tabledata" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <br />
+            @*<input type="date" class="form-control Tabledata" id="Stoppagedate2" />*@
+            @Html.TextBoxFor(m => m.StoppageDate2, new { @Class = "form-control date Tabledata" })
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div id="myChart" class="col-md-12 col-xs-12">
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        if ($("#Stoppagedate").val() == '01-01-0001') {
+            $('#Stoppagedate').datepicker('setDate', 'today');
+        }
+        if ($("#Stoppagedate2").val() == '01-01-0001') {
+            $('#Stoppagedate2').datepicker('setDate', 'today');
+        }
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+    });
+    $(".Tabledata").on("change", function () {
+        var Unit = $("#Unit2").val();
+        var Station = $("#Station2").val();
+        var Department = $("#Department2").val();
+        var Stoppagedate = $("#StoppageDate").val();
+        var Stoppagedate2 = $("#StoppageDate2").val();
+
+         $.ajax({
+                    url: "@Url.Action("PartialGroupWiseStoppageReport", "Stoppages")",
+                    dataType: 'HTML',
+             data: { UnitId: Unit, StartDate: Stoppagedate, EndDate: Stoppagedate2, StationId: Station, DepartmentId: Department},
+                    asycs: false,
+                    success: function (returnData) {
+                       
+                        $("#myChart").html(returnData);
+
+                    }
+                });
+
+        $('#myChart').show();
+
+    });
+
+</script>
+

@@ -1,0 +1,88 @@
+﻿@model KnowledgeApp_Test.Models.Report.ChemicalConsumption
+@using KnowledgeApp_Test.Services
+@*@using KnowledgeApp_Test.Models.Sugar_Molasses*@
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "ChemicalConsumptionReport";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unitlist = ds.GetUnitddl();
+    //List<SugarGodown> SugarGodansList = ds.SugarGodownddl();
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">
+            Chemical Consumption Report
+        </h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit:
+            @Html.DropDownListFor(m=>m.UnitID, new SelectList(unitlist, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Date:
+            @Html.TextBoxFor(m => m.AnalysisDate, new { @Class= "form-control date Tabledata" })
+            @*<input type="text" class="form-control date Tabledata" id="AnalysisDate">*@
+        </div>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div id="myChart" class="col-md-12 col-xs-12">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script language="javascript">
+
+    $(document).ready(function () {
+ 
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        if ($("#AnalysisDate").val() == '01-01-0001') {
+            $('#AnalysisDate').datepicker('setDate', 'today');
+        }
+
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $('.Tabledata').on("change", function () {
+            
+            var Unit = $("#Unit2").val();
+            var AnalysisDate = $("#AnalysisDate").val();
+
+            $.ajax({
+                  url: "@Url.Action("PartialChemicalConsumptionReport", "Report")",
+                    dataType: 'HTML',
+                data: { AnalysisDate: AnalysisDate, unit: Unit},
+                    asycs: false,
+                success: function (returnData) {
+                    
+                    $("#myChart").html(returnData);
+                   
+                    }
+             });
+            $('#myChart').show();
+        });
+
+    });
+    
+   
+
+</script>
+
+

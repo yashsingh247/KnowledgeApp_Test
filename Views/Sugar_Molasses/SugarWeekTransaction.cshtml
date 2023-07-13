@@ -1,0 +1,167 @@
+﻿@model KnowledgeApp_Test.Models.Sugar_Molasses.SugarWeekTransaction
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Sugar Week Transaction";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<Unit> unit = DS.GetUnitddl();
+    List<SugarGodown> sugarGodowns = DS.SugarGodownddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd)
+    {
+        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditSugarWeekTransaction", "Sugar_Molasses")')"><i class="fa fa-plus"></i> New Sugar Week Transaction</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-3">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl Tabledata", @id = "Unit2" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                Sugar Godown
+                @Html.DropDownListFor(m => m.SugarGodownId, new SelectList(sugarGodowns, "SugarGodownId", "GodownNumber"), "Select Godown", new { @class = "form-control ddl Tabledata", @id = "SugarGodown2" })
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="SugarWeekTransaction" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th width="15%">Unit Name</th>
+                            <th width="15%">Godown Number</th>
+                            <th width="15%">Transaction Week</th>
+                            <th width="5%">Iscumsa Value</th>
+                            <th width="5%">Moisture Value</th>
+                            <th width="2%">Godown Id</th>
+                            <th width="2%">Unit Id</th>
+                        </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $(".Tabledata").on('change', function () {
+            var Unit = $("#Unit2").val();
+            var SugarGodown = $("#SugarGodown2").val();
+
+            GetSugarweekData(Unit, SugarGodown)
+        });
+        GetSugarweekData('','','','');
+    });
+        function GetSugarweekData(Unit, SugarGodown) {
+            var URL = '/Sugar_Molasses/SugarWeekTransactionData?Unit=' + Unit + '&SugarGodown=' + SugarGodown;
+            $("#SugarWeekTransaction").DataTable().clear().draw();
+            $("#SugarWeekTransaction").DataTable().destroy();
+            $('#SugarWeekTransaction').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "SugarWeekTransactionId", "render": function (data) { return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditSugarWeekTransaction", "Sugar_Molasses")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>";},},
+                { "data": "SugarWeekTransactionId" },
+                { "data": "UnitUnitName" },
+                { "data": "SugarGodownGodownNumber" },
+                { "data": "TransactionWeek"},
+
+                { "data": "IcumsaValue" },
+                { "data": "MoistureValue" },
+
+                { "data": "SugarGodownId" },
+                { "data": "UnitId" },
+            ],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+                buttons: [
+                    {
+
+                        extend: 'pdf',
+                        action: newexportaction,
+                    },
+                    {
+
+                        extend: 'excel',
+                        action: newexportaction,
+                    },
+                    {
+
+                        extend: 'print',
+                        action: newexportaction,
+                    },
+                ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Sugar Day Transaction',
+                    height: 700,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+    </script>
+
+

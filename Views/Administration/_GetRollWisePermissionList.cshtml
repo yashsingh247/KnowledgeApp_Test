@@ -1,0 +1,84 @@
+﻿@model List<KnowledgeApp_Test.Models.Administration.RolePermisssionList>
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-bordered dataTable" id="Rolerights" width="100%" cellspacing="0" style="text-align:center">
+                <thead>
+                    <tr style="text-align:center">
+                        
+                        <th class="hidden"></th>
+                        <th style="text-align:center">
+                            Form Name
+                        </th>
+                       
+                        <th style="text-align:center">
+                            Add
+                        </th>
+                        <th style="text-align:center">
+                            Edit
+                        </th>
+                        <th style="text-align:center">
+                            Delete
+                        </th>
+                        <th style="text-align:center">
+                            View
+                        </th>
+                        <th style="text-align:center">
+                            Excel
+                        </th>
+                        <th>
+                            Pdf
+                        </th>
+                        <th style="text-align:center">
+                            Search
+                        </th>
+
+                        <th style="text-align:center">
+                            Notification
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        <tr id="tr_@i">
+                           
+                            <td>
+                                @Html.DisplayFor(m => m[i].FormName)
+                            </td>
+                          
+                            <td>
+                                @Html.HiddenFor(m => m[i].MenuID)
+                                @Html.HiddenFor(m => m[i].SubMenuID)
+                                @Html.DisplayFor(m => m[i].BtnAdd)
+                            </td>
+                            <td>
+                                
+                                @Html.DisplayFor(m => m[i].btnEdit)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => m[i].btnDelete)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => m[i].btnView)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => m[i].btnExportExcel)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => m[i].btnExportPdf)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => m[i].btnSearch)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(m => m[i].BtnNotification)
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

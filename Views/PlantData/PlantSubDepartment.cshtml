@@ -1,0 +1,160 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.PlantSubDepartment
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Plant Sub  Department";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<PlantDepartment> department = DS.PlantDepartmentddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditPlantSubDepartment", "PlantData")')"><i class="fa fa-plus"></i> New Plant Sub Department</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                Plant Department
+                @Html.DropDownListFor(m => m.PlantDepartmentId, new SelectList(department, "PlantDepartmentId", "DepartmentName"), "Select Department", new { @class = "form-control ddl", @id = "PlantDepartment2" })
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="SubDepartment" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>ID</th>
+                            <th>Department Name</th>
+                            <th>Old Code</th>
+                            <th>Sub Department Name</th>
+                            <th>Short Name</th>
+                            <th>Department Code</th>
+                            <th>Plant Department Id</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Option ",
+            allowClear: true,
+            theme: "classic"
+        });
+        $("#PlantDepartment2").on('change', function () {
+            var PlantDepartment = $("#PlantDepartment2").val();
+            getPlantSubDepartmentData(PlantDepartment)
+        });
+        getPlantSubDepartmentData('');
+    });
+    function getPlantSubDepartmentData(PlantDepartment) {
+
+
+        var URL = '/PlantData/PlantSubDepartmentData?PlantDepartment=' + PlantDepartment;
+
+        $("#SubDepartment").DataTable().clear().draw();
+        $("#SubDepartment").DataTable().destroy();
+
+        $('#SubDepartment').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "PlantSubDepartmentId", "render": function (data) { return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditPlantSubDepartment", "PlantData")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "PlantSubDepartmentId" },
+                { "data":"PlantDepartmentName"},
+                { "data": "OldCode" },
+                { "data":"SubDepartmentName"},
+                { "data": "ShortName" },
+                { "data": "DepartmentCode" },
+                { "data": "PlantDepartmentId" },],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Plant Sub Department',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+</script>

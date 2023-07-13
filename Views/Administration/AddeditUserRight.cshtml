@@ -1,0 +1,209 @@
+﻿@model KnowledgeApp_Test.Models.Administration.UserPermisssion
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "AddeditUserRight";
+    DropdownListSevices DS = new DropdownListSevices();
+   // List<UserRoles> user = DS.Usersddl();
+    List<Unit> unit = DS.GetUnitddl();
+    <style>
+        .scroll {
+    width: 100%;
+    height: 80%;
+    overflow: scroll;
+    }
+            .scroll::-webkit-scrollbar {
+    width: 5px;
+    }
+            .scroll::-webkit-scrollbar-thumb {
+        border-radius: 5px;
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
+    }
+
+    </style>
+}
+
+@using (Html.BeginForm("AddeditUserRight", "Administration", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Assign User Rights</h3>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label> Unit</label>
+                <br />
+                @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select User", new { @class = "form-control ddl" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                User  Name
+                <select class="form-control ddl" id="UserId" name="UserId">
+                    <option></option>
+                </select>
+
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label>Roll List</label>
+                        <br />
+                        <input id="RollList" type="checkbox" /> Roll List
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="form-group">
+                        <label>All Forms</label>
+                        <br />
+                        <input id="AllForms" type="checkbox" /> All Forms
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-2">
+            <div class="btn-group">
+                <br />
+                <button class="form-control bg-success">Save</button>
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group scroll">
+                <div id="Rolllist" class="col-md-12 col-xs-12">
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group scroll">
+                <div id="RollDetails" class="col-md-12 col-xs-12 ">
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div id="AllFormPage" class="col-md-12 col-xs-12 ">
+
+            </div>
+        </div>
+    </div>
+}
+<script>
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $("#UnitId").on("change", function () {
+            $("#UserId").empty();
+            var unitId = $("#UnitId").val();
+            var URL = "/Administration/UserName?UnitId=" + unitId;
+           
+            $.ajax({
+                url: URL,
+                dataType: 'json',
+                contentType: 'application/json',
+                success: function (data) {
+                    
+                    $.each(data, function (key, item) {
+                        var option = "<option value='" + item.UserId + "'>" + item.USerName + "</option>";
+                        $('#UserId').append(option);
+                    })
+                },
+            });
+        });
+
+
+
+        $("#Rolllist").hide();
+        $("#RollDetails").hide();
+
+
+
+        $("#RollList").on("change", function () {
+            if ($('input[id="RollList"]').is(':checked')) {
+                $("#RollDetails").show();
+            }
+            else
+            {
+                $("#RollDetails").hide();
+            }
+        });
+        $("#UserId").on("change", function ()
+        {
+            var unitId = $("#UnitId").val();
+            var RoleId = $("#UserId").val();
+            Role(RoleId, unitId)
+        });
+
+
+
+    });
+     function Allform(UserId,Role)
+     {
+         var unitId = $("#UnitId").val();
+            $.ajax({
+                  url: "@Url.Action("GetAllPageforUserpermission", "Administration")",
+                    dataType: 'HTML',
+                data: { UserId: UserId, Unit: unitId, Role: Role},
+                    asycs: false,
+                 success: function (returnData) {
+                     $("#AllFormPage").html(returnData);
+                    }
+            });
+         $("#AllForms").prop('checked', 'checked');
+         $("#AllFormPage").show();
+
+        }
+    function Role(RoleId, unitId)
+        {
+            $.ajax({
+                  url: "@Url.Action("RoleList", "Administration")",
+                    dataType: 'HTML',
+                data: { UserRoleId: RoleId, Unit: unitId },
+                    asycs: false,
+                 success: function (returnData) {
+                     $("#Rolllist").html(returnData);
+                    }
+             });
+        
+                $("#Rolllist").show();
+
+    }
+
+     function bindlist(RoleId)
+     {
+         var unitId = $("#UnitId").val();
+
+        $.ajax({
+                  url: "@Url.Action("GetRollWisePermissionList", "Administration")",
+                    dataType: 'HTML',
+            data: { RoleId: RoleId, Unit: unitId },
+                    asycs: false,
+                 success: function (returnData) {
+                     $("#RollDetails").html(returnData);
+                    }
+        });
+        $("#RollList").prop('checked', 'checked');
+        $("#RollDetails").show();
+    }
+
+
+
+</script>
+

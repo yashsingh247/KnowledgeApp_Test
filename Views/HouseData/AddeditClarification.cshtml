@@ -1,0 +1,75 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.Clarification
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.HouseData
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Clarification";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<ClarificationType> clarificationType = ds.ClarificationTypeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditClarification", "HouseData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Clarification
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.ClarificationId)
+                    @Html.DropDownListFor(m => m.ClarificationTypeId, new SelectList(clarificationType, "ClarificationTypeId", "ClarificationName"), "Select Clarifiaction", new { @class = "form-control ddl", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Clarification Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ClarificationCode, new { @class = "form-control Sint", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Clarification Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ClarificationName, new { @class = "form-control", @maxlength = "40" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.ClarificationId == 0 && right[0].BtnAdd==true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+
+                }
+
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

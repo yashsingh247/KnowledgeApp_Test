@@ -1,0 +1,205 @@
+﻿@model KnowledgeApp_Test.Models.Targets.MonthTarget
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Targets
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Month Target";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Parameter> ParameterList = ds.GetParemeterddl();
+    List<SeasonMonth> seasonMonth = ds.GetSeasonMonthddl();
+    List<CrushingSeason> crushingSeason = ds.GetCrushingSeasonddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+    List<Unit> unit = ds.GetUnitddl();
+
+}
+
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h3 style="color:#0090d9;">Month Target</h3>
+
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditMonthTarget", "Targets")')"><i class="fa fa-plus"></i> Add New Month Target </a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+
+
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                Crushing Season
+                @Html.DropDownListFor(m => m.CrushingSeason, new SelectList(crushingSeason, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl", @Id = "CrushingSeason2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.Unit, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @Id = "Unit2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Month
+                @Html.DropDownListFor(m => m.SeasonMonth, new SelectList(seasonMonth, "MonthId", "MonthName"), "Select Month", new { @class = "form-control ddl", @Id = "SeasonMonth2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Parameter
+                @Html.DropDownListFor(m => m.Parameter, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @Id = "Parameter2" })
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="MonthTarget" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="20%"></th>
+                            <th>Id</th>
+                            <th>Crushing Season Name</th>
+                            <th>Unit Name</th>
+                            <th>Month Name</th>
+                            <th width="15%">Parameter Name</th>
+                            <th>Target Value</th>
+                            <th>Actual Value</th>
+                            <th>Crushing Season Id</th>
+                            <th>Month Id</th>
+                            <th>Parameter Id</th>
+                            <th>Unit Id</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".ddl").select2({ placeholder: "select Option ", allowClear: true, theme: "classic" });
+
+        $(".ddl").on('change', function () {
+            var SeasonMonth = $("#SeasonMonth2").val();
+            var Parameter = $("#Parameter2").val();
+            var CrushingSeason = $("#CrushingSeason2").val();
+            var Unit = $("#Unit2").val();
+            GetMonthTargetData(SeasonMonth, Parameter, CrushingSeason, Unit)
+        });
+
+
+
+        GetMonthTargetData("", "", "", "");
+    });
+
+    function GetMonthTargetData(SeasonMonth, Parameter, CrushingSeason, Unit) {
+        $("#MonthTarget").DataTable().clear().draw();
+        $("#MonthTarget").DataTable().destroy();
+        var Urllink = '/Targets/MonthTargetData?SeasonMonth=' + SeasonMonth + '&Parameter=' + Parameter + '&CrushingSeason=' + CrushingSeason + '&Unit=' + Unit ;
+
+        $('#MonthTarget').DataTable({
+                "ajax": {
+                    "url": Urllink,
+                    "type": "post",
+                    "datatype": "json"
+                },
+                "columns": [{
+                    "data": "MonthTargetId", "render": function (data)
+                    {
+                        return "@if (right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditMonthTarget", "Targets")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";
+                    },},
+                    { "data": "MonthTargetId" },
+                    { "data": "CrushingSeasonName" },
+                    { "data": "UnitName" },
+                    { "data": "MonthName",},
+                    { "data": "ParameterName" },
+                    { "data":"TargetValue"},
+                    { "data": "ActualValue" },
+                    { "data": "CrushingSeasonId" },
+                    { "data": "MonthId" },
+                    { "data": "ParameterId" },
+                    { "data": "UnitId" },
+
+                ],
+                columnDefs: [
+                    {
+                        targets: 1,
+                        className: 'noVis'
+                    }
+                ],
+                dom: 'Blfrtip',
+
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                },
+                {
+
+                    extend: 'excel',
+                    action: newexportaction,
+                    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+                },
+                {
+
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+                "serverSide": "true",
+                "order": [0, "asc"],
+                 "processing": "true",scrollX: true,scrollY: true,paging: true,
+                "language":
+                {
+                    "processing": "Processing Please Wait....."
+                }
+            });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Month Target Details',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+</script>
+
+
+
+

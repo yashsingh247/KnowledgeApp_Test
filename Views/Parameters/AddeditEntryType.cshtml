@@ -1,0 +1,57 @@
+﻿@model KnowledgeApp_Test.Models.Parameters.EntryType
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Entry Type";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+    Layout = null;
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditEntryType", "Parameters", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Entry Type Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.EntryTypeId)
+                    @Html.TextBoxFor(m => m.EntryTypeName, new { @Class = "form-control", @required = "required", @maxlength = "30" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Entry Order
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.EntryOrder, new { @Class = "form-control", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.EntryTypeId == 0 && right[0].BtnAdd==true)
+
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+
+            </div>
+
+        </div>
+    }
+}

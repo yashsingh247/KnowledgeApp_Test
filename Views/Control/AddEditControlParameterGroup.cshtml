@@ -1,0 +1,55 @@
+﻿@model KnowledgeApp_Test.Models.Control.ControlParameterGroup
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Control Parameter Group";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddEditControlParameterGroup", "Control", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { onsubmit = "return SubmitForm(this)" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                @Html.HiddenFor(m => m.ParameterGroupId)
+                Control Parameter Group Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ControlParameterGroupName, new { @class = "form-control", @maxlength = 20 })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Serial Order
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.SerialOrder, new { @class = "form-control", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                @if (Model.ParameterGroupId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control btn btn-success">Save</button>
+
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control btn btn-info">Update</button>
+                }
+            </div>
+        </div>
+    }
+}

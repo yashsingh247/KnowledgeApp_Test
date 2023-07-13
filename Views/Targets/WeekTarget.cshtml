@@ -1,0 +1,172 @@
+﻿@model KnowledgeApp_Test.Models.Targets.WeekTarget
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Targets
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Week Target";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Parameter> ParameterList = ds.GetParemeterddl();
+    List<SeasonWeek> seasonWeek = ds.GetSeasonWeekddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h3 style="color:#0090d9;">Week Target</h3>
+
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddWeekTarget", "Targets")')"><i class="fa fa-plus"></i> Add New Week Target</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                Week
+                @Html.DropDownListFor(m => m.SeasonWeek, new SelectList(seasonWeek, "WeekId", "WeekName"), "Select Week", new { @class = "form-control ddl", @Id = "Week2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Parameter
+                @Html.DropDownListFor(m => m.Parameter, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @Id = "Parameter2" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="WeekTarget" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th>Week Name</th>
+                            <th>Parameter Name</th>
+                            <th>Target Value</th>
+                            <td>Actual Value</td>
+                            <td>Week Id</td>
+                            <td>Parameter Id</td>
+
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".ddl").select2({ placeholder: "select Option ", allowClear: true, theme: "classic" });
+        $(".ddl").on('change', function () {
+            var Week = $("#Week2").val();
+            var Parameter = $("#Parameter2").val();
+            GetWeekTargetkData(Week, Parameter)
+        });
+
+        GetWeekTargetkData("", "");
+    });
+
+    function GetWeekTargetkData(Week, Parameter) {
+        $("#WeekTarget").DataTable().clear().draw();
+        $("#WeekTarget").DataTable().destroy();
+        var Urllink = '/Targets/WeekTargetData?Week=' + Week + '&Parameter=' + Parameter;
+        $('#WeekTarget').DataTable({
+                "ajax": {
+                    "url": Urllink,
+                    "type": "post",
+                    "datatype": "json"
+                },
+                "columns": [{
+                    "data": "WeekTargetId", "render": function (data)
+                    {
+                        return "@if (right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddWeekTarget", "Targets")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";
+                    },},
+                    { "data": "WeekTargetId" },
+                    { "data": "WeekName" },
+                    { "data": "ParameterName" },
+                    { "data": "TargetValue",},
+                    { "data": "ActualValue" },
+                    { "data":"WeekId"},
+                    { "data": "ParameterId" },
+
+                ],
+                columnDefs: [
+                    {
+                        targets: 1,
+                        className: 'noVis'
+                    }
+                ],
+                dom: 'Blfrtip',
+            buttons: [
+                {
+                    title: 'Season Target',
+                    extend: 'pdf',
+                },
+                {
+                    title: 'Season Target',
+                    extend: 'excel',
+                },
+                {
+                    title: 'Season Target',
+                    extend: 'print',
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+
+                "serverSide": "true",
+                "order": [0, "asc"],
+                 "processing": "true",scrollX: true,scrollY: true,paging: true,
+                "language":
+                {
+                    "processing": "Processing Please Wait....."
+                }
+            });
+    }
+
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Week Target Details',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+</script>

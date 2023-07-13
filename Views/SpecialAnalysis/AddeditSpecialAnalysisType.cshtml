@@ -1,0 +1,129 @@
+﻿@model KnowledgeApp_Test.Models.SpecialAnalysis.SpecialAnalysisType
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    var Id = "Special Analysis Type";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+ @if (right[0].BtnAdd == true|| right[0].btnEdit == true)
+ {
+     using (Html.BeginForm("AddeditSpecialAnalysisType", "SpecialAnalysis", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+     {
+    <div class="row">
+        <div class="col-md-4">
+            Special Analysis Type Code
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.HiddenFor(m => m.SpecialAnalysisTypeId)
+                @Html.TextBoxFor(m => m.SpecialAnalysisTypeCode, new { @class = "form-control Tint", @required = "required", onkeypress = "javascript:return isNumber(event)" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Special Analysis Type Name
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.SpecialAnalysisTypeName, new { @class = "form-control", @maxlength = "30" })
+
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Is Periodic
+        </div>
+        <div class="col-md-1">
+            <div class="form-group">
+                @Html.CheckBoxFor(m => m.IsPeriodic, new { @class = "form-control" })
+
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Start Row Number
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.StartRowNumber, new { @class = "form-control Code", onkeypress = "javascript:return isNumber(event)" })
+
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Excel Template Name
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.ExcelTemplateName, new { @class = "form-control", @maxlength = "50" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Date Row
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.DateRow, new { @class = "form-control Code", onkeypress = "javascript:return isNumber(event)" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Date Column
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.DateColumn, new { @class = "form-control Code", onkeypress = "javascript:return isNumber(event)" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            @if (Model.SpecialAnalysisTypeId == 0 && right[0].BtnAdd == true)
+            {
+                <button class="form-control bg-success">Save</button>
+            }
+            else if(right[0].btnEdit == true)
+            {
+                <button class="form-control bg-info">Update</button>
+            }
+
+        </div>
+
+    </div>
+     }
+ }
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        if ($("#SpecialAnalysisTypeCode").val() == 0) {
+            $("#SpecialAnalysisTypeCode").val('');
+        }
+
+    });
+</script>

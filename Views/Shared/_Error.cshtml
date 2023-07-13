@@ -1,0 +1,18 @@
+﻿
+<!DOCTYPE html>
+<html>
+<head>
+
+</head>
+<body>
+    @if (ViewBag.Alert != null)
+    {
+        var message = ViewBag.Alert;
+        <div class="alert @message.CssClassName alert-dismissible fade show">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>@message.Title</strong> @message.DisplayMessage
+        </div>
+    }
+    @RenderBody()
+</body>
+</html>

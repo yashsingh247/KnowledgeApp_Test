@@ -1,0 +1,373 @@
+﻿@model KnowledgeApp_Test.Models.TPT.TptParameter
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices DS = new DropdownListSevices();
+    List<ParameterUnit> parameterUnit = DS.GetParameterUnitddl();
+    List<Parameter> parameter = DS.GetParemeterddl();
+    var Id = "Tpt Parameter";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+    using (Html.BeginForm("AddeditTptParameter", "TPT", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <!--ParameterCode-->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        ParameterCode
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.HiddenFor(m => m.TptParameterId)
+                            @Html.TextBoxFor(m => m.ParameterCode, new { @class = "form-control", @maxlength = "5", @required = "required", })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Parameter Name
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ParameterName, new { @class = "form-control", @maxlength = "40" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+
+                        IsInputParameter
+                    </div>
+                    <div class="col-md-1">
+
+                        @Html.CheckBoxFor(m => m.IsInputParameter)
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Dataatype-->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        DataType
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DataType, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        ParameterUnit
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.ParameterUnitId, new SelectList(parameterUnit, "ParameterUnitId", "ParameterUnitName"), "Select Parameter Unit", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Formula
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Formula, new { @class = "form-control", @maxlength = "100" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Parameter-->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Parameter
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.ParameterId, new SelectList(parameter, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        HighlightPositive
+                    </div>
+                    <div class="col-md-1">
+
+                        @Html.CheckBoxFor(m => m.HighlightPositive)
+
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        DeviationPercent
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DeviationPercent, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Difference Value-->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        DifferenceValue
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DifferenceValue, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        ConsolidationType
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ConsolidationType, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        ConsolidationParameterId
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ConsolidationParameterId, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--CalculationLevel-->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        CalculationLevel
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.CalculationLevel, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Precision
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Precision, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        ShowOnFinalTpt
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.ShowOnFinalTpt)
+                            @*@Html.CheckBoxFor(m => m.ShowOnFinalTpt, new { @class = "form-control" })*@
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!--ReportType-->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        ReportType
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ReportType, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        DisplayOrder
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        TpTptSerial
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.TpTptSerial, new { @class = "form-control", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Descriptive Formula-->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        DescriptiveFormula
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DescriptiveFormula, new { @class = "form-control", @maxlength = "500" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Tex Parameter
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.TexParameterId, new SelectList(parameter, "ParameterId", "ParameterName"), "Select Tex Parameter", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Wil Parameter
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.WilParameterId, new SelectList(parameter, "ParameterId", "ParameterName"), "Select Wil Parameter", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Show On Output-->
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        ShowOnOutput
+                    </div>
+                    <div class="col-md-1">
+
+                        @Html.CheckBoxFor(m => m.ShowOnOutput)
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        OutputRowNumber
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.OutputRowNumber, new { @class = "form-control Sint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        OutputSerial
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.OutputSerial, new { @class = "form-control Sint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.TptParameterId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>
+

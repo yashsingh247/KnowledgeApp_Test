@@ -1,0 +1,109 @@
+﻿@model KnowledgeApp_Test.Models.Report.MillLog
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "SugarDayTransactionReport";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unitlist = ds.GetUnitddl();
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">
+            Mill Log Report
+        </h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit:
+            @Html.DropDownList("UnitId", new SelectList(unitlist, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Date :
+            @Html.TextBoxFor(m => m.Entrydate1, new {  @Class = "form-control date Tabledata" })
+
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <br />
+            @Html.TextBoxFor(m => m.Entrydate2, new {  @Class = "form-control date Tabledata" })
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div id="myChart" class="col-md-12 col-xs-12">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script language="javascript">
+  
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        if ($("#Entrydate1").val() == '01-01-0001')
+        {
+            $('#Entrydate1').datepicker('setDate', 'today');
+        }
+        if ($("#Entrydate2").val() == '01-01-0001') {
+            $('#Entrydate2').datepicker('setDate', 'today');
+        }
+
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $('.Tabledata').on("change", function () {
+
+            var Unit = $("#Unit2").val();
+            var EntryDate = $("#Entrydate1").val();
+            var EntyryDate2 = $("#Entrydate2").val();
+            if (EntryDate == "" && EntyryDate2 != "") {
+
+                alert("Please select Date ");
+                $("#Entrydate2").val('');
+                $("#Entrydate1").focus()
+            }
+            else {
+                $.ajax({
+                    url: "@Url.Action("PartialMillLogReport", "Report")",
+                    dataType: 'HTML',
+                    data: { EntryDate: EntryDate, Entrydate2: EntyryDate2, Unit: Unit },
+                    asycs: false,
+                    success: function (returnData) {
+
+                        $("#myChart").html(returnData);
+
+                    }
+                });
+            }
+            $('#myChart').show();
+
+        });
+
+    });
+    $(function () {
+        $("#accordion").accordion({
+            heightStyle: "content"
+
+        });
+    });
+
+</script>
+
+

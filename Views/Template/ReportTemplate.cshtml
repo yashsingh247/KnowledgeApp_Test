@@ -1,0 +1,149 @@
+﻿@model KnowledgeApp_Test.Models.Template.ReportTemplate
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Template;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Report Template";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<ReportType> reportTypes = dropdownListSevices.ReportTypeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                @if (right[0].BtnAdd == true)
+                {
+                    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditReportTemplate", "Template")')"><i class="fa fa-plus"></i> New Report Template</a>
+                }
+            </div>
+        </div>
+        <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+            @Html.Raw(@ViewBag.Alert)
+        </div>
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered dataTable" id="ReportTemplate" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Id</th>
+                            <th>Report Template Name</th>
+                            <th>Print Stoppage Detail</th>
+                            <th>Season Row</th>
+                            <td>Season Column</td>
+                            <td>Crop Day Row</td>
+                            <td>Crop Day Column</td>
+                            <td>Report Type</td>
+                            <td>Column Count</td>
+                            <td>Template File Name</td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+      
+<script type="text/javascript">
+    $(document).ready(function () {
+        getReportTemplateData();
+    });
+    function getReportTemplateData() {
+        dataTable = $('#ReportTemplate').DataTable({
+            "ajax": {
+                "url": "/Template/ReportTemplateData",
+                "type": "post",
+                "datatype": "json"
+            },
+        "columns": [{
+         "data": "ReportTemplateId", "render": function (data) {
+                        return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditReportTemplate", "Template")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";
+                    },},
+         { "data": "ReportTemplateId" },
+         { "data": "ReportTemplateName" },
+         { "data": "PrintStoppageDetail",render: function (data, type, row) {if (type === 'display') {return '<input type="checkbox" class="editor-active">';} return data;},},
+         { "data":"SeasonRow"},
+         { "data": "SeasonColumn" },
+         { "data": "CropDayRow" },
+         { "data":"CropDayColumn"},
+         { "data": "ReportType" },
+         { "data": "ColumnCount" },
+         { "data": "TemplateFileName" }],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+
+            buttons: [
+                {
+                    extend: 'pdf',
+                    orientation: 'landscape',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+    }
+function PopupForm(url) {
+    console.log(url)
+    var formDiv = $('<div/>');
+    $.get(url)
+        .done(function (response) {
+            formDiv.html(response);
+            Popup = formDiv.dialog({
+                autoOpen: true,
+                resizable: false,
+                title: 'Fill Report Template Details',
+                height: 700,
+                width: 1200,
+                close: function () {
+                    Popup.dialog('destroy').remove();
+                }
+
+            });
+        });
+}
+
+
+</script>
+

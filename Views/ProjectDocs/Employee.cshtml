@@ -1,0 +1,167 @@
+﻿@model KnowledgeApp_Test.Models.ProjectDocs.Employee
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Employee";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<PlantDepartment> Employee = ds.PlantDepartmentddl();
+
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+
+
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Employee</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddEmployee", "ProjectDocs")')"><i class="fa fa-plus"></i> New Employee</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnEdit == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-3">
+            <div class="form-group">
+                PlantDepartment
+                @Html.DropDownListFor(m => m.PlantDepartmentId, new SelectList(Employee, "PlantDepartmentId", "DepartmentName"), "select Plant Department", new { @class = "form-control ddl", @id = "PlantDepartment2" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="employee" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Employee Id</th>
+                            <th width="18%">Department Name</th>
+                            <th>Employee  Code</th>
+                            <th width="18%">Employe Name</th>
+                            <th>Employee Class</th>
+                            <th>IsApprover</th>
+                            <th>Plant Department Id</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select Plant Department",
+                allowClear: true,
+                theme: "classic"
+            });
+            $("#PlantDepartment2").on('change', function () {
+                var SpecialAnalysisType = $("#PlantDepartment2").val();
+                getDocumentProposalData(SpecialAnalysisType)
+            });
+        getDocumentProposalData("");
+    });
+
+        function getDocumentProposalData(PlantDepartment) {
+
+            var URL = '/ProjectDocs/EmployeeData?PlantDepartment=' + PlantDepartment;
+            $("#employee").DataTable().clear().draw();
+            $("#employee").DataTable().destroy();
+            $('#employee').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "EmployeeId", "render": function (data) {return "@if(right[0].btnEdit==true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddEmployee", "ProjectDocs")/" + data + "')><i class='fa fa-pencil'></i></a>}@if(right[0].btnDelete==true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "EmployeeId" },
+                { "data":"PlantDepartmentDepartmentName"},
+                { "data": "EmployeeCode" },
+                { "data": "EmployeeName" },
+                { "data": "EmployeeClass" },
+                { "data": "IsApprover", render: function (data, type, row) { if (data == true) { return '<input type="checkbox" disabled="true"  checked  >'; } return '<input type="checkbox" disabled="true" readonly="true">'; }, },
+                { "data":"PlantDepartmentId"},
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    title: 'Employee',
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                    title: 'Employee',
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    title: 'Employee',
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+        }
+
+        function PopupForm(url) {
+
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Employee Details',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+    </script>

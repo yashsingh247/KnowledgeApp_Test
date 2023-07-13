@@ -1,0 +1,279 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.ClarificationHouse
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.HouseData
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Clarification House";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<ClarificationType> clarificationType = ds.ClarificationTypeddl();
+    List<Shift> shift = ds.Shiftddl();
+    List<Employee> employee = ds.Employeeddl();
+    List<Clarification> clarifications = ds.Clarificationddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditClarificationHouse", "HouseData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    @if (Model.ClarificationHouseId == 0 && right[0].BtnAdd == true)
+                    {
+                        <button class="form-control bg-success">Save</button>
+                    }
+                    else if (right[0].btnEdit == true)
+                    {
+
+                        <button class="form-control bg-info">Update</button>
+
+                    }
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                TransactionDate
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.ClarificationHouseId, new { @Id = "HouseId" })
+                    @Html.TextBoxFor(m => m.TransactionDate, new { Value = Model.TransactionDate.ToString("dd-MM-yyyy"), @class = "form-control date", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Process Head
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ProcessHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Process Head", new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Section Head
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.SectionHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Section Head", new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Shift
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ShiftId, new SelectList(shift, "ShiftId", "ShiftName"), "Select Shift", new { @class = "form-control ddl", @required = "required" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Is Chemist
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsChemist)
+
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-4">
+                Department Head
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.DepartmentHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Department Head", new { @class = "form-control ddl" })
+
+                </div>
+
+            </div>
+        </div>
+        if (Model.ClarificationHouseId != 0 && right[0].BtnAdd == true)
+        {
+            <div class="row">
+                <div class="col-md-4">
+                    Details
+                </div>
+
+                <div class="col-md-8">
+                    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditClarificationHouseDetail", "HouseData")')"><i class="fa fa-plus"></i> New Clarification House Details</a>
+
+                </div>
+            </div>
+
+
+        }
+        <hr />
+        if (right[0].btnView == true)
+        {
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        @Html.DropDownList("Clarification", new SelectList(clarifications, "ClarificationId", "ClarificationName"), "Select Clarification", new { @class = "form-control ddl", @Id = "Clarification2" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-8">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="ClarificationHoueDetails" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th width="15%"></th>
+                                    <th>Id</th>
+                                    <th>Serial No</th>
+                                    <th>Clarification Name</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        }
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        if ($("#TransactionDate").val() == '01-01-0001') {
+
+            $("#TransactionDate").val('');
+        }
+
+        var HouseId = $("#HouseId").val();
+        $("#Clarification2").on('change', function () {
+
+            var Clarification = $("#Clarification2").val();
+            getClarification(Clarification, HouseId)
+        });
+        getClarification('', HouseId)
+    });
+
+    function getClarification(Clarification, HouseId) {
+        $("#ClarificationHoueDetails").DataTable().clear().draw();
+        $("#ClarificationHoueDetails").DataTable().destroy();
+
+        var URL = '/HouseData/ClarificationHouseDetailData?Clrification=' + Clarification + '&HouseId=' + HouseId;
+        $('#ClarificationHoueDetails').DataTable({
+            "ajax": {
+                "url":URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [
+                { "data": "ClarificationHouseDetailID", "render": function (data) {return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditClarificationHouseDetail", "HouseData")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>"; },},
+                { "data": "ClarificationHouseDetailID" },
+                { "data": "SerialNo" },
+                { "data": "ClarificationName" },
+                { "data": "ClarificationValue" },],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+            buttons: ['excel', 'pdf', 'print'],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Clarification Details',
+                    height: 700,
+                    width: 1000,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+    function DeleteDetailTable(Id) {
+        var TableName = "ClarificationHouseDetails";
+        var URL = '/Login/DeleteDatabyId?TableName=' + TableName + '&Id=' + Id;
+        $.ajax({
+            url: URL,
+            dataType: 'HTML',
+            //data: { UserId: UserId, Unit: unitId, Role: Role },
+            //asycs: false,
+            success: function (returnData) {
+                console.log(returnData)
+                var A = []
+                A = JSON.parse(returnData)
+
+                var Status = A["hasError"];
+                var Msg = A["message"];
+                if (Status == true) {
+                    $("#DeleteMessge").append(Msg);
+                    location.reload();
+
+                }
+                else {
+                    console.log(Msg)
+                    console.log(Status)
+                    $("#DeleteMessge").append(Msg);
+                }
+            },
+
+        });
+    }
+
+</script>

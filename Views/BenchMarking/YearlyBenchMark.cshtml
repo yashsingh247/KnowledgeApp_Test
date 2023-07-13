@@ -1,0 +1,158 @@
+﻿@model KnowledgeApp_Test.Models.BenchMarking.YearlyBenchMark
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.BenchMarking
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Yearly Bench Mark";
+}
+@{
+    DropdownListSevices ds = new DropdownListSevices();
+    List<BenchMarkParameter> BMP = ds.GetBenchMarkParameterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Yearly Bench Mark</h3>
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditYearlyBenchMarkParameter", "BenchMarking")')"><i class="fa fa-plus"></i> Add New Yearly Bench Mark Parameter</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-3">
+            <div class="form-group">
+                Benchc Mark Parameter
+                @Html.DropDownListFor(m => m.BenchMarkParameterId, new SelectList(BMP, "BenchMarkParameterId", "BenchMarkName"), "Select Parameter", new { @class = "form-control ddl", @ID = "BenchMarkParameter2" })
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="YearBench" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th> BenchMark Parameter Id</th>
+                            <th> BenchMark Code</th>
+                            <th> BenchMark Parameter Name</th>
+                            <th> Year Serial</th>
+                            <th> Applicable Year</th>
+                            <th> Applicable Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+<script type="text/javascript">
+             $(document).ready(function ()
+             {
+                 $(".ddl").select2({
+                     placeholder: "select ",allowClear: true,theme: "classic"
+                 });
+                 $("#BenchMarkParameter2").on('change', function() {
+                     var BenchMarkParameter = $("#BenchMarkParameter2").val();
+                     GetYEarlyBenchData(BenchMarkParameter)
+                });
+                 GetYEarlyBenchData()
+             });
+    function GetYEarlyBenchData(BenchMarkParameter) {
+        $("#YearBench").DataTable().clear().draw();
+        $("#YearBench").DataTable().destroy();
+        var URL = "/BenchMarking/YearlyBenchMarkData?BenchMark=" + BenchMarkParameter;
+        console.log(URL)
+        dataTable = $('#YearBench').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "Post",
+                "datatype": "json"
+            },
+             "columns": [
+                 { "data": "YearlyBenchMarkId", "render": function (data) {return "@if (right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditYearlyBenchMarkParameter", "BenchMarking")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}"; },},
+                 { "data": "YearlyBenchMarkId" },
+                 { "data": "BenchMarkCode" },
+                 { "data": "BenchMarkParameterName" },
+                 { "data": "YearSerial" },
+                 { "data": "ApplicableYear" },
+                 { "data": "ApplicableValue"},],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                    columns: [0, 1, 2, 3, 4, 5, 6]
+                },
+                {
+
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'New Yearly Bench Mark Parameter',
+                    height: 300,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+</script>
+

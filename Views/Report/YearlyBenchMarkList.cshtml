@@ -1,0 +1,135 @@
+﻿@model IEnumerable<KnowledgeApp_Test.Models.Report.YearlyBenchMark>
+@using KnowledgeApp_Test.Services
+@*@using KnowledgeApp_Test.Models.Sugar_Molasses*@
+@using KnowledgeApp_Test.Models.BenchMarking
+@{
+    ViewBag.Title = "ClarificationHouseReport";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<BenchMarkParameter> unitlist = ds.GetBenchMarkParameterddl();
+    //List<SugarGodown> SugarGodansList = ds.SugarGodownddl();
+}
+<style>
+    body {
+        padding-top: 50px;
+        background-color: #34495e;
+    }
+
+    .hiddenRow {
+        padding: 0 !important;
+    }
+</style>
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">
+            Bench Mark List
+        </h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Year Number:
+
+            <input type="number" class="form-control Tabledata" value="@unitlist" id="AnalysisDate">
+        </div>
+    </div>
+
+</div>
+
+<div id="accordion">
+    @{
+        foreach (var item in Model.Select(a => a.SerialNumber).Distinct())
+        {
+            <h3>Date: @item</h3>
+            <div>
+                <table class="table table-bordered Report " id="ParemetertypeReport" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <td>S.N.</td>
+                            <td>Bench Mark Code</td>
+                            <td>Bench Mark Name</td>
+                            <td>Applicable Year</td>
+                            <th>Applicable Value</th>
+
+</thead>
+
+                    <tbody>
+                        @foreach (var i in Model.Where(a => a.SerialNumber.Equals(@item)))
+                        {
+                        <tr>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => i.SerialNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => i.BenchMarkCode)
+                            </td>
+
+                            <td>@Html.DisplayFor(modelItem => i.BenchMarkName) </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => i.ApplicableYear)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => i.ApplicableValue)
+                            </td>
+
+                        </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    }
+</div>
+
+<script language="javascript">
+    ;
+    $(document).ready(function () {
+        ;
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $('.Tabledata').on("change", function () {
+            
+            var AnalysisDate = $("#AnalysisDate").val();
+            ;
+            var Url = 'YearlyBenchMarkList?AnalysisDate=' + AnalysisDate;
+            console.log(AnalysisDate)
+            console.log(Url)
+            window.location.href = Url;
+        });
+
+    });
+    $(document).ready(function () {
+        $('.Report').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                'excel', 'pdf', 'print'
+            ]
+        });
+    });
+    $(function () {
+        $("#accordion").accordion({
+            heightStyle: "content"
+
+        });
+    });
+
+</script>
+
+

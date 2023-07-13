@@ -1,0 +1,265 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.ShiftEngineerLogbook
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    ViewBag.Title = "Shift Engineer Logbook";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<Unit> unit = DS.GetUnitddl();
+    List<Parameter> parameters = DS.GetParemeterddl();
+    List<PlantDepartment> plantDepartment = DS.PlantDepartmentddl();
+    List<PlantSubDepartment> plantSubDepartments = DS.PlantSubDepartmentddl();
+    List<Employee> employee = DS.Employeeddl();
+    List<Shift> shifts = DS.Shiftddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Shift Engineer Logbook</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditShiftEngineerLogbook", "PlantData")')"><i class="fa fa-plus"></i> New Shift Engineer Logbook</a>
+    }
+    <hr />
+
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.Unit, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl TableData", @Id = "Unit2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                LogDate
+                @Html.TextBoxFor(m => m.LogDate, new { @class = "form-control date TableData", @id = "LogDate2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <br />
+                @Html.TextBoxFor(m => m.LogDate, new { @class = "form-control date TableData", @id = "LogDate3" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                PlantDepartment
+                @Html.DropDownListFor(m => m.PlantDepartmentId, new SelectList(plantDepartment, "PlantDepartmentId", "DepartmentName"), "Select Department", new { @class = "form-control ddl TableData", @id = "PlantDepartment2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                PlantSubDepartment
+                @Html.DropDownListFor(m => m.PlantSubDepartmentId, new SelectList(plantSubDepartments, "PlantSubDepartmentId", "SubDepartmentName"), "Select Sub Department", new { @class = "form-control ddl TableData", @Id = "PlantSubDepartment2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Shift
+                @Html.DropDownListFor(m => m.Shift, new SelectList(shifts, "ShiftId", "ShiftName"), "Select Shift", new { @class = "form-control ddl TableData", @id = "Shift2" })
+            </div>
+        </div>
+    </div>
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                SectionHead
+                @Html.DropDownListFor(m => m.SectionHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Section Head", new { @class = "form-control ddl TableData", @id = "SectionHead2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Department
+                @Html.DropDownListFor(m => m.DepartmentHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Department Head id", new { @class = "form-control ddl TableData", @id = "DepartmentHead2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Shift Incharge
+                @Html.DropDownListFor(m => m.ShiftInchargeId, new SelectList(shifts, "ShiftId", "ShiftName"), "Select Shift Incgharge", new { @class = "form-control ddl TableData", @id = "ShiftIncharge2" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="logbook" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th>Document Number</th>
+                            <th>LogDate</th>
+                            <th>Plant Department Name</th>
+                            <th>Plant Sub Department Name</th>
+                            <th>Shift Name</th>
+                            <th>Is Chemist</th>
+                            <th>Section Head Code</th>
+                            <th>Department Head Code</th>
+                            <th>Entry User Id</th>
+                            <th>Entry Date</th>
+                            <th>Plant Department Id</th>
+                            <th>Plant Sub Department Id</th>
+                            <th>Section Head Id</th>
+                            <th>Department Head Id</th>
+                            <th>Shift Id</th>
+                            <th>Shift Incharge Id</th>
+                            <th>Unit Id</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "select Option ",
+            allowClear: true,
+            theme: "classic"
+        });
+
+        $(".TableData").on('change', function ()
+        {
+            var ShiftIncharge = $("#ShiftIncharge2").val();
+            var DepartmentHead = $("#DepartmentHead2").val();
+            var LogDate3 = $("#LogDate3").val();
+            var PlantDepartment = $("#PlantDepartment2").val();
+            var PlantSubDepartment = $("#PlantSubDepartment2").val();
+            var SectionHead = $("#SectionHead2").val();
+            var LogDate2 = $("#LogDate2").val();
+            var Shift = $("#Shift2").val();
+            var Unit = $("#Unit2").val();
+
+            geShiftEngineerLogbookData(Unit, Shift, LogDate2, LogDate3, PlantDepartment, PlantSubDepartment, ShiftIncharge, SectionHead, DepartmentHead)
+        });
+        geShiftEngineerLogbookData('','','','','','','','','')
+    });
+
+    function geShiftEngineerLogbookData(Unit, Shift, LogDate2, LogDate3, PlantDepartment, PlantSubDepartment, ShiftIncharge, SectionHead, DepartmentHead) {
+        $("#logbook").DataTable().clear().draw();
+        $("#logbook").DataTable().destroy();
+        var Urllink = '/PlantData/ShiftEngineerLogbookData?Unit=' + Unit + '&Shift=' + Shift + '&LogDate2=' + LogDate2 + '&LogDate3=' + LogDate3 + '&PlantDepartment=' + PlantDepartment + '&PlantSubDepartment=' + PlantSubDepartment + '&ShiftIncharge=' + ShiftIncharge + '&SectionHead=' + SectionHead + '&DepartmentHead=' + DepartmentHead;
+
+
+        $('#logbook').DataTable({
+            "ajax": {
+                "url": Urllink,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{ "data": "EngineerLogbookId", "render": function (data) { return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditShiftEngineerLogbook", "PlantData")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}"; }, },
+            { "data": "EngineerLogbookId" },
+            { "data": "DocumentNumber" },
+                { "data": "LogDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+            { "data": "PlantDepartmentDepartmentName" },
+            { "data": "PlantSubDepartmentSubDepartmentName" },
+            { "data": "ShiftShiftName" },
+                { "data": "IsChemist", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+            { "data": "SectionHeadEmployeeCode" },
+            { "data":"DepartmentHeadEmployeeCode"},
+            { "data": "EntryUserId" },
+                { "data": "EntryDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+            { "data": "PlantDepartmentId" },
+            { "data": "PlantSubDepartmentId" },
+            { "data": "SectionHeadId" },
+            { "data": "DepartmentHeadId" },
+            { "data": "ShiftId" },
+            { "data": "ShiftInchargeId" },
+            { "data": "UnitId" }
+
+            ],
+
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    title: 'Shift Engineer Logbook',
+                    orientation: 'landscape',
+                    pageSize: 'LEGAL',
+                    extend: 'pdf',
+                    
+                    //exportOptions: {
+                    //    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+                    //},
+                    action: newexportaction
+                },
+                {
+                    title: 'Shift Engineer Logbook',
+                    extend: 'excel',
+                    //exportOptions: {
+                    //    columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+                    //},
+                    action: newexportaction
+                },
+                {
+                    title: 'Shift Engineer Logbook',
+                    extend: 'print',
+                    action: newexportaction,
+                },
+
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+
+        function PopupForm(url) {
+            console.log(url)
+
+            var formDiv = $('<div/>');
+            $.get(url)
+                .done(function (response) {
+                    formDiv.html(response);
+                    Popup = formDiv.dialog({
+                        autoOpen: true,
+                        resizable: false,
+                        title: 'Fill Shift Engineering Log Book',
+                        height: 700,
+                        width: 1200,
+                        close: function () {
+                            Popup.dialog('destroy').remove();
+                        }
+
+                    });
+                });
+        }
+
+</script>

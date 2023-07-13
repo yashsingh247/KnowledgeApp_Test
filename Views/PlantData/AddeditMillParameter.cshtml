@@ -1,0 +1,111 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.MillParameter
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Pan";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+    using (Html.BeginForm("AddeditMillParameter", "PlantData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Mill Parameter Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.MillParameterId)
+                    @Html.TextBoxFor(m => m.MillParameterCode, new { @class = "form-control Sint", @required = "required", onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Mill Parameter Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.MillParameterName, new { @class = "form-control", @maxlength = "40" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Flag
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Flag, new { @class = "form-control Tint", onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Is Applicable For Wil
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsApplicableForWil, new { @class = "form-control" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Is Two Hourly
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsTwoHourly, new { @class = "form-control" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                ShortName
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ShortName, new { @class = "form-control", @maxlength = "40" })
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.MillParameterId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#MillParameterCode").val() == 0) {
+                $("#MillParameterCode").val('');
+            }
+
+        });
+    </script>

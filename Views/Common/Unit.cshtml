@@ -1,0 +1,168 @@
+﻿@model KnowledgeApp_Test.Models.Common.Unit
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models;
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    ViewBag.Title = "Unit";
+
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Company> CompanyList = dropdownListSevices.GetCompanyddl();
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditUnit", "Common")')"><i class="fa fa-plus"></i> Add New Unit</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-3">
+            <div class="form-group">
+                Company:
+                @Html.DropDownListFor(m => m.Company, new SelectList(CompanyList, "CompanyId", "CompanyName"), "Select Company", new { @class = "form-control ddl" })
+
+            </div>
+        </div>
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="Unit" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="20%"></th>
+                            <th>UnitId</th>
+                            <th>Unit Name</th>
+                            <th>Company Name</th>
+                            <th>Address Line 1</th>
+                            <th>Address Line 2</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+    }
+}
+    <script type="text/javascript">
+    var Popup, dataTable;
+    $(document).ready(function () {
+
+        GetUnitData();
+        $(".ddl").select2({
+            placeholder: "select Company",
+            allowClear: true,
+            theme: "classic"
+        });
+
+        $("#Company").on("change", function () {
+
+            var company = $("#Company").val();
+
+            GetUnitData(company);
+        });
+
+    });
+    function GetUnitData(company) {
+        var Urllink = "/Common/UnitData?Company=" + company;
+
+        $("#Unit").DataTable().clear().draw();
+        $("#Unit").DataTable().destroy();
+        $('#Unit').DataTable({
+            "ajax": {
+                url: Urllink,
+                type: "post",
+                datatype: "json",
+
+            },
+
+            "columns": [{
+                "data": "UnitId", "render": function (data)
+                {
+                        return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditUnit", "Common")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";
+                },
+            },
+                { "data": "UnitId" },
+                { "data": "UnitName" },
+                { "data": "CompanyName" },
+                { "data": "AddressLine1" },
+                { "data": "AddressLine2" },],
+
+            "serverSide": "true",
+            "order": [0, "asc"],
+
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Unit Details',
+                    height: 300,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+    </script>
+
+

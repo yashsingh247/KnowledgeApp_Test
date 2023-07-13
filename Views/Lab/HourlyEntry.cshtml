@@ -1,0 +1,207 @@
+﻿@model List<KnowledgeApp_Test.Models.Parameters.ParameterTypeModel>
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Lab
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = TempData["Name"]; ;
+}
+@{
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    LabService labService = new LabService();
+    List<Unit> unit = dropdownListSevices.GetUnitddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">Hourly Entry - @ViewBag.Name</h3>
+    </div>
+</div>
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Custom Tabs -->
+
+            <div class="panel">
+
+                <div class="panel-body">
+                    <div class="col-sm-1 ">
+                        <button type="submit" id="btnParametertab" onclick='return SaveParaHourValue()' class="form-control btn btn-success">Save</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <input type="text" id="EntryDate" onchange="return getAllParaHourValue()" class="form-control date" />
+                    </div>
+                    <div class="col-sm-2 ">
+                        @*@Html.DropDownList("StudentGender", new SelectList(Hour, "HourValue", "UnitName"), "Select Unit", new { @class = "form-control ddl", onchange = "return getAllParaHourValue()", @id = "EntryHour" })*@
+                        <select class="form-control ddl" onchange='return getAllParaHourValue()' id="EntryHour">
+                            <option value="0">Select Hour</option>
+                            @for (int i = 1; i < 25; i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-sm-2 ">
+                        @Html.DropDownList("Unit", new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", onchange = "return getAllParaHourValue()", @id = "Unit" })
+                    </div>
+                </div>
+                <div class="nav-tabs-custom">
+                    <ul class="nav nav-tabs">
+                        @if (Model != null)
+                        {
+                            foreach (var ptype in Model)
+                            {
+                                <li class="@ptype.TabClass"><a href="#@ptype.ParameterTypeID" data-toggle="tab">@ptype.ParameterTypeName</a></li>
+                            }
+                        }
+
+
+
+                        @*<li class="pull-right"><a href="ParameterList" class="text-muted"><i class="fa fa-gear"></i></a></li>*@
+                    </ul>
+                    <div class="tab-content">
+                        @if (Model != null)
+                        {
+                            foreach (var ptype in Model)
+                            {
+                                <div class="@ptype.TabPaneClass" id="@ptype.ParameterTypeID">
+                                    <div class="box-header with-border">
+                                        <h3 class="box-title">@ptype.ParameterTypeName</h3>
+                                        <div id="divPara" class="col-sm-12 box-body">
+                                            @Html.Raw(ptype.tablehtml)
+                                        </div>
+                                    </div>
+
+                                </div><!-- /.tab-pane -->
+                            }
+                        }
+
+                    </div><!-- /.tab-content -->
+                </div><!-- nav-tabs-custom -->
+            </div><!-- /.col -->
+        </div>
+    </div>
+}
+    <script>
+        $(document).ready(function () {
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+            $(".ddl").select2({
+                allowClear: true,
+                theme: "classic"
+            });
+
+        });
+
+        function SaveParaHourValue() {
+
+            if ($('#Unit').val() != 0 && $("#EntryHour").val() != 0) {
+
+                var mainArr = [];
+                console.log($('#Unit').val());
+                $(".table tr .columnName").each(function () {
+                    if ($(this).find(".parametervalueclass").val() != "") {
+                        mainArr.push({
+                            EntryDate: $("#EntryDate").val(),
+                            EntryHour: $("#EntryHour").val(),
+                            UnitId: $("#Unit").val(),
+                            ParameterID: $(this).find(".parameterid").val(),
+                            HourValue: $(this).find(".parametervalueclass").val(),
+
+                        });
+
+
+                    }
+                });
+
+                console.log(mainArr);
+
+                //var URL = "/Lab/SaveParameterHourValue/jsonData?";
+                //console.log(URL)
+                var s = '';
+                $.ajax({
+                    type: "POST",
+                    url: "/Lab/SaveAllHaourEntry",
+                    dataType: "Json",
+                    //console.log(URL),
+                    data: { jsonData: mainArr },
+
+                    success: function (result) {
+                        s = result;
+                        console.log(s);
+
+                        location.reload();
+                    },
+                    error: function (result) {
+
+                        alert('Error Occured!!');
+                    }
+                });
+
+
+            }
+            else {
+                alert('Select Unit and Hour');
+                return false;
+            }
+        }
+
+
+
+        function getAllParaHourValue() {
+            $('.parametervalueclass').val('');
+            var EntryDate = $("#EntryDate").val()
+            var EntryHour = $("#EntryHour").val()
+            var UnitId = $("#Unit").val()
+            console.log(UnitId, EntryHour, EntryHour)
+            if (UnitId != "" && UnitId != 0 && EntryHour != "" && EntryHour != 0 && EntryDate != "" && EntryDate != 0) {
+                var URL = "/Lab/AllParameterHourValue?EntryDate=" + EntryDate + "&EntryHour=" + EntryHour + "&UnitId=" + UnitId;
+                console.log(URL);
+                $.ajax({
+                    type: "POST",
+                    url: URL,
+                    dataType: "Json",
+                    function(data) {
+                        $.each(result, function (key, item) {
+                            console.log(result)
+                            $(".table tr .columnName").each(function () {
+                                if ($(this).find(".parameterid").val() == item.ParameterID) {
+                                    $(this).find(".parametervalueclass").val(item.HourValue);
+                                }
+                            })
+                        })
+                    },
+
+                })
+            }
+            else {
+                alert('Select Unit And  Entry Date And EntryDate');
+            }
+        }
+
+
+
+        $(".parametervalueclass").bind('keypress', function (e) {
+            if ($('#Unit').val() == 0) {
+                alert('Select Unit');
+                return false;
+            }
+            var code;
+            if (e.keycode) code = e.keycode;
+            else if (e.which) code = e.which;
+            if (e.which == 46)
+                return true;
+            if (code > 57)
+                return false;
+        });
+
+    </script>
+
+

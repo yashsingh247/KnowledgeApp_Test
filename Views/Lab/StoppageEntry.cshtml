@@ -1,0 +1,146 @@
+﻿@model List<KnowledgeApp_Test.Models.Parameters.ParameterTypeModel>
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Common;
+@{
+    ViewBag.Title = "StoppageEntry";
+}
+@{
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Unit> Unitlist = dropdownListSevices.GetUnitddl();
+}
+<div class="row">
+    <div class="col-md-12">
+        <!-- Custom Tabs -->
+        <div class="panel">
+            <div class="panel-body">
+                <div class="col-sm-1 ">
+                    <button type="submit" id="btnParametertab" onclick='return SaveStoppageParaValue()'>Save</button>
+                </div>
+                <div class="col-sm-3">
+                    <input type="text" id="EntryDate" onchange="return getAllParaDayValue()" class="form-control date" />
+                </div>
+
+                <div class="col-sm-2 ">
+                    @Html.DropDownList("Unit", new SelectList(Unitlist, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @id = "Unit" })
+                    @*<select class="form-control" id="Unit">
+            <option value="0">--Select Unit--</option>
+        </select>*@
+                </div>
+
+            </div>
+        </div>
+        <div class="nav-tabs-custom">
+            <ul class="nav nav-tabs">
+                @foreach (var ptype in Model)
+                {
+                    <li class="@ptype.TabClass"><a href="#@ptype.ParameterTypeID" data-toggle="tab">@ptype.ParameterTypeName</a></li>
+                }
+            </ul>
+            <div class="tab-content">
+                @foreach (var ptype in Model)
+                {
+                    <div class="@ptype.TabPaneClass" id="@ptype.ParameterTypeID">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">@ptype.ParameterTypeName</h3>
+                            <div id="divPara" class="col-sm-12 box-body">
+                                @Html.Raw(ptype.tablehtml)
+                            </div>
+                        </div>
+
+                    </div><!-- /.tab-pane -->
+                }
+            </div><!-- /.tab-content -->
+        </div><!-- nav-tabs-custom -->
+    </div><!-- /.col -->
+</div>
+<script>
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "select Unit",
+            allowClear: true,
+            theme: "classic"
+        });
+    });
+
+    function SaveStoppageParaValue() {
+        if ($('#Unit').val() != 0) {
+            var mainArr = [];
+            $(".table tr .columnName").each(function () {
+                if ($(this).find(".parametervalueclass").val() != "") {
+                    mainArr.push({
+                        EntryDate: $("#EntryDate").val(),
+                        UnitId: $("#Unit").val(),
+                        ParameterID: $(this).find(".parameterid").val(),
+                        ParameterValue: $(this).find(".parametervalueclass").val(),
+                    });
+                }
+            });
+            var URL
+
+            console.log(mainArr);
+            var s = '';
+            $.ajax({
+                type: "POST",
+                url: "/Lab/SaveAllDailyEntry",
+                dataType: "Json",
+                data: { jsonData: mainArr },
+                success: function (result) {
+                    s = result;
+                    alert(s);
+                    location.reload();
+                },
+                error: function (result) {
+                    alert('Error Occured!!');
+                }
+            });
+        }
+        else {
+            alert('Select Unit and Hour');
+            return false;
+        }
+    }
+
+    
+
+    function getAllParaDayValue() {
+        $('.parametervalueclass').val('');
+        var EntryDate = $("#EntryDate").val();
+        var UnitId = $("#Unit").val();
+        var URL = "/Lab/AllParameterDailyValue?EntryDate=" + EntryDate + "&UnitId=" + UnitId;
+        $.ajax({
+            type: "POST",
+            url: URL,
+            dataType: "Json",
+            data: (obj),
+            success: function (result) {
+                $.each(result, function (key, item) {
+                    $(".table tr .columnName").each(function () {
+                        if ($(this).find(".parameterid").val() == item.ParameterID) {
+                            $(this).find(".parametervalueclass").val(item.DayValue);
+                        }
+                    })
+                })
+            },
+            error: function (result) {
+                alert('Error Occured!!');
+            }
+        })
+    }
+
+    $(".parametervalueclass").bind('keypress', function (e) {
+        if ($('#Unit').val() == 0) {
+            alert('Select Unit');
+            return false;
+        }
+        var code;
+        if (e.keycode) code = e.keycode;
+        else if (e.which) code = e.which;
+        if (e.which == 46)
+            return true;
+        if (code > 57)
+            return false;
+    });
+
+</script>
+

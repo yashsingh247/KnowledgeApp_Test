@@ -1,0 +1,112 @@
+﻿@model KnowledgeApp_Test.Models.Parameters.DateWiseStockParameter
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "DateWiseStockParameter";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unitlist = ds.GetUnitddl();
+    List<Parameter> parameterlist = ds.GetParemeterddl();
+    List<ParameterType> parameterType = ds.GetParemeterTypeddl();
+
+}
+<style>
+    body {
+        padding-top: 50px;
+        background-color: #34495e;
+    }
+
+
+
+    .hiddenRow {
+        padding: 0 !important;
+    }
+</style>
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">Date Wise Stock Parameter</h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+    <div class="col-md-2">
+        <div class="form-group">
+            ParameterType
+            @Html.DropDownListFor(m=>m.ParameterTypeId, new SelectList(parameterType, "ParameterTypeId", "ParameterTypeName"), "select Parameter Type", new { @class = "form-control ddl Tabledata", @Id = "ParameterType2" })
+
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Parameter
+            @Html.DropDownListFor(m=>m.ParameterId, new SelectList(parameterlist, "ParameterId", "ParameterName"), "select Parameter", new { @class = "form-control ddl Tabledata", @Id = "Parameter2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit
+            @Html.DropDownListFor(m=>m.UnitId, new SelectList(unitlist, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            EntryDate:
+            <input type="text" class="form-control date Tabledata" id="entrydate">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <br />
+            <input type="text" class="form-control date Tabledata" id="entrydate2">
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div id="myChart"></div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $('#entrydate').datepicker('setDate', 'today');
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+           $('.Tabledata').on("change", function () {
+        
+        var Unit = $("#Unit2").val();
+        var ParameterType = $("#ParameterType2").val();
+        var Parameter = $("#Parameter2").val();
+        var EntryDate = $("#entrydate").val();
+        var EntyryDate2 = $("#entrydate2").val();
+        $.ajax({
+            url: "@Url.Action("PartialDateWiseStockParameter", "Parameters")",
+            type: 'POST',
+            dataType: 'HTML',
+            data: { Entrydate: EntryDate, Entrydate2: EntyryDate2, unit: Unit, parametertype: ParameterType, parameter: Parameter },
+            asycs: false,
+            success: function (returnData) {
+                $("#myChart").html(returnData);
+                // alert(msApp)
+
+            }
+        });
+        $('#myChart').show();
+    });
+
+
+
+    });
+
+</script>
+
+
+
+
+
+
+

@@ -1,0 +1,95 @@
+﻿@model KnowledgeApp_Test.Models.Stoppages.GroupWiseStoppageReport
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Stoppages
+@using KnowledgeApp_Test.Services
+@{
+    ViewBag.Title = "Station Wise Stoppage Report";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unit = ds.GetUnitddl();
+    List<StoppageStation> stations = ds.GetStoppageStationddl();
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h2>StationWiseStoppageReport</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit
+            @Html.DropDownList("UnitId", new SelectList(unit, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Station
+            @Html.DropDownList("StationId", new SelectList(stations, "StationId", "StationName"), "select Station", new { @class = "form-control ddl Tabledata", @Id = "Station2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Stoppage Date
+            <input type="text" class="form-control date" id="Stoppagedate">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <br />
+            <input type="text" class="form-control date" id="Stoppagedate2">
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div id="myChart" class="col-md-12 col-xs-12">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        if ($("#Stoppagedate").val() == '01-01-0001') {
+            $('#Stoppagedate').datepicker('setDate', 'today');
+        }
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+    });
+    $(".Tabledata").on("change", function () {
+        var Unit = $("#Unit2").val();
+        var Station = $("#Station2").val();
+        var Stoppagedate = $("#Stoppagedate").val();
+        var Stoppagedate2 = $("#Stoppagedate2").val();
+        if (Stoppagedate == "" && Stoppagedate2 != "" ) {
+
+            alert("Please select Date ");
+            $("#Stoppagedate2").val('');
+            $("#Stoppagedate").focus()
+
+        }
+        else {
+
+            $.ajax({
+                url: "@Url.Action("PartialStationWiseStoppageReport", "Stoppages")",
+                dataType: 'HTML',
+                data: { UnitId: Unit, StartDate: Stoppagedate, EndDate: Stoppagedate2, StationId: Station },
+                asycs: false,
+                success: function (returnData) {
+                   
+                    $("#myChart").html(returnData);
+
+                }
+            });
+        }
+        $('#myChart').show();
+    
+    });
+  
+</script>

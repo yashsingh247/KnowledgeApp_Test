@@ -1,0 +1,82 @@
+﻿@model KnowledgeApp_Test.Models.Stoppages.StoppageDepartment
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Stoppage Department";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Parameter> parameter = ds.GetParemeterddl();
+    GeneralServices GS = new GeneralServices();
+    
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true|| right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditStoppageDepertment", "Stoppages", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Department Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.DepartmentId)
+                    @Html.TextBoxFor(m => m.DepartmentCode, new { @class = "form-control", @maxlength = "2" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Department Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DepartmentName, new { @class = "form-control", @maxlength = "4", @required = "required" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Parameter
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ParameterId, new SelectList(parameter, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl " })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.DepartmentId == 0 && right[0].BtnAdd == true)
+                {<button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select Unit",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

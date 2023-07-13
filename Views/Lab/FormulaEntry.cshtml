@@ -1,0 +1,248 @@
+﻿@model KnowledgeApp_Test.Models.Lab.FormulaEntry
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Parameters;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "FormulaEntry";
+}
+@{
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    ParameterServices parameterServices = new ParameterServices();
+    List<Parameter> ParameterList = parameterServices.Parameter("");
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+
+}
+@if (right.Count == 0 || right == null)
+{
+     Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("FormulaEntry", "Lab", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="col-md-7" style="background:white;margin:15px;padding-top:10px;">
+            <div class="col-md-12">
+                <div class="col-sm-5">Day/ToDate </div>
+                <div class="col-sm-5">
+                    @Html.DropDownListFor(m => m.FormulaType, new List<SelectListItem>{
+        new SelectListItem{ Text="Day", Value = "1" },
+        new SelectListItem{ Text="ToDate", Value = "2" },
+        }, new { @id = "FormulaType", onchange = "return getFormula()", @class = "form-control ddl" })
+                   
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-sm-5">Parameter</div>
+                <div class="col-sm-5">
+                    @Html.DropDownListFor(m => m.ParameterID, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl tabledata", @Id = "Parameter", onchange = "return getFormula()" })
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-sm-5">Existing Formula</div>
+                <div class="col-sm-5">
+                    <input id="ExistingFormula" readonly />
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-sm-5">Parameter</div>
+                <div class="col-sm-5">
+                    @*<input id="NewParameter" />*@
+                    @Html.DropDownListFor(m => m.Parameter, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl tabledata", @id = "NewParameter" })
+                </div>
+                <div class="col-sm-2">
+                    
+                    <a class="glyphicon glyphicon-plus" id="AddPara" style="margin-bottom:10px" onclick="table"></a>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-sm-5">Numeral</div>
+                <div class="col-sm-5">
+                    <input id="Numeral" />
+                </div>
+                <div class="col-sm-2">
+                    <a class="glyphicon glyphicon-plus" id="AddNumeral" style="margin-bottom:10px"></a>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-sm-5">Operator</div>
+                <div class="col-sm-5">
+                    <select class="form-control ddl" id="Operator">
+                        <option value="0">--Select Operator--</option>
+                        <option value="1">(</option>
+                        <option value="2">)</option>
+                        <option value="3">+</option>
+                        <option value="4">-</option>
+                        <option value="5">*</option>
+                        <option value="6">/</option>
+                    </select>
+                </div>
+                <div class="col-sm-2">
+                    <a class="glyphicon glyphicon-plus" id="AddOperator" style="margin-bottom:10px"></a>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-sm-3">Formula Details</div>
+                <div class="col-sm-4">
+                    <table id="LeftTable" style="min-height:50px; min-width:111px; border:1px solid;margin-left:112px;"></table>
+                </div>
+                <div class="col-sm-4" style="border:1px;">
+                    <table id="RightTable" style="min-height:50px; min-width:140px; border:1px solid;"></table>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-sm-4">Modified Formula</div>
+                <div class="col-sm-4">
+                    @Html.TextAreaFor(m => m.ModifiedFormula, new { @id = "ModifiedFormula", style = "margin-left:54px;" })
+                </div>
+            </div>
+
+            <div class="col-md-12" style="">
+                <div class="col-sm-4">
+                    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+                        @Html.Raw(@ViewBag.Alert)
+                    </div>
+                </div>
+
+                <div class="col-sm-5" style="align-items:center;">
+                    @if (right[0].BtnAdd == true)
+                    {
+                    <button class="btn-success" type="submit" id="btnParametertab">Save</button>
+                    }
+                </div>
+                <div class="col-sm-4"></div>
+            </div>
+
+        </div>
+    }
+}
+    <script>
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select ",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+        function getFormula() {
+
+            $('#LeftTable').html(null);
+            $('.parametervalueclass').val('');
+
+            var FormulaType = $('#FormulaType option:selected').val();
+            var ParameterId = $("#Parameter").val();
+            console.log(ParameterId)
+            var URL = "/Lab/ParameterFormulaData?FormulaType=" + FormulaType + "&ParameterId=" + ParameterId;
+            $.ajax({
+                type: "POST",
+                url: URL,
+                dataType: "Json",
+                success: function (result) {
+                    console.log(URL),
+                        console.log(result)
+                    console.log($("#Parameter").val())
+                    $("#ExistingFormula").val(result[0].Formula);
+                    $("#ModifiedFormula").val(result[0].Formula);
+
+                    var formulastring = result[0].Formula;
+                    var Operators = ['+', '-', '*', '/', '(', ')'];
+                    for (var i = 0; i < Operators.length; i++) {
+                        var rg = new RegExp("\\" + Operators[i], "g");
+                        formulastring = formulastring.replace(rg, " " + Operators[i] + " ");
+                    }
+                    //var Para = formulastring.split(/[\*+-/()]/);
+                    var Para = formulastring.split(" ");
+                    for (var i = 0; i < Para.length; i++) {
+                        $("#LeftTable").append("<tr><td>" + Para[i] + "</td></tr>");
+                        $("#RightTable").append("<tr><td>" + Para[i] + "</td></tr>");
+                    }
+                },
+                error: function (result) {
+                    alert('Error Occured!!');
+                }
+            })
+        }
+
+        $(document).ready(function () {
+            var oldValue;
+            var newValue;
+            var Operators = ['+', '-', '*', '/', '(', ')'];
+            $("#AddPara").click(function () {
+                //if ($("#LeftTable tr:last").val() = Operators) {
+                //    alert("Choose Numral Value");
+                //    console.log($("#LeftTable tr:last").val());
+                //}
+                $("#LeftTable").append("<tr><td>" + 'P' + $('#NewParameter').val() + "</td></tr>");
+                var obj = {
+                    ParameterCode: $("#NewParameter").val(),
+                }
+                $.ajax({
+                    type: "GET",
+                    url: "Parameter",
+                    dataType: "Json",
+                    data: (obj),
+                    success: function (result) {
+                        $("#RightTable").append("<tr><td>" + result[0].ParameterName + "</td></tr>");
+                    },
+                    error: function (result) {
+                        alert('Error Occured!!');
+                    }
+                })
+                oldValue = $("#ModifiedFormula").val();
+                newValue = $('#NewParameter').val();
+                $("#ModifiedFormula").val((oldValue) + ('P' + newValue));
+                $('#NewParameter').val(null);
+            });
+            $("#AddNumeral").click(function () {
+                $("#LeftTable").append("<tr><td>" + $('#Numeral').val() + "</td></tr>");
+                $("#RightTable").append("<tr><td>" + $('#Numeral').val() + "</td></tr>");
+                oldValue = $("#ModifiedFormula").val();
+                newValue = $('#Numeral').val();
+                $("#ModifiedFormula").val(oldValue + newValue);
+                $('#Numeral').val(null);
+            });
+            $("#AddOperator").click(function () {
+                $("#LeftTable").append("<tr><td>" + $('#Operator option:selected').text() + "</td></tr>");
+                $("#RightTable").append("<tr><td>" + $('#Operator option:selected').text() + "</td></tr>");
+                oldValue = $("#ModifiedFormula").val();
+                newValue = $('#Operator option:selected').text();
+                $("#ModifiedFormula").val(oldValue + newValue);
+                $('#Operator option:selected').text("--Select Operator--");
+            });
+        })
+
+        function SaveFormula() {
+            if ($('#Parameter').val() != 0) {
+                var mainArr = [];
+                mainArr.push({
+                    FormulaType: $('#FormulaType option:selected').val(),
+                    ParameterCode: $("#Parameter option:selected").val(),
+                    Formula: $("#ModifiedFormula").val(),
+                });
+                console.log(mainArr)
+                var URL = '/Lab/SaveFormula?jsonData=' + mainArr;
+                var s = '';
+                $.ajax({
+                    type: "POST",
+                    url: "/Lab/SaveFormula",
+                    dataType: "Json",
+
+                    //data: { jsonData: mainArr },
+                    success: function (result) {
+                        s = result;
+                        alert(s);
+                        location.reload();
+                    },
+                    error: function (result) {
+                        console.log(result)
+                        alert('Error Occured!!');
+                    }
+                });
+            }
+            else {
+                alert('Select Parameter');
+                return false;
+            }
+        }
+
+    </script>

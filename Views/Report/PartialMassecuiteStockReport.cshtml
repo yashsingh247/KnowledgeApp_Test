@@ -1,0 +1,84 @@
+﻿@model IEnumerable<KnowledgeApp_Test.Models.Report.MassecuiteStock>
+
+<div id="accordion">
+    @{
+        foreach (var item in Model.Select(a => a.UnitUnitName).Distinct())
+        {
+            <h3>Unit Id : @item</h3>
+            <div>
+                <table class="table table-bordered Report" id="ParemetertypeReport" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+
+                            <th>Unit </th>
+                            <th>Shift Name </th>
+                            <th>Massecuite</th>
+                            <th>Received From Pre Shift</th>
+                            <th>Drop</th>
+                            <th>Cured</th>
+                            <th>Balance</th>
+
+                    </thead>
+
+                    <tbody>
+                        @foreach (var i in Model.Where(a => a.UnitUnitName.Equals(@item)))
+                        {
+                            <tr>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.UnitUnitName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.ShiftName)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => i.MASSECUITE) </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.SHIFT_RCV)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.DROPP)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => i.CURED)</td>
+
+                                <td>@Html.DisplayFor(modelItem => i.BALANCE)</td>
+
+
+                            </tr>
+
+                        }
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    }
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.Report').DataTable({
+
+            dom: 'Bfrtip',
+            buttons: [
+                'excel', 'pdf', 'print'
+            ]
+        });
+    });
+    $(function () {
+        $("#accordion").accordion({
+            heightStyle: "content"
+
+        });
+    });
+</script>

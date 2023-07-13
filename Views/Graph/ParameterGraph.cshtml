@@ -1,0 +1,89 @@
+﻿@model KnowledgeApp_Test.Models.Graph.ParameterGraph
+
+@{
+    ViewBag.Title = "ParameterGraph";
+
+}
+@{
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+}
+
+<div class="row">
+    <section class="col-lg-12 connectedSortable">
+        <div class="box box-solid bg-teal-gradient">
+            <div class="box-header">
+                <i class="fa fa-th"></i>
+                <h3 class="box-title">Parameter Graph</h3>
+                <div class="box-tools pull-right">
+                    <button class="btn bg-teal btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+                    <button class="btn bg-teal btn-sm" data-widget="remove"><i class="fa fa-times"></i></button>
+                </div>
+            </div>
+            <div class="box-body border-radius-none">
+                <div class="chart" id="ParameterGraph" style="height:400px">
+                    <partial name="_ParameterGraph" model="@ViewBag.BarChart" />
+                </div>
+            </div><!-- /.box-body -->
+        </div>
+    </section>
+</div>
+
+<script>
+ window.onload = function ()
+    {
+    var result = @Html.Raw(ViewBag.DataPoints);
+     var dataPoints = [];
+     for (var i = 0; i < result.length; i++)
+     {
+         dataPoints.push({ x: new Date(result[i].EntryDateFrom), y: parseFloat(result[i].DayValue) });
+
+     }
+
+    var chart = new CanvasJS.Chart("chartContainer", {
+    animationEnabled: true,
+    title: {
+        text: "Unit Wise Recovery",
+
+    },
+    data: [
+        {
+            xValueFormatString: "DD/MM/YYYY",
+            yValueFormatString: "####",
+            showInLegend: true,
+            type: "spline",
+            name: "Rupapur",
+            dataPoints: dataPoints,
+        },
+        {
+            xValueFormatString: "DD/MM/YYYY",
+            yValueFormatString: "#,##0.0\"%\"",
+            showInLegend: true,
+            type: "spline",
+            name: "Ajbapur",
+            dataPoints: dataPoints1,
+        },
+        {
+            xValueFormatString: "DD/MM/YYYY",
+            yValueFormatString: "#,##0.0\"%\"",
+            showInLegend: true,
+            type: "spline",
+            name: "Hariawan",
+            dataPoints: dataPoints2,
+        },
+        {
+            xValueFormatString: "DD/MM/YYYY",
+            yValueFormatString: "#,##0.0\"%\"",
+            showInLegend: true,
+            type: "spline",
+            name: "Loni",
+            dataPoints: dataPoints3,
+        }
+    ]
+});
+chart.render();
+
+};
+</script>
+
+
+

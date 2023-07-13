@@ -1,0 +1,167 @@
+﻿@model KnowledgeApp_Test.Models.SpecialAnalysis.SpecialAnalysisParameter
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.SpecialAnalysis
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<SpecialAnalysisType> SpecialAnalysisType = ds.GetSpecialAnalysisTypeddl();
+    var Id = "Special Analysis Parameter";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditSpecialAnalysisParameter", "SpecialAnalysis", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Special Analysis Parameter Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.SpecialAnalysisParameterId)
+                    @Html.TextBoxFor(m => m.SpecialAnalysisParameterCode, new { @class = "form-control", @Required = "required", @maxlength = "5" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Special Analysis Parameter Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.SpecialAnalysisParameterName, new { @class = "form-control", @maxlength = "50" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Special Analysis Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.SpecialAnalysisParameterId, new SelectList(SpecialAnalysisType, "SpecialAnalysisTypeId", "SpecialAnalysisTypeName"), "Special Analysis Type", new { @class = "form-control ddl" })
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Is Input
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsInput, new { @class = "form-control" })
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Formula
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Formula, new { @class = "form-control", @maxlength = "500" })
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                DataType
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DataType, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Short Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ShortName, new { @class = "form-control", @maxlength = "20" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Descriptive Formula
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DescriptiveFormula, new { @class = "form-control", @maxlength = "500" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Row Number
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.RowNumber, new { @class = "form-control Code", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Column Number
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ColumnNumber, new { @class = "form-control Code", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Calculation Level
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.CalculationLevel, new { @class = "form-control Code", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div><div class="row">
+            <div class="col-md-2">
+                @if (Model.SpecialAnalysisParameterId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Unit",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

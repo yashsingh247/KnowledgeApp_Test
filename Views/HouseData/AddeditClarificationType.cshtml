@@ -1,0 +1,79 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.ClarificationType
+@using KnowledgeApp_Test.Models.Administration
+@using KnowledgeApp_Test.Services
+@{
+    Layout = null;
+    ViewBag.Title = "Clarification Type";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditClarificationType", "HouseData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+    <div class="row">
+        <div class="col-md-4">
+            Clarification Type Code
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.HiddenFor(m => m.ClarificationTypeId)
+                @Html.TextBoxFor(m => m.ClarificationTypeCode, new { @class = "form-control Tint", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Clarification Name
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+
+                @Html.TextBoxFor(m => m.ClarificationName, new { @class = "form-control", @Maxlength = "40" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Clarification Nature
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.ClarificationNature, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            @if (Model.ClarificationTypeId == 0 && right[0].BtnAdd==true)
+            {
+                <button class="form-control bg-success">Save</button>
+            }
+            else if(right[0].btnEdit == true)
+            {
+                <button class="form-control bg-info">Update</button>
+            }
+
+
+        </div>
+
+    </div>
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        if ($("#ClarificationTypeCode").val() == 0) {
+            $("#ClarificationTypeCode").val('');
+        }
+    });
+</script>

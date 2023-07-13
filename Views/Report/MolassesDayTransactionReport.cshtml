@@ -1,0 +1,131 @@
+﻿@model IEnumerable<KnowledgeApp_Test.Models.Report.MolassesDayTransaction>
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "MolassesDayTransactionReport";
+    //DropdownListSevices ds = new DropdownListSevices();
+    //List<Unit> unitlist = ds.GetUnitddl();
+    //List<SugarGodown> SugarGodansList = ds.SugarGodownddl();
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">Molasses Day Transaction Report</h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+
+    <div class="col-md-2">
+        <div class="form-group">
+            EntryDate:
+            <input type="date" class="form-control Tabledata" id="entrydate">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <br />
+            <input type="date" class="form-control Tabledata" id="entrydate2">
+        </div>
+    </div>
+</div>
+
+<div id="accordion">
+    @{
+        foreach (var item in Model.Select(a => a.TankNumber).Distinct())
+        {
+            <h3>Unit Id : @item</h3>
+            <div>
+                <table class="table table-bordered Report" id="ParemetertypeReport" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Tank Number </th>
+                            <th>Transaction Date</th>
+                            <th>Production</th>
+                            <th>Shifting In</th>
+                            <th>TotalIn</th>
+                            <th>Sales</th>
+                            <th>Shifting Out</th>
+                            <th>TotalOut</th>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.Where(a => a.TankNumber.Equals(@item)))
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.TankNumber)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.TransactionDate)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => i.Production)</td>
+                                <td>@Html.DisplayFor(modelItem => i.TotalIn)</td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.ShiftingIN)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => i.Sales)</td>
+                                <td>@Html.DisplayFor(modelItem => i.ShiftingOut)</td>
+                                <td>@Html.DisplayFor(modelItem => i.TotalOut)</td>
+
+                            </tr>
+
+                        }
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    }
+</div>
+
+<script language="javascript">
+    
+    $(document).ready(function () {
+        
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $('.Tabledata').on("change", function () {
+            
+            var EntryDate = $("#entrydate").val();
+            var EntyryDate2 = $("#entrydate2").val();
+            
+            var Url = 'MolassesDayTransactionReport?entrydate=' + EntryDate + '&entrydate2=' + EntyryDate2;
+            console.log(EntryDate, EntyryDate2)
+            console.log(Url)
+            window.location.href = Url;
+        });
+
+    });
+    $(document).ready(function () {
+        $('.Report').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                'excel', 'pdf', 'print'
+            ]
+        });
+    });
+    $(function () {
+        $("#accordion").accordion({
+            heightStyle: "content"
+
+        });
+    });
+
+</script>

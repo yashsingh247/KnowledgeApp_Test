@@ -1,0 +1,58 @@
+﻿@model IEnumerable<KnowledgeApp_Test.Models.Administration.RolePermisssion>
+<li class="nav-item">
+    @{
+        var menulist = Model.Select(s => new { s.MenuId, s.MenuName }).Distinct().ToList();
+        foreach (var item in menulist)
+
+        {
+            if (@item.MenuId != 0)//Condition Applied For Set DashBoard
+            {
+                <a class="nav-link collapsed " href="javascript:void(0)" data-toggle="collapse" data-target="#collapseUtilities_@item.MenuId"
+                   aria-expanded="true" aria-controls="collapseUtilities">
+                    <span>@item.MenuName</span>
+                </a>
+
+                <div id="collapseUtilities_@item.MenuId" class="collapse" aria-labelledby="headingUtilities"
+                     data-parent="#accordionSidebar">
+                    <div class="py-2 collapse-inner rounded" style="background-color: #8aa4af; ">
+                        @{
+                            var SubValue = Model.Where(n => n.MenuId == item.MenuId).Select(s => new { s.MenuId, s.SubMenuId, s.SubMenuName }).Distinct().ToList();
+                            foreach (var SubMenu in SubValue)
+                            {
+                                if (SubMenu.SubMenuId == 0)
+                                {
+                                    var ChildValue = Model.Where(n => n.MenuId == item.MenuId && n.SubMenuId == SubMenu.SubMenuId).Select(s => new { s.FormId, s.FormName, s.URL }).Distinct().ToList();
+                                    foreach (var childMenu in ChildValue)
+                                    {
+                                        <a class="collapse-item" href="/@childMenu.URL"><i class="nav-icon fa fa-circle-o"></i><span>@childMenu.FormName</span></a>
+                                    }
+                                }
+                                else
+                                {
+                                    <a class="nav-link collapsed" href="javascript:void(0)" data-toggle="collapse"
+                                       data-target="#collapseStoppageReport_@SubMenu.SubMenuId" aria-expanded="true" aria-controls="collapsePages">
+                                        <i class="nav-icon fa fa-circle-o"></i> <span>@SubMenu.SubMenuName</span>
+                                    </a>
+                                    <div id="collapseStoppageReport_@SubMenu.SubMenuId" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar_@SubMenu.SubMenuId">
+                                        <div class="py-2 collapse-inner rounded" style="background-color: #8aa4af;">
+                                            @{
+
+                                                var ChildValue = Model.Where(n => n.MenuId == item.MenuId && n.SubMenuId == SubMenu.SubMenuId).Select(s => new { s.FormId, s.FormName, s.URL }).Distinct().ToList();
+                                                foreach (var childMenu in ChildValue)
+                                                {
+                                                    <a class="collapse-item" href="/@childMenu.URL"><i class="nav-icon fa fa-circle-o"></i><span>@childMenu.FormName</span></a>
+
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                }
+
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        }
+    }
+</li>

@@ -1,0 +1,198 @@
+﻿@model KnowledgeApp_Test.Models.TPT.TptRevision
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Tpt Revision";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<CrushingSeason> crushingSeason = ds.GetCrushingSeasonddl();
+    List<Unit> unit = ds.GetUnitddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h3 style="color:#0090d9;">Tpt Revision</h3>
+
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditTptRevision", "TPT")')"><i class="fa fa-plus"></i> Add Tpt Revision</a>
+    }
+        <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+            @Html.Raw(@ViewBag.Alert)
+        </div>
+    if (right[0].btnView == true)
+    {
+        <div class="row" style="background-color: #f0f3f5">
+            <div class="col-md-3">
+                <div class="form-group">
+                    Unit
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl Tabledata", @id = "Unit2" })
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="form-group">
+                    CreationDate
+                    @Html.TextBoxFor(m => m.CreationDate, new { @class = "form-control Tabledata date", @Id = "CreationDate2" })
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    CreationDate
+                    @Html.TextBoxFor(m => m.CreationDate, new { @class = "form-control Tabledata date", @Id = "CreationDate3" })
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    CrushingSeason
+                    @Html.DropDownListFor(m => m.CrushingSeasonId, new SelectList(crushingSeason, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl Tabledata", @id = "CrushingSeason2" })
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="tptPower" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th width="35%"></th>
+                                <th>Id</th>
+                                <th width="10%">Unit Name</th>
+                                <th width="10%">Revision Name</th>
+                                <th>Revision Code</th>
+                                <th>Creation Date</th>
+                                <th width="10%">Season Start Date</th>
+                                <th>Crushing Season Name</th>
+                                <th width="10%">Season End Date</th>
+                                <th>Season Days</th>
+                                <th>Crushing Season Id</th>
+                                <th>Unit Id</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".date").datepicker({ dateFormat: 'dd-mm-yy' });
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+
+        $(".Tabledata").on('change', function () {
+            var CreationDate2 = $("#CreationDate2").val();
+            var Unit = $("#Unit2").val();
+            var CreationDate3 = $("#CreationDate3").val();
+            var CrushingSeason = $("#CrushingSeason2").val();
+            getTptPowerData(Unit, CreationDate2, CreationDate3, CrushingSeason)
+        });
+
+        getTptPowerData('', '', '', '')
+    });
+
+    function getTptPowerData(Unit, CreationDate2, CreationDate3, CrushingSeason) {
+        var URL = '/TPT/TptRevisionData?Unit=' + Unit + '&CreationDate2=' + CreationDate2+ '&CreationDate3=' + CreationDate3 + '&CrushingSeason=' + CrushingSeason;
+        $("#tptPower").DataTable().clear().draw();
+        $("#tptPower").DataTable().destroy();
+        $('#tptPower').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "RevisionId", "render": function (data) { return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditTptRevision", "TPT")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "RevisionId" },
+                { "data": "UnitUnitName" },
+                { "data": "RevisionName" },
+                { "data": "RevisionCode" },
+                { "data": "CreationDate" ,'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "SeasonStartDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "CrushingSeasonCrushingSeasonName" },
+                { "data": "SeasonEndDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "SeasonDays" },
+                { "data": "CrushingSeasonId" },
+                { "data": "UnitId" },],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'print',
+                    action: newexportaction,
+                },
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Tpt Revisison',
+                    height: 700,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+</script>
+

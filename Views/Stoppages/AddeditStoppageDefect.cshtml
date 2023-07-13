@@ -1,0 +1,75 @@
+﻿@model KnowledgeApp_Test.Models.Stoppages.StoppageDefect
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Stoppages
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<StoppageSparesProcess> processes = ds.GetStoppageSparesProcessddl();
+    var Id = "Stoppage Defect";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditStoppageDefect", "Stoppages", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Spares Process
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.DefectId)
+                    @Html.DropDownListFor(m => m.SpareProcessId, new SelectList(processes, "SpareProcessId", "SpareProcessName"), "Select SpareProcess", new { @class = "form-control ddl" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Defect Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DefectCode, new { @class = "form-control", @maxlength = "5" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Defect Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DefectName, new { @class = "form-control", @required = "required", @maxlength = "40" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.DefectId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

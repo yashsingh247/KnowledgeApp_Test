@@ -1,0 +1,293 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.PanPosition
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Pan Position";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<Unit> unit = DS.GetUnitddl();
+    List<Employee> employee = DS.Employeeddl();
+    List<Shift> shift = DS.Shiftddl();
+    List<Pan> pan = DS.Panddl();
+    var SId = ViewBag.SpecialAnalysis;
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddreditPanPosition", "PlantData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.PanPositionId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+            </div>
+        </div>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-4">
+                Analysis Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.PanPositionId, new { @Id = "PanPositionId" })
+                    @Html.TextBoxFor(m => m.AnalysisDate, new { @Value = Model.AnalysisDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Shift
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ShiftId, new SelectList(shift, "ShiftId", "ShiftName"), "Select Shift", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Process Head
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.ProcessHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Process Head", new { @class = "form-control ddl" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Section Head
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.SectionHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Section Head", new { @class = "form-control ddl" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Department Head
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.DepartmentHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Department Head", new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        if (right[0].btnView == true)
+        {
+            <div class="row">
+
+                <div class="col-md-4">
+                    Details
+                </div>
+                <div class="col-md-8">
+                    @if (Model.PanPositionId != 0 && right[0].BtnAdd == true)
+                    {
+                        <div class="row">
+                            <div class="col-md-4">
+                                <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddreditPanPositionDetails", "PlantData")')"><i class="fa fa-plus"></i> New Pan Postion Details</a>
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                </div>
+                <div class="col-md-10">
+                    <div class="row">
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                Pan
+                                @Html.DropDownListFor(m => m.Pan, new SelectList(pan, "PanId", "PanName"), "Select Pan", new { @class = "form-control ddl ", @id = "PanId2" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col-md-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="Details" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th width="15%">Id</th>
+                                            <th width="5%">Serial Number</th>
+                                            <th width="15%">Pan Name</th>
+                                            <th width="15%">PanValue</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            }
+        }
+
+    }
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        if ($("#AnalysisDate").val() == '01-01-0001') {
+
+            $("#AnalysisDate").val('');
+        }
+
+        $(".ddl").select2({
+            placeholder: "select Option ",
+            allowClear: true,
+            theme: "classic"
+        });
+        $("#PanId2").on('change', function () {
+            var Pan = $("#PanId2").val();
+            var PanPostion = $("#PanPositionId2").val();
+            getPanPositionDetalData(PanPostion,Pan)
+        });
+        getPanPositionDetalData('','')
+    });
+    function getPanPositionDetalData(PanPostion, Pan)
+        {
+
+        var URL = '/PlantData/PanPositionDetailData?PanPosition=' + PanPostion + '&Pan=' + Pan ;
+            $("#Details").DataTable().clear().draw();
+            $("#Details").DataTable().destroy();
+            $('#Details').DataTable({
+                "ajax": {
+                    "url": URL,
+                    "type": "post",
+                    "datatype": "json"
+                },
+                "columns": [{
+                    "data": "PanPositionDetailID", "render": function (data) { return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddreditPanPositionDetails", "PlantData")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=DeleteDetailTable(" + data + ")><i class='fa fa-trash'></i></a>";},},
+                    { "data": "PanPositionDetailID" },
+                    { "data": "SerialNumber" },
+                    { "data": "PanName" },
+                    { "data": "PanValue" },
+                ],
+                columnDefs: [
+                    {
+                        targets: 1,
+                        className: 'noVis'
+                    }
+                ],
+                dom: 'Blfrtip',
+                buttons: [
+                    {
+                        extend: 'pdf',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'excel',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'print',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'colvis',
+                        columns: ':not(.noVis)'
+                    }
+                ],
+                "serverSide": "true",
+                "order": [0, "asc"],
+                 "processing": "true",scrollX: true,scrollY: true,paging: true,
+                "language":
+                {
+                    "processing": "Processing Please Wait....."
+                }
+            });
+        }
+    function PopupForm(url) {
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Pan Position Details',
+                    height: 700,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+        }
+    function DeleteDetailTable(Id)
+    {
+        var TableName ="PanPositionDetail";
+       
+
+        var URL = '/Login/DeleteDatabyId?TableName=' + TableName + '&Id=' + Id;
+        $.ajax({
+            url: URL,
+            dataType: 'HTML',
+            //data: { UserId: UserId, Unit: unitId, Role: Role },
+            //asycs: false,
+            success: function (returnData) {
+                console.log(returnData)
+                var A=[]
+                A = JSON.parse(returnData)
+
+                var Status = A["hasError"];
+                var Msg = A["message"];
+                if (Status == true) {
+                    $("#DeleteMessge").append(Msg);
+                    location.reload();
+
+                }
+                else
+                {
+                    console.log(Msg)
+                    console.log(Status)
+                    $("#DeleteMessge").append(Msg);
+                }
+            },
+
+        });
+    }
+
+</script>
+
+
+
+

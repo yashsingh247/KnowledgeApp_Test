@@ -1,0 +1,105 @@
+﻿@model KnowledgeApp_Test.Models.Sugar_Molasses.SugarWeekTransaction
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices DS = new DropdownListSevices();
+    List<Unit> unit = DS.GetUnitddl();
+    List<SugarGodown> sugarGodowns = DS.SugarGodownddl();
+    var Id = " Sugar Week Transaction";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+    using (Html.BeginForm("AddeditSugarWeekTransaction", "Sugar_Molasses", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Sugar Godown
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.SugarWeekTransactionId)
+                    @Html.DropDownListFor(m => m.SugarGodownId, new SelectList(sugarGodowns, "SugarGodownId", "GodownNumber"), "Select Godown", new { @class = "form-control ddl Tabledata", @id = "SugarGodown2", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl Tabledata", @id = "Unit2", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Transaction Week
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.TransactionWeek, new { @class = "form-control Code", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Icumsa Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.IcumsaValue, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Moisture Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.MoistureValue, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.SugarWeekTransactionId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#TransactionWeek").val() == 0) {
+                $("#TransactionWeek").val('');
+            }
+        });
+    </script>

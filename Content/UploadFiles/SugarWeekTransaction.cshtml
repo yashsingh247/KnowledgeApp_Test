@@ -1,0 +1,229 @@
+﻿@model KnowledgeApp_Test.Models.Sugar_Molasses.SugarWeekTransaction
+@{
+    ViewBag.Title = "SugarWeekTransaction";
+}
+
+
+@using (Html.BeginForm("SugarWeekTransaction", "Sugar_Molasses", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+{
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h3 style="color:#0090d9;">Sugar Week Transaction</h3>
+
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-group navbar-search">
+                <div class="input-group">
+                    <input type="text" class="form-control bg-light border-0 small" placeholder="Search for..."
+                           aria-label="Search" aria-describedby="basic-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button">
+                            <i class="fa fa-search fa-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="Col-md-2">
+            <div class="form-group">
+                <button type="button" class="form-control" style="background-color: #E59866;color:black;" data-toggle="modal" data-target="#myModal"><i class="fa fa-plus" style="color:green"></i>  <span> New Sugar Trasnsaction</span></button>
+                @*<button class="form-control" style="background-color: #E59866;color:black;" data-toggle="modal" data-target="#myModal"><i class="fa fa-plus" style="color:green"></i> <span> Add New Company</span></button>*@
+            </div>
+            <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <hr />
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    Sugar Godown
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        @Html.DropDownListFor(model => model.SugarGodown, new List<SelectListItem>
+                                  {
+                                      new SelectListItem { Text = "ASP.NET MVC", Value = "1" },
+                                      new SelectListItem { Text = "ASP.NET WEB API", Value = "2" },
+                                      new SelectListItem { Text = "ENTITY FRAMEWORK", Value = "3" },
+                                      new SelectListItem { Text = "DOCUSIGN", Value = "4" },
+                                      new SelectListItem { Text = "ORCHARD CMS", Value = "5" },
+                                      new SelectListItem { Text = "JQUERY", Value = "6" },
+                                      new SelectListItem { Text = "ZENDESK", Value = "7" },
+                                      new SelectListItem { Text = "LINQ", Value = "8" },
+                                      new SelectListItem { Text = "C#", Value = "9" },
+                                      new SelectListItem { Text = "GOOGLE ANALYTICS", Value = "10" }},
+                                      new { @class = "form-control" })
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    Unit
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        @Html.DropDownListFor(model => model.Unit, new List<SelectListItem>
+                                  {
+                                      new SelectListItem { Text = "ASP.NET MVC", Value = "1" },
+                                      new SelectListItem { Text = "ASP.NET WEB API", Value = "2" },
+                                      new SelectListItem { Text = "ENTITY FRAMEWORK", Value = "3" },
+                                      new SelectListItem { Text = "DOCUSIGN", Value = "4" },
+                                      new SelectListItem { Text = "ORCHARD CMS", Value = "5" },
+                                      new SelectListItem { Text = "JQUERY", Value = "6" },
+                                      new SelectListItem { Text = "ZENDESK", Value = "7" },
+                                      new SelectListItem { Text = "LINQ", Value = "8" },
+                                      new SelectListItem { Text = "C#", Value = "9" },
+                                      new SelectListItem { Text = "GOOGLE ANALYTICS", Value = "10" }},
+                                      new { @class = "form-control" })
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    Transaction Week
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.TransactionWeek, new { @class = "form-control" })
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    Icumsa Value
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.IcumsaValue, new { @class = "form-control" })
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    Moisture Value
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        @Html.TextBoxFor(m => m.MoistureValue, new { @class = "form-control" })
+                                    </div>
+
+                                </div>
+                            </div>
+
+                           
+
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="btn-group">
+                                        <button class="form-control bg-success">Save</button>
+                                        <button class="form-control bg-info">Update</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="Col-md-3">
+            <div class="form-group">
+                <button class="form-control"><i class="fa fa-refresh" style="color:blue"></i></button>
+            </div>
+        </div>
+        <div class="Col-md-3">
+            <div class="form-group">
+                <button class="form-control"><i class="fa fa-table" style="color:blue"></i></button>
+            </div>
+        </div>
+        <div class="Col-md-3">
+            <div class="form-group">
+                <button class="form-control"><i class="fa fa-file-excel-o" style="color:green"></i></button>
+            </div>
+        </div>
+        <div class="Col-md-3">
+            <div class="form-group">
+                <button class="form-control"><i class="fa fa-file-pdf-o" style="color:red"></i></button>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-3">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(model => model.Unit, new List<SelectListItem>
+                                  {
+                                      new SelectListItem { Text = "ASP.NET MVC", Value = "1" },
+                                      new SelectListItem { Text = "ASP.NET WEB API", Value = "2" },
+                                      new SelectListItem { Text = "ENTITY FRAMEWORK", Value = "3" },
+                                      new SelectListItem { Text = "DOCUSIGN", Value = "4" },
+                                      new SelectListItem { Text = "ORCHARD CMS", Value = "5" },
+                                      new SelectListItem { Text = "JQUERY", Value = "6" },
+                                      new SelectListItem { Text = "ZENDESK", Value = "7" },
+                                      new SelectListItem { Text = "LINQ", Value = "8" },
+                                      new SelectListItem { Text = "C#", Value = "9" },
+                                      new SelectListItem { Text = "GOOGLE ANALYTICS", Value = "10" }},
+                                      new { @class = "form-control" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                SugarGodown
+                @Html.DropDownListFor(model => model.SugarGodown, new List<SelectListItem>
+                                  {
+                                      new SelectListItem { Text = "ASP.NET MVC", Value = "1" },
+                                      new SelectListItem { Text = "ASP.NET WEB API", Value = "2" },
+                                      new SelectListItem { Text = "ENTITY FRAMEWORK", Value = "3" },
+                                      new SelectListItem { Text = "DOCUSIGN", Value = "4" },
+                                      new SelectListItem { Text = "ORCHARD CMS", Value = "5" },
+                                      new SelectListItem { Text = "JQUERY", Value = "6" },
+                                      new SelectListItem { Text = "ZENDESK", Value = "7" },
+                                      new SelectListItem { Text = "LINQ", Value = "8" },
+                                      new SelectListItem { Text = "C#", Value = "9" },
+                                      new SelectListItem { Text = "GOOGLE ANALYTICS", Value = "10" }},
+                                      new { @class = "form-control" })
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table">
+                <tr>
+                    <th> Name</th>
+                    <th> Name</th>
+                    <th> Name</th>
+                    <th> Name</th>
+                </tr>
+                <tr>
+                    <td>Yash</td>
+                    <td>Yash</td>
+                    <td>Yash</td>
+                    <td>Yash</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+
+

@@ -1,0 +1,245 @@
+﻿@model KnowledgeApp_Test.Models.Stoppages.Stoppage
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Stoppages
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Stoppage";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unit = ds.GetUnitddl();
+    List<CrushingSeason> crushingSeasons = ds.GetCrushingSeasonddl();
+    List<StoppageStation> stoppageStations = ds.GetStoppageStationddl();
+    List<StoppageSparesProcess> stoppageSparesProcesses = ds.GetStoppageSparesProcessddl();
+    List<StoppageActionTaken> actionTaken = ds.StoppageActionTakenddl();
+    List<StoppageDefect> stoppageDefect = ds.StoppageDefectddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Stoppage</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditStoppage", "Stoppages")')"><i class="fa fa-plus"></i> Add New Stoppage</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                UnitName
+                @Html.DropDownListFor(m => m.Unit, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl Tabledata", @id = "Unit2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Crushing Season
+                @Html.DropDownListFor(m => m.CrushingSeason, new SelectList(crushingSeasons, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl Tabledata", @Id = "CrushingSeason2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Stoppage Date
+                @Html.TextBoxFor(m => m.StoppageDate, new { @Class = "form-control date Tabledata", @Id = "StoppageDate2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Stoppage Date
+                @Html.TextBoxFor(m => m.StoppageTill, new { @Class = "form-control date Tabledata", @id = "StoppageTill2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Station
+                @Html.DropDownListFor(m => m.StoppageStation, new SelectList(stoppageStations, "StationId", "StationName"), "Select Stoppage Station", new { @class = "form-control ddl Tabledata", @id = "StoppageStation2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Spares Process
+                @Html.DropDownListFor(m => m.StoppageSparesProcess, new SelectList(stoppageSparesProcesses, "SpareProcessId", "SpareProcessName"), "Select Spare Process", new { @class = "form-control ddl Tabledata", @Id = "StoppageSparesProcess2" })
+            </div>
+        </div>
+    </div>
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                Action
+                @Html.DropDownListFor(m => m.StoppageActionTaken, new SelectList(actionTaken, "ActionId", "ActionName"), "Select Action Take", new { @class = "form-control ddl Tabledata", @Id = "StoppageActionTaken2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Defect
+                @Html.DropDownListFor(m => m.StoppageDefect, new SelectList(stoppageDefect, "DefectId", "DefectName"), "Select Defectss", new { @class = "form-control ddl Tabledata", @id = "StoppageDefect2" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="Stoppage" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th>Unit Name </th>
+                            <th>Crushing Season</th>
+                            <th>Stoppage Date </th>
+                            <th>Stoppage Start</th>
+                            <th>Stoppage Till </th>
+                            <th>Date Serial </th>
+                            <th>Station Code </th>
+                            <th>Duration </th>
+                            <th>Duration Hour </th>
+                            <th>Remarks</th>
+                            <th>Stoppage Type</th>
+                            <th>Spare Process Code</th>
+                            <th>Defect Code</th>
+                            <th>Action Code</th>
+                            <th>Spare Process Name</th>
+                            <th>Defect Name</th>
+                            <th>Action Name</th>
+                            <th>ActionId</th>
+                            <th>Crushing Season Id</th>
+                            <th>Defect Id</th>
+                            <th>Spare Process Id</th>
+                            <th>Station Id</th>
+                            <th>Unit Id</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    } 
+}
+    <script type="text/javascript">
+     $(document).ready(function () {
+         $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $(".Tabledata").on('change', function ()
+        {
+            var Unit = $("#Unit2").val();
+            var CrushingSeason = $("#CrushingSeason2").val();
+            var StoppageDate = $("#StoppageDate2").val();
+            var StoppageTill = $("#StoppageTill2").val();
+            var StoppageStation = $("#StoppageStation2").val();
+            var StoppageSparesProcess = $("#StoppageSparesProcess2").val();
+            var StoppageActionTaken = $("#StoppageActionTaken2").val();
+            var StoppageDefect = $("#StoppageDefect2").val();
+            getStoppageDefect(Unit, CrushingSeason, StoppageDate, StoppageTill, StoppageStation, StoppageSparesProcess, StoppageActionTaken, StoppageDefect)
+        });
+
+        getStoppageDefect('', '', '', '', '', '', '', '')
+    });
+
+    function getStoppageDefect(Unit, CrushingSeason, StoppageDate, StoppageTill, StoppageStation, StoppageSparesProcess, StoppageActionTaken, StoppageDefect) {
+         var Url = '/Stoppages/StoppageData?Unit=' + Unit + '&CrushingSeason=' + CrushingSeason + '&StoppageDate=' + StoppageDate + '&StoppageTill=' + StoppageTill + '&StoppageStation=' + StoppageStation + '&StoppageSparesProcess=' + StoppageSparesProcess + '&StoppageActionTaken=' + StoppageActionTaken + '&StoppageDefect=' + StoppageDefect;
+        $("#Stoppage").DataTable().clear().draw();
+        $("#Stoppage").DataTable().destroy();
+        $('#Stoppage').DataTable({
+            "ajax": {
+                "url": Url,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "StoppageId", "render": function (data) {
+                        return "@if (right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditStoppage", "Stoppages")/" + data + "')><i class='fa fa-pencil'></i></a>}@if(right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data":"StoppageId"},
+                { "data": "UnitUnitName" },
+                { "data": "CrushingSeasonName" },
+                { "data": "StoppageDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "StoppageStart", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "StoppageTill", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "DateSerial" },
+                { "data": "StationCode" },
+                { "data": "Duration" },
+                { "data": "DurationHour" },
+                { "data": "Remarks" },
+                { "data": "StoppageTypeName" },
+                { "data": "SpareProcessCode" },
+                { "data": "DefectCode" },
+                { "data": "ActionCode" },
+                { "data": "SpareProcessName" },
+                { "data": "DefectDefectName" },
+                { "data": "ActionActionName" },
+                { "data": "ActionId" },
+                { "data": "CrushingSeasonId" },
+                { "data": "DefectId" },
+                { "data": "SpareProcessId" },
+                { "data": "StationId" },
+                { "data": "UnitId" },],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    title: 'Stoppage',
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                    title: 'Stoppage',
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    title: 'Stoppage',
+                    extend: 'print',
+                    action: newexportaction,
+                },
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+     var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Stoppage',
+                    height: 500,
+                    width: 1000,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+    </script>

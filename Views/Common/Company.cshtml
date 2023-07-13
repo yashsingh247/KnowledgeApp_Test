@@ -1,0 +1,162 @@
+﻿@model KnowledgeApp_Test.Models.Company
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Company";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Enterprise> selectlist = dropdownListSevices.GetEntrpriseddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddEditCompany", "Common")')"><i class="fa fa-plus"></i> Add New Company</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    <div class="row " style="background-color:#e7e7e7">
+
+        <div class="col-md-3">
+            <div class="form-group">
+                EnterPrise
+                @Html.DropDownListFor(m => m.enterprises, new SelectList(selectlist, "EnterpriseId", "EnterpriseName"), "Select User", new { @class = "form-control ddl" })
+            </div>
+        </div>
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="Company" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>CompanyId</th>
+                            <th>Company Name</th>
+                            <th>Enterprise Name</th>
+                            <th>AddressLine1</th>
+                            <th>AddressLine2</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+    <script type="text/javascript">
+    var Popup, dataTable;
+    $(document).ready(function () {
+        GetCompanyData();
+        $(".ddl").select2({
+            placeholder: "select Enterprise",
+            allowClear: true,
+            theme: "classic"
+        });
+        $("#enterprises").on("change", function () {
+            var Enterprise = $('#enterprises').val();
+
+            GetCompanyData(Enterprise)
+        });
+
+    });
+    function GetCompanyData(Enterprise) {
+        var Urllink = "/Common/CompanyData?Enterprise=" + Enterprise;
+        $("#Company").DataTable().clear().draw();
+        $("#Company").DataTable().destroy();
+
+        dataTable = $('#Company').DataTable({
+            "ajax": {
+                "url": Urllink,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "CompanyId", "render": function (data)
+                {
+                        return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddEditCompany", "Common")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";
+                },
+            },
+             { "data": "CompanyId" },
+            { "data": "CompanyName" },
+            { "data": "EnterpriseName" },
+            { "data": "AddressLine1" },
+            { "data": "AddressLine2" },],
+            "serverSide": "true",
+            "order": [0, "asc"],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Company Details',
+                    height: 300,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+    </script>
+
+

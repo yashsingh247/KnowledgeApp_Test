@@ -1,0 +1,72 @@
+﻿@model KnowledgeApp_Test.Models.Enterprise
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Enterprise";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddEditEnterprise", "Common", FormMethod.Post, new { onsubmit = "return SubmitForm(this)" }))
+    {
+        @Html.HiddenFor(m => m.EnterpriseId)
+        <div class="row">
+            <div class="col-md-4">
+                Enterprise Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.EnterpriseId)
+                    @Html.TextBoxFor(m => m.EnterpriseName, new { @class = "form-control", @maxlength = "100" })
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                AddressLine1
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.AddressLine1, new { @class = "form-control", @maxlength = "80" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                AddressLine2
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.AddressLine2, new { @class = "form-control", @maxlength = "100" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.EnterpriseId == 0 && right[0].BtnAdd == true)
+                {
+                    <input type="submit" value="submit" class="btn btn-success" />
+                }
+                else if (right[0].btnEdit == true)
+                {
+
+                    <button class="form-control btn btn-info">Update</button>
+                }
+
+
+            </div>
+        </div>
+    }
+}
+

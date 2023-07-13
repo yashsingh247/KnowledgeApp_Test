@@ -1,0 +1,192 @@
+﻿@model KnowledgeApp_Test.Models.Sugar_Molasses.SugarDayTransaction
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Sugar Day Transaction";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<Unit> unit = DS.GetUnitddl();
+    List<SugarGodown> sugarGodowns = DS.SugarGodownddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Sugar Day Transaction</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd)
+    {
+        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditSugarDayTransaction", "Sugar_Molasses")')"><i class="fa fa-plus"></i> New Sugar Day Transaction</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-3">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl Tabledata", @id = "Unit2" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                Sugar Godown
+                @Html.DropDownListFor(m => m.SugarGodownId, new SelectList(sugarGodowns, "SugarGodownId", "GodownNumber"), "Selet Godown", new { @class = "form-control ddl Tabledata", @id = "SugarGodown2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Transaction Date
+                @Html.TextBoxFor(m => m.TransactionDate, new { @Class = "form-control Tabledata date", @Id = "TransactionDate" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Transaction Date
+                @Html.TextBoxFor(m => m.TransactionDate, new { @Class = "form-control Tabledata date", @Id = "TransactionDate2" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="SugarDayTransaction" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Id</th>
+                            <th width="15%">Unit Name</th>
+                            <th width="15%">Godown Number</th>
+                            <th width="15%">Transaction Date</th>
+                            <th width="5%">Production</th>
+                            <th width="5%">ShiftIn</th>
+                            <th width="5%">Sales</th>
+                            <th width="5%">ShiftOut</th>
+                            <th width="5%">TornBag</th>
+                            <th width="5%">Iscumsa Value</th>
+                            <th width="5%">Moisture Value</th>
+                            <th width="10%">Line Replace Date</th>
+                            <th width="2%">Godown Id</th>
+                            <th width="2%">Unit Id</th>
+                        </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+
+}
+<script type="text/javascript">
+        $(document).ready(function () {
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $(".Tabledata").on('change', function () {
+            var Unit = $("#Unit2").val();
+            var SugarGodown = $("#SugarGodown2").val();
+            var TransactionDate = $("#TransactionDate").val();
+            var TransactionDate2 = $("#TransactionDate2").val();
+            GetSugarDayTransactionData(Unit, SugarGodown, TransactionDate, TransactionDate2)
+        });
+        GetSugarDayTransactionData('','','','');
+    });
+        function GetSugarDayTransactionData(Unit, SugarGodown, TransactionDate, TransactionDate2) {
+            var URL = '/Sugar_Molasses/SugarDayTransactionData?Unit=' + Unit + '&SugarGodown=' + SugarGodown + '&TransactionDate=' + TransactionDate + '&TransactionDate2=' + TransactionDate2;
+                $("#SugarDayTransaction").DataTable().clear().draw();
+                $("#SugarDayTransaction").DataTable().destroy();
+            $('#SugarDayTransaction').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "SugarDayTransactionId", "render": function (data) { return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditSugarDayTransaction", "Sugar_Molasses")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>";},},
+                { "data": "SugarDayTransactionId" },
+                { "data": "UnitUnitName" },
+                { "data": "SugarGodownGodownNumber" },
+                { "data": "TransactionDate",'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "Production" },
+                { "data": "ShiftingIn" },
+                { "data": "Sales" },
+                { "data": "ShiftingOut" },
+                { "data": "TornBagCount" },
+                { "data": "IcumsaValue" },
+
+                { "data": "MoistureValue" },
+                { "data": "LineReplaceDate" ,'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "SugarGodownId" },
+                { "data": "UnitId" },
+            ],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+                buttons: [
+                    {
+
+                        extend: 'pdf',
+                        action: newexportaction,
+                    },
+                    {
+
+                        extend: 'excel',
+                        action: newexportaction,
+                    },
+                    {
+
+                        extend: 'print',
+                        action: newexportaction,
+                    },
+                ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Sugar Day Transaction',
+                    height: 700,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+</script>
+
+

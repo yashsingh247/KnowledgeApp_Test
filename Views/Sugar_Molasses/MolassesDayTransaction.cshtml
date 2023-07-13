@@ -1,0 +1,262 @@
+﻿@model KnowledgeApp_Test.Models.Sugar_Molasses.MolassesDayTransaction
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Molasses Day Transaction";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<Unit> unit = DS.GetUnitddl();
+    //bool view;
+    List<MolassesTank> MolassesTank = DS.MolassesTankddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+
+}
+
+
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h3 style="color:#0090d9;">Molasses Day Transaction</h3>
+
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+
+        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditMolassesDayTransaction", "Sugar_Molasses")')"><i class="fa fa-plus"></i> New Molasses Day Transaction</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+
+        <div class="row" style="background-color: #f0f3f5">
+            <div class="col-md-3">
+                <div class="form-group">
+                    Unit
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl Tabledata", @id = "Unit2" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    Tank Number
+                    @Html.DropDownListFor(m => m.MolassesTankId, new SelectList(MolassesTank, "MolassesTankId", "TankNumber"), "Select Tank", new { @class = "form-control ddl Tabledata", @id = "Tank2" })
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    Transaction Date
+                    @Html.TextBoxFor(m => m.TransactionDate, new { @Class = "form-control Tabledata date", @Id = "TransactionDate" })
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    Transaction Date
+                    @Html.TextBoxFor(m => m.TransactionDate, new { @Class = "form-control Tabledata date", @Id = "TransactionDate2" })
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="MolassesDayTransaction" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th width="10%"></th>
+                                <th width="2%">ID</th>
+                                <th>Unit Name</th>
+                                <th>Tank Number</th>
+                                <th>Transaction Date</th>
+                                <th width="2%">Production</th>
+                                <th width="2%">Shifting IN</th>
+                                <th width="2%">Sales</th>
+                                <th width="2%">Shifting Out</th>
+                                <th width="2%">In Temperature 1 </th>
+                                <th width="2%">In Temperature 2 </th>
+                                <th width="2%">In Temperature 3 </th>
+                                <th>In Temperature 4 </th>
+                                <th>In Temperature5 </th>
+                                <th>Out Temperature 1</th>
+                                <th>Out Temperature 2</th>
+                                <th>Out Temperature 3</th>
+                                <th>Out Temperature 4</th>
+                                <th>OutTemperature 5</th>
+                                <th>Water In 1</th>
+                                <th>Water In 2</th>
+                                <th>Water In 3</th>
+                                <th>Water In 4</th>
+                                <th>Water In 5</th>
+                                <th>Water Out 1</th>
+                                <th>Water Out 2</th>
+                                <th>Water Out 3</th>
+                                <th>Water Out 4</th>
+                                <th>Water Out 5</th>
+                                <th>Molasses Temperature 1</th>
+                                <th>Molasses Temperature 2</th>
+                                <th>Molasses Temperature 3</th>
+                                <th>Molasses Temperature 4</th>
+                                <th>Molasses Temperature 5</th>
+                                <th>Brix</th>
+                                <th>TRS </th>
+                                <th>Production Temperature 1</th>
+                                <th>Production Temperature 2</th>
+                                <th>Production Temperature 3</th>
+                                <th>Production Temperature 4</th>
+                                <th>Production Temperature 5</th>
+                                <th>Re circulation Hours</th>
+                                <th>Water Spay Hours </th>
+                                <th>Unit Id </th>
+                                <th>Molasses Tank ID</th>
+                            </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $(".Tabledata").on('change', function () {
+            var Unit = $("#Unit2").val();
+            var Tank = $("#Tank2").val();
+            var TransactionDate = $("#TransactionDate").val();
+            var TransactionDate2 = $("#TransactionDate2").val();
+            GetMDTransaction(Unit, Tank, TransactionDate, TransactionDate2)
+        });
+        
+            GetMDTransaction('', '', '', '')
+        
+    });
+    function GetMDTransaction(Unit, Tank, TransactionDate, TransactionDate2) {
+        var URL = '/Sugar_Molasses/MolassesDayTransactionData?Unit=' + Unit + '&tank=' + Tank + '&TransactionDate=' + TransactionDate + '&TransactionDate2=' + TransactionDate2;
+        $("#MolassesDayTransaction").DataTable().clear().draw();
+        $("#MolassesDayTransaction").DataTable().destroy();
+        $('#MolassesDayTransaction').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "MolassesDayTransactionId", "render": function (data) { return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditMolassesDayTransaction", "Sugar_Molasses")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>";},},
+                { "data": "MolassesDayTransactionId" },
+                { "data": "UnitUnitName"},
+                { "data": "MolassesTankTankNumber" },
+
+                { "data": "TransactionDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "Production" },
+                { "data": "ShiftingIn" },
+                { "data": "Sales" },
+                { "data": "ShiftingOut" },
+                { "data": "InTemperature1" },
+                { "data": "InTemperature2" },
+                { "data": "InTemperature3" },
+                { "data": "InTemperature4" },
+                { "data": "InTemperature5" },
+                { "data": "OutTemperature1" },
+                { "data": "OutTemperature2" },
+                { "data": "OutTemperature3" },
+                { "data": "OutTemperature4" },
+                { "data": "OutTemperature5" },
+                { "data": "WaterIn1" },
+                { "data": "WaterIn2" },
+                { "data": "WaterIn3" },
+                { "data": "WaterIn4" },
+                { "data": "WaterIn5" },
+                { "data": "WaterOut1" },
+                { "data": "WaterOut2" },
+                { "data": "WaterOut3" },
+                { "data": "WaterOut4" },
+                { "data": "WaterOut5" },
+                { "data": "MolassesTemperature1" },
+                { "data": "MolassesTemperature2" },
+                { "data": "MolassesTemperature3" },
+                { "data": "MolassesTemperature4" },
+                { "data": "MolassesTemperature5" },
+                { "data": "Brix" },
+                { "data": "Trs" },
+                { "data": "ProductionTemperature1" },
+                { "data": "ProductionTemperature2" },
+                { "data": "ProductionTemperature3" },
+                { "data": "ProductionTemperature4" },
+                { "data": "ProductionTemperature5" },
+                { "data": "RecirculationHours" },
+                { "data": "WaterSpayHours" },
+                { "data": "UnitId" },
+                { "data": "MolassesTankId" },],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                   
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    
+                    extend: 'print',
+                    action: newexportaction,
+                },
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Molasses Day Transaction',
+                    height: 700,
+                    width: 1200,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+    </script>
+
+

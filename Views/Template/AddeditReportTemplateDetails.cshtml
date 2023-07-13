@@ -1,0 +1,131 @@
+﻿@model KnowledgeApp_Test.Models.Template.ReportTemplateDetails
+@using KnowledgeApp_Test.Models.Parameters;
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+}
+@{
+    ViewBag.Title = "Report Template";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Parameter> ParameterList = dropdownListSevices.GetParemeterddl();
+    List<ParameterType> parameterType = dropdownListSevices.GetParemeterTypeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditReportTemplateDetails", "Template", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { onsubmit = "return SubmitForm(this)" }))
+    {
+        <hr />
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.ReportTemplateDetailID == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-success">Update</button>
+                }
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                RowNumber
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.ReportTemplateDetailID)
+                    @Html.HiddenFor(m => m.ReportTemplateID, new { Value = ViewBag.ReportTemplateId })
+                    @Html.TextBoxFor(m => m.RowNumber, new { @class = "form-control Smint", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                ColumnNumber
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ColumnNumber, new { @class = "form-control Smint", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-4">
+                Parameter
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.ParameterID, new SelectList(ParameterList, "ParameterId", "ParameterName"), new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Parameter Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.ParameterType, new SelectList(parameterType, "ParameterTypeId", "ParameterTypeName"), new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                FixedValue
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.FixedValue, new { @class = "form-control", @maxlength = "80" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                PreFixedValuse
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.PrefixValue, new { @class = "form-control", @maxlength = "80" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                PostFixValue
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.PostfixValue, new { @class = "form-control", @maxlength = "80" })
+                </div>
+
+            </div>
+        </div>
+    }
+}
+    <script>
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Unit",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

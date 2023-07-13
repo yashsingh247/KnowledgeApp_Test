@@ -1,0 +1,170 @@
+﻿@model KnowledgeApp_Test.Models.Parameters.ParameterType
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Parameters;
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    ViewBag.Title = "Parameter Type";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<EntryType> entryTypelist = dropdownListSevices.GetEntryTypeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditParameterType","Parameters")')"><i class="fa fa-plus"></i> Add Parameter Type</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    <div class="row" style="background-color:#e7e7e7">
+        <div class="col-md-3">
+            <div class="form-group">
+                Entry Type
+                @Html.DropDownListFor(m => m.EntryTypeId, new SelectList(entryTypelist, "EntryTypeId", "EntryTypeName"), "select Entry Type", new { @class = "form-control ddl", @Id = "EntryType2" })
+
+            </div>
+        </div>
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="ParemeterType" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th> Entry Type Id</th>
+                            <th> Parameter Type Name</th>
+                            <th> Is Computed</th>
+                            <th> Parameter Type Code</th>
+                            <th>Is Stoppage Type</th>
+                            <th>Entry Type Name</th>
+                            <th>Is Stock Type</th>
+                            <th>Parameter Type Id</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" rel="stylesheet" />
+@*<script src="https://cdn.datatables.net/1.10.15/js/dataTables.bootstrap.min.js"></script>*@
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+<script>
+    $(document).ready(function () {
+        //$(".ddl").select2().select2();
+        $(".ddl").select2({
+            placeholder: "select Entry Type",
+            allowClear: true,
+            theme: "classic"
+        });
+        $("#EntryType2").on('change', function () {
+            var EntryType = $("#EntryType2").val();
+
+            GetParameterTypeData(EntryType);
+        });
+        GetParameterTypeData();
+    })
+    function GetParameterTypeData(EntryType) {
+        $("#ParemeterType").DataTable().clear().draw();
+        $("#ParemeterType").DataTable().destroy();
+
+        var URL = '/Parameters/ParameterTypeData?EntryType=' + EntryType,
+            dataTable = $('#ParemeterType').DataTable({
+
+            "ajax": {
+                "url":URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [
+                {
+                    "data": "ParameterTypeId", "render": function (data) {
+                        return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditParameterType", "Parameters")/" + data + "')><i class='fa fa-pencil'></i> </a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i> </a>}";
+                    },
+                },
+                { "data": "ParameterTypeId" },
+                { "data": "ParameterTypeName" },
+                { "data": "IsComputed", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "ParameterTypeCode" },
+                { "data": "IsStoppageType", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "EntryTypeName" },
+                { "data": "IsStockType", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "EntryTypeId" },
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+                buttons: [
+                    {
+                        extend: 'pdf',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'excel',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'print',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'colvis',
+                        columns: ':not(.noVis)'
+                    }
+                ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Entry Type Details',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+</script>

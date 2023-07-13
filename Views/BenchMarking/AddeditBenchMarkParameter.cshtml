@@ -1,0 +1,117 @@
+﻿@model KnowledgeApp_Test.Models.BenchMarking.BenchMarkParameter
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+}
+@{
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<ParameterUnit> parameterUnit = dropdownListSevices.GetParameterUnitddl();
+    List<Parameter> ParameterList = dropdownListSevices.GetParemeterddl();
+    GeneralServices GS = new GeneralServices();
+    ViewBag.Title = "Bench Mark Parameter";
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+ else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+ {
+using (Html.BeginForm("AddeditBenchMarkParameter", "BenchMarking", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+{
+    <div class="row">
+        <div class="col-md-4">
+            Bench Mark Code
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.HiddenFor(m => m.BenchMarkParameterId)
+                @Html.TextBoxFor(m => m.BenchMarkCode, new { @class = "form-control", @required = "required", @maxlength = "5" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Bench Mark Name
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.BenchMarkName, new { @class = "form-control", @maxlength = "40" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Parameter Unit
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.DropDownListFor(m => m.ParameterUnitId, new SelectList(parameterUnit, "ParameterUnitId", "ParameterUnitName"), "Select Parameter", new { @class = "form-control ddl" })
+
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Parameter
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+
+                @Html.DropDownListFor(m => m.ParameterId, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Bench Mark Type
+        </div>
+
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.BenchMarkType, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Row Number
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.RowNumber, new { @class = "form-control Smint", @onkeypress = "javascript:return isNumber(event)" })
+            </div>
+
+        </div>
+    </div><div class="row">
+        <div class="col-md-2">
+            @if (Model.BenchMarkParameterId == 0 && right[0].BtnAdd == true)
+            {
+                <button class="form-control bg-success">Save</button>
+            }
+            else if(right[0].btnEdit == true)
+            {
+                <button class="form-control bg-info">Update</button>
+            }
+
+        </div>
+    </div>
+}
+ }
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select ",
+            allowClear: true,
+            theme: "classic"
+        });
+    });
+</script>
+

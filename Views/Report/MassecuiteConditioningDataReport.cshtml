@@ -1,0 +1,73 @@
+﻿
+@model KnowledgeApp_Test.Models.Report.MassecuiteConditioningData
+@using KnowledgeApp_Test.Services
+@*@using KnowledgeApp_Test.Models.Sugar_Molasses*@
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "MassecuiteConditioningDataReport";
+    //DropdownListSevices ds = new DropdownListSevices();
+    //List<Unit> unitlist = ds.GetUnitddl();
+    //List<SugarGodown> SugarGodansList = ds.SugarGodownddl();
+
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">
+            Massecuite Conditioning Data Report
+        </h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Date:
+            @*@Html.TextBoxFor(m => m.DateTime, new { Value = Model.DateTime.ToString("dd-MM-yyyy"), @class = "form-control date Tabledata" })*@
+            <input type="text" class="form-control date Tabledata" id="AnalysisDate">
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div id="myChart" class="col-md-12 col-xs-12">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script language="javascript">
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $('.Tabledata').on("change", function () {
+            
+            var AnalysisDate = $("#DateTime").val();
+            $.ajax({
+                  url: "@Url.Action("PartialMassecuiteConditioningDataReport", "Report")",
+                    dataType: 'HTML',
+                data: { AnalysisDate: AnalysisDate},
+                    asycs: false,
+                success: function (returnData) {
+                    $("#myChart").html(returnData);
+
+                    }
+             });
+            $('#myChart').show();
+
+        });
+    });
+   
+</script>
+
+

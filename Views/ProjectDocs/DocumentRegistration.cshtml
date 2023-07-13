@@ -1,0 +1,254 @@
+﻿@model KnowledgeApp_Test.Models.ProjectDocs.DocumentRegistration
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    ViewBag.Title = "Document Registration";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> Unit = ds.GetUnitddl();
+    List<DocumentClass> DocumentClass = ds.DocumentClassddl();
+    List<Employee> Employee = ds.Employeeddl();
+    List<DocumentSubClass> documentSubClasses = ds.DocumentSubClassddl();
+    List<PlantDepartment> PlantDepartment = ds.PlantDepartmentddl();
+    List<PlantSubDepartment> PlantSubDepartment = ds.PlantSubDepartmentddl();
+    List<ApprovalStatus> ApprovalStatus = ds.ApprovalStatusddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Document Registration</h3>
+        </div>
+    </div>
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+        <div class="row">
+
+            <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddDocumentRegistration", "ProjectDocs")')"><i class="fa fa-plus"></i> New Document Registration</a>
+
+        </div>
+    }
+    if (right[0].btnView == true)
+    { 
+        <div class="row" style="background-color: #f0f3f5">
+            <div class="col-md-2">
+                <div class="form-group">
+                    Unit
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(Unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl ", @Id = "Unit2" })
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    DocumentClass
+                    @Html.DropDownListFor(m => m.DocumentClassId, new SelectList(DocumentClass, "DocumentClassId", "ClassName"), "Select Class", new { @class = "form-control ddl", @Id = "DocumentClass2" })
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    DocumentOwner
+                    @Html.DropDownListFor(m => m.DocumentOwnerId, new SelectList(Employee, "EmployeeId", "EmployeeName"), "Select Document Owner", new { @class = "form-control ddl", @id = "DocumentOwner2" })
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    DocumentApprover
+                    @Html.DropDownListFor(m => m.DocumentApproverId, new SelectList(Employee, "EmployeeId", "EmployeeName"), "Select Document Approver", new { @class = "form-control ddl", @id = "DocumentApprover2" })
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    Document Sub Class
+                    @Html.DropDownListFor(m => m.DocumentSubClassId, new SelectList(documentSubClasses, "DocumentSubClassId", "SubClassName"), "Select Sub Class", new { @class = "form-control ddl", @id = "DocumentSubClass2" })
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    Document Department
+                    @Html.DropDownListFor(m => m.DocumentDepartmentId, new SelectList(PlantDepartment, "PlantDepartmentId", "DepartmentName"), "Select Document Department", new { @class = "form-control ddl", @id = "DocumentDepartment2" })
+                </div>
+            </div>
+        </div>
+        <div class="row" style="background-color: #f0f3f5">
+            <div class="col-md-3">
+                <div class="form-group">
+                    Document Sub Department
+                    @Html.DropDownListFor(m => m.DocumentSubDepartmentId, new SelectList(PlantSubDepartment, "PlantSubDepartmentId", "SubDepartmentName"), "Select Sub Department", new { @class = "form-control ddl ", @Id = "DocumentSubDepartment2" })
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="Registration" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>  </th>
+                                
+                                <th>Id</th>
+                                <th>Document Number</th>
+                                <th>Document Date</th>
+                                <th>Unit Name</th>
+                                <th>Subject</th>
+                                <th>Document ClassName</th>
+                                <th>Document Type</th>
+                                <th>Document Owner Employee Code</th>
+                                <th>Document  Approver Employee Code</th>
+                                <th>DocumentFile</th>
+                                <th>Document Approver Date</th>
+                                <th>Preamble</th>
+                                <th>Approval Status</th>
+                                <th>Document SubClass Name</th>
+                                <th>Document Department Name</th>
+                                <th>Document Sub Department Name</th>
+                                <th>Document Approver Id</th>
+                                <th>Document Class Id</th>
+                                <th>Document Department Id</th>
+                                <th>Document Owner Id</th>
+                                <th>Document SubClass Id</th>
+                                <th>Document Sub Department Id</th>
+
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "select Plant Department",
+            allowClear: true,
+            theme: "classic"
+        });
+        $(".ddl").on('change', function () {
+            var Unit = $("#Unit2").val();
+            var DocumentClass = $("#DocumentClass2").val();
+            var DocumentOwner = $("#DocumentOwner2").val();
+            var DocumentApprover = $("#DocumentApprover2").val();
+            var DocumentSubClass = $("#DocumentSubClass2").val();
+            var DocumentDepartment = $("#DocumentDepartment2").val();
+            var DocumentSubDepartment = $("#DocumentSubDepartment2").val();
+            GetDocumentRegistration(Unit, DocumentClass, DocumentOwner, DocumentApprover, DocumentSubClass, DocumentDepartment, DocumentSubDepartment)
+        });
+
+        GetDocumentRegistration("","","","","","","");
+
+    })
+    function GetDocumentRegistration(Unit, DocumentClass, DocumentOwner, DocumentApprover, DocumentSubClass, DocumentDepartment, DocumentSubDepartment) {
+
+        var URL = '/ProjectDocs/DocumentRegistrationData?Unit=' + Unit + '&DocumentClass=' + DocumentClass + '&DocumentOwner=' + DocumentOwner + '&DocumentApprover=' + DocumentApprover + '&DocumentSubClass=' + DocumentSubClass + '&DocumentDepartment=' + DocumentDepartment + '&DocumentSubDepartment=' + DocumentSubDepartment;
+        $("#Registration").DataTable().clear().draw();
+        $("#Registration").DataTable().destroy();
+        $('#Registration').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "DocumentRegistrationId", "render": function (data) { return "@if(right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddDocumentRegistration", "ProjectDocs")/" + data + "')><i class='fa fa-pencil'></i></a>}@if(right[0].btnDelete == true){<a class='btn btn-danger btn-sm'  onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "DocumentRegistrationId" },
+                { "data":"DocumentNumber"},
+                { "data": "DocumentDate",'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "UnitUnitName" },
+                { "data": "Subject" },
+                { "data": "DocumentClassClassName" },
+                { "data": "DocumentType" },
+                { "data": "DocumentOwnerEmployeeCode" },
+                { "data": "DocumentApproverEmployeeCode" },
+                { "data": "ImagePath" },
+                { "data": "DocumentApproverDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "Preamble" },
+                { "data": "ApprovalStatus" },
+                { "data": "DocumentSubClassSubClassName" },
+                { "data": "DocumentDepartmentDepartmentName" },
+                { "data":"DocumentSubDepartmentSubDepartmentName"},
+                { "data": "DocumentApproverId" },
+                { "data": "DocumentClassId" },
+                { "data": "DocumentDepartmentId" },
+                { "data": "DocumentOwnerId" },
+                { "data": "DocumentSubClassId" },
+                { "data": "DocumentSubDepartmentId" },
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+                     "processing": "true",scrollX: true,scrollY: true,paging: true,scrollX: true,scrollY: true,paging: true,scrollX: true,scrollY: true,paging: true,scrollX: true,scrollY: true,paging: true,scrollX: true,scrollY: true,paging: true,scrollX: true,scrollY: true,paging: true,scrollX: true,scrollY: true,paging: true,scrollX: true,scrollY: true,paging: true,scrollX: true,scrollY: true,paging: true,scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'print',
+                    action: newexportaction,
+                },
+
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Document Registration Details',
+                    height: 550,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+</script>
+
+
+

@@ -1,0 +1,190 @@
+﻿@model KnowledgeApp_Test.Models.Targets.SeasonWeek
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> Unitlist = ds.GetUnitddl();
+    List<CrushingSeason> CrushingSeason = ds.GetCrushingSeasonddl();
+    var Id = "Season Week";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditSeasonWeek", "Targets", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                CrushingSeason
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.WeekId)
+                    @Html.DropDownListFor(m => m.CrushingSeasonId, new SelectList(CrushingSeason, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(Unitlist, "UnitId", "UnitName"), "UnitName", new { @class = "form-control ddl", @Id = "Unit2", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Year Number
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.YearNumber, new { @class = "form-control Code", onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Month Number
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.MonthNumber, new { @class = "form-control Code", onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                WeekNumber
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.WeekNumber, new { @class = "form-control code", onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Start Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.StartDate, new { Value = Model.StartDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                End Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.EndDate, new { Value = Model.EndDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Days
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Days, new { @class = "form-control Code", onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Target Days
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.TargetDays, new { @class = "form-control Code", onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Week Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.WeekName, new { @class = "form-control", @maxlength = "30" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Week Serial
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.WeekSerial, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.WeekId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+            $(".ddl").select2({
+                placeholder: "select Option ",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#YearNumber").val() == 0) {
+                $("#YearNumber").val('');
+            }
+            if ($("#MonthNumber").val() == 0) {
+                $("#MonthNumber").val('');
+            }
+            if ($("#WeekNumber").val() == 0) {
+                $("#WeekNumber").val('');
+            }
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy', maxDate: '+0D', });
+            if ($("#StartDate").val() == '01-01-0001') {
+                $('#StartDate').datepicker('setDate', 'today');
+            }
+            if ($("#EndDate").val() == '01-01-0001') {
+                $('#EndDate').datepicker('setDate', 'today');
+            }
+        });
+    </script>
+

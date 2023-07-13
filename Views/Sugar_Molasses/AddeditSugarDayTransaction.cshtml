@@ -1,0 +1,190 @@
+﻿@model KnowledgeApp_Test.Models.Sugar_Molasses.SugarDayTransaction
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    Layout = null;
+    DropdownListSevices DS = new DropdownListSevices();
+    List<Unit> unit = DS.GetUnitddl();
+    List<SugarGodown> sugarGodowns = DS.SugarGodownddl();
+    var Id = "Sugar Day Transaction";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+
+    using (Html.BeginForm("AddeditSugarDayTransaction", "Sugar_Molasses", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Sugar Godown
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.SugarDayTransactionId)
+                    @Html.DropDownListFor(m => m.SugarGodownId, new SelectList(sugarGodowns, "SugarGodownId", "GodownNumber"), "Select Godown", new { @class = "form-control ddl Tabledata", @id = "SugarGodown2", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl Tabledata", @id = "Unit2", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Transaction Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.TransactionDate, new { Value = Model.TransactionDate.ToString("dd-MM-yyyy"), @class = "form-control date", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Production
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Production, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Shifting In
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ShiftingIn, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Sales
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Sales, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Shifting Out
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ShiftingOut, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-4">
+                Torn Bag Count
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.TornBagCount, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                IcumsaValue
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.IcumsaValue, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                MoistureValue
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.MoistureValue, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                LineReplace Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.LineReplaceDate, new { Value = Model.LineReplaceDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+                </div>
+
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.SugarDayTransactionId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+            </div>
+        </div>
+    }
+}
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+            if ($("#TransactionDate").val() == '01-01-0001') {
+
+                $("#TransactionDate").val('');
+            }
+            if ($("#LineReplaceDate").val() == '01-01-0001') {
+                $('#LineReplaceDate').datepicker('setDate', 'today');
+            }
+
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>
+
+

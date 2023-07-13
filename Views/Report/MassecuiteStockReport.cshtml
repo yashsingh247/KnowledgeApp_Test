@@ -1,0 +1,82 @@
+﻿@model KnowledgeApp_Test.Models.Report.MassecuiteStock
+@using KnowledgeApp_Test.Services
+@*@using KnowledgeApp_Test.Models.Sugar_Molasses*@
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "MassecuiteStockReport";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unitlist = ds.GetUnitddl();
+    //List<SugarGodown> SugarGodansList = ds.SugarGodownddl();
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">Plant Performance Report</h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit:
+            @Html.DropDownList("UnitId", new SelectList(unitlist, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Date:
+            @Html.TextBoxFor(m => m.AnalysisDate, new { @Class = "form-control date Tabledata" })
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div id="myChart" class="col-md-12 col-xs-12">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script language="javascript">
+    $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+    if ($("#AnalysisDate").val() == '01-01-0001') {
+        $('#AnalysisDate').datepicker('setDate', 'today');
+    }
+    $(document).ready(function () {
+
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $('.Tabledata').on("change", function () {
+
+            var Unit = $("#Unit2").val();
+            var AnalysisDate = $("#AnalysisDate").val();
+           
+             $.ajax({
+                  url: "@Url.Action("PartialMassecuiteStockReport", "Report")",
+                    dataType: 'HTML',
+                 data: { Unit: Unit, AnalysisDate: AnalysisDate},
+                    asycs: false,
+                success: function (returnData) {
+                    $("#myChart").html(returnData);
+
+                    }
+             });
+            $('#myChart').show();
+
+        });
+
+    });
+   
+
+</script>
+
+

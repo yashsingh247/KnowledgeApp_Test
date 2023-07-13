@@ -1,0 +1,278 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.MassecuiteConditioningData
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.HouseData
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Shift> shift = ds.Shiftddl();
+    List<Employee> employee = ds.Employeeddl();
+    List<MassecuiteConditioning> Ms = ds.MassecuiteConditioningddl();
+    ViewBag.Title = "Massecuite Conditioning";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditMassecuiteConditioningData", "HouseData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    @if (Model.MassecuiteConditioningDataId == 0 && right[0].BtnAdd == true)
+                    {
+                        <button class="form-control bg-success">Save</button>
+                    }
+                    else if (right[0].btnEdit == true)
+                    {
+                        <button class="form-control bg-info">Update</button>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Analysis Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.MassecuiteConditioningDataId, new { @Id = "DataId" })
+                    @Html.TextBoxFor(m => m.AnalysisDate, new { Value = Model.AnalysisDate.ToString("dd-MM-yyyy"), @class = "form-control date", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Shift
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ShiftId, new SelectList(shift, "ShiftId", "ShiftName"), "Select Shift", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Process Head
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ProcessHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select ProcessHead", new { @class = "form-control ddl", @Id = "ProcessHead2" })
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Section Head
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.SectionHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Section Head ", new { @class = "form-control ddl", @Id = "SectionHead2" })
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Department Head
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.DepartmentHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Department Head", new { @class = "form-control ddl", @Id = "SectionHead2" })
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    Details
+                </div>
+            </div>
+            <div class="col-md-4">
+                @if(Model.MassecuiteConditioningDataId!=0 && right[0].BtnAdd==true)
+                { 
+                <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditMassecuiteConditioningDataDetails", "HouseData")')"><i class="fa fa-plus"></i> New MassecuiteConditioningDataDetails</a>
+                }
+            </div>
+        </div>
+        <hr />
+        <div class="row" style=" width:1000px;">
+            <div class="col-md-4">
+                <div class="form-group">
+                    Massecuite Conditioning
+                    @Html.DropDownList("Conditionings", new SelectList(Ms, "MassecuiteConditioningId", "MassecuiteConditioningName"), "Select MassecuiteConditioning", new { @class = "form-control ddl", @Id = "MassecuiteConditioning2" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="MassecuiteConditioningDetailData" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th width="10%">Id</th>
+                                        <th width="10%">Serial Number</th>
+                                        <th width="45%">Massecuite Conditioning</th>
+                                        <th width="10%"> Analysis Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "select Option ",
+            allowClear: true,
+            theme: "classic"
+        });
+        if ($("#AnalysisDate").val() == '01-01-0001') {
+
+            $("#AnalysisDate").val('');
+        }
+
+
+        var Dataid = $("#DataId").val();
+        $("#MassecuiteConditioning2").on('change', function () {
+
+            var MassecuiteConditioning = $("#MassecuiteConditioning2").val();
+            MassecuiteConditioninDetaigData(Dataid,MassecuiteConditioning)
+        });
+
+        MassecuiteConditioninDetaigData(Dataid,'')
+    });
+    function MassecuiteConditioninDetaigData(Dataid,MassecuiteConditioning) {
+        var Url = '/HouseData/MassecuiteConditioningDetailsDataData?conditinung=' + MassecuiteConditioning + '&DataId=' + Dataid;
+
+        $("#MassecuiteConditioningDetailData").DataTable().clear().draw();
+        $("#MassecuiteConditioningDetailData").DataTable().destroy();
+        $('#MassecuiteConditioningDetailData').DataTable({
+            "ajax": {
+                "url": Url,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "MassecuiteConditioningDataDetailsId", "render": function (data) {
+                        return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditMassecuiteConditioningDataDetails", "HouseData")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>";},},
+                { "data": "MassecuiteConditioningDataDetailsId" },
+                { "data": "SerialNo" },
+                { "data": "MassecuiteConditioningName" },
+                { "data": "AnalysisValue" },
+
+
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Massecuite Data Details Details',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+        }
+        function DeleteDetailTable(Id) {
+            var TableName = "MassecuiteConditioningDetailsData";
+            var URL = '/Login/DeleteDatabyId?TableName=' + TableName + '&Id=' + Id;
+            $.ajax({
+                url: URL,
+                dataType: 'HTML',
+                //data: { UserId: UserId, Unit: unitId, Role: Role },
+                //asycs: false,
+                success: function (returnData) {
+                    console.log(returnData)
+                    var A = []
+                    A = JSON.parse(returnData)
+
+                    var Status = A["hasError"];
+                    var Msg = A["message"];
+                    if (Status == true) {
+                        $("#DeleteMessge").append(Msg);
+                        location.reload();
+
+                    }
+                    else {
+                        console.log(Msg)
+                        console.log(Status)
+                        $("#DeleteMessge").append(Msg);
+                    }
+                },
+
+            });
+        }
+    </script>
+
+
+
+
+
+

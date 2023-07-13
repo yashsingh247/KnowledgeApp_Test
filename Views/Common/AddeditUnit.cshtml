@@ -1,0 +1,90 @@
+﻿@model KnowledgeApp_Test.Models.Common.Unit
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+}
+@{
+    ViewBag.Title = "Unit";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Company> selectlist = dropdownListSevices.GetCompanyddl();
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditUnit", "Common", FormMethod.Post, new { onsubmit = "return SubmitForm(this)" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Company
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.UnitId)
+                    @Html.DropDownListFor(m => m.CompanyId, new SelectList(selectlist, "CompanyId", "CompanyName"), "Select Company", new { @class = "form-control ddl", @required = "required" })
+
+                </div>
+            </div>
+            <div class="col-md-4">
+                Unit Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.UnitName, new { @class = "form-control", @maxlength = "100" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Address Line1:
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.AddressLine1, new { @class = "form-control", @maxlength = "80" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Address Line2:
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.AddressLine2, new { @class = "form-control", @maxlength = "80" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                @if (Model.UnitId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control btn btn-success">Save</button>
+
+                }
+                else if(right[0].btnEdit == true)
+                {
+
+                    <button class="form-control btn btn-info">Update</button>
+                }
+
+            </div>
+        </div>
+    }
+}
+    <script>
+        $(document).ready(function () {
+            $(".ddl").select2({
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

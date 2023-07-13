@@ -1,0 +1,92 @@
+﻿@model KnowledgeApp_Test.Models.Targets.WeekTarget
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Targets
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Parameter> ParameterList = ds.GetParemeterddl();
+    List<SeasonWeek> seasonWeek = ds.GetSeasonWeekddl();
+    var Id = "Week Target";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddWeekTarget", "Targets", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Season Week
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.WeekTargetId)
+                    @Html.DropDownListFor(m => m.WeekId, new SelectList(seasonWeek, "WeekId", "WeekName"), "Select Week", new { @class = "form-control ddl", @Id = "Unit2", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Parameter
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ParameterId, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Target Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.TargetValue, new { @class = "form-control", oninput = "validatetTendecimal(this)", })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Actual Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ActualValue, new { @class = "form-control", oninput = "validatetTendecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.WeekTargetId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+
+            </div>
+
+        </div>
+    }
+}
+    <script>
+        $(document).ready(function () {
+            $(".ddl").select2({ placeholder: "select Option ", allowClear: true, theme: "classic" });
+        });
+
+    </script>

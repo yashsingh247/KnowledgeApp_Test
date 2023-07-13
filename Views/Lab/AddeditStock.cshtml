@@ -1,0 +1,115 @@
+﻿@model KnowledgeApp_Test.Models.Lab.Stock
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+}
+@{
+    ViewBag.Title = "Stock";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Unit> Unitlist = dropdownListSevices.GetUnitddl();
+    List<CrushingSeason> crushingSeasons = dropdownListSevices.GetCrushingSeasonddl();
+    List<Parameter> ParameterList = dropdownListSevices.GetParemeterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditStock", "Lab", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Entry Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.StockId)
+                    @Html.TextBoxFor(m => m.EntryDate, new { Value = Model.EntryDate, @class = "form-control date", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(Unitlist, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Parameter
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ParameterId, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Crushing Season
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.CrushingSeasonId, new SelectList(crushingSeasons, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Day Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DayValue, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.CrushingSeasonId == 0 && right[0].BtnAdd==true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit==true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                allowClear: true,
+                theme: "classic"
+            });
+            $(".date").datepicker({ dateFormat: 'dd-mm-yy', });
+            if ($("#EntryDate").val() == '01/01/0001 00:00:00') {
+
+                $("#EntryDate").val('');
+            }
+
+        });
+    </script>

@@ -1,0 +1,64 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.MassecuiteConditioningDataDetails
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.HouseData
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.ProjectDocs
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<MassecuiteConditioning> massecuiteConditionings = ds.MassecuiteConditioningddl();
+}
+@using (Html.BeginForm("AddeditMassecuiteConditioningDataDetails", "HouseData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+{
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            AnalysisValue
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.SerialNo, new { @class = "form-control", @maxlength = "80", @required = "required" })
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            MassecuiteConditioning
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.HiddenFor(m => m.MassecuiteConditioningDataDetailsId)
+                @Html.DropDownListFor(m => m.MassecuiteConditioningDataDetailsId, new SelectList(massecuiteConditionings, "MassecuiteConditioningId", "MassecuiteConditioningName"), "Select MassecuiteConditioning", new { @class = "form-control ddl", @Id = "ProcessHead2" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            AnalysisValue
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.AnalysisValue, new { @class = "form-control", @maxlength = "80", @required = "required" })
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            @if (Model.MassecuiteConditioningDataDetailsId == 0)
+            {
+                <button class="form-control bg-success">Save</button>
+            }
+            else
+            {
+                <button class="form-control bg-info">Update</button>
+
+            }
+
+        </div>
+
+    </div>
+}

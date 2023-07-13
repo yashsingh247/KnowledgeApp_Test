@@ -1,0 +1,377 @@
+﻿@model KnowledgeApp_Test.Models.Template.ReportTemplate
+@using KnowledgeApp_Test.Models.Template;
+@using KnowledgeApp_Test.Models.Parameters;
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+}
+@{
+    ViewBag.Title = "Report Template";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<ReportType> reportType = dropdownListSevices.ReportTypeddl();
+    List<ReportTemplate> reportTemplates = dropdownListSevices.ReportTemplateddl();
+    List<Parameter> ParameterList = dropdownListSevices.GetParemeterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditReportTemplate", "Template", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+
+    {
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.ReportTemplateId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if (right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-primary">Update</button>
+                }
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            ReportTemplateName
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.HiddenFor(m => m.ReportTemplateId)
+                            @Html.TextBoxFor(m => m.ReportTemplateName, new { @class = "form-control", @maxlength = "50" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            PrintStoppageDetail
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.PrintStoppageDetail, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!--SeasonRow-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            SeasonRow
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.SeasonRow, new { @class = "form-control Smint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            SeasonColumn
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.SeasonColumn, new { @class = "form-control Smint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!--SeasonRow-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            CropDayRow
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.CropDayRow, new { @class = "form-control Smint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            CropDayColumn
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.CropDayColumn, new { @class = "form-control Smint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!--Report Type-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            ParameterType
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.ReportType, new SelectList(reportType, "ReportTypeId", "ReportTypeName"), "Select Report Type", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            ColumnCount
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ColumnCount, new { @class = "form-control Smint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!--Template-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            TemplateFileName
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        @Html.HiddenFor(m => m.TemplateFileName);
+                        @Html.TextBoxFor(m => m.ImagePath, new { @type = "file" })
+
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    }
+    if (right[0].btnView == true)
+    {
+        <div class="row">
+            <div class="col-md-2">
+                Details
+            </div>
+            <div class="col-md-10">
+                @if (Model.ReportTemplateId != 0 && right[0].BtnAdd == true)
+                {
+                    <div class="row">
+                        <div class=" col-md-6">
+                            <div class="form-group">
+                                <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditReportTemplateDetails", "Template")')"><i class="fa fa-plus"></i> New Report Template Details</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <div class=" col-md-3">
+                        <div class="form-group">
+                            @Html.DropDownList("ReportTemplate", new SelectList(reportTemplates, "ReportTemplateId", "ReportTemplateName"), "Select Report Template", new { @class = "form-control ddl Tabledata", @Id = "ReportTempId2" })
+                        </div>
+                    </div>
+                    <div class=" col-md-3">
+                        <div class="form-group">
+                            @Html.DropDownList("Parameter", new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @Id = "Parameter2" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered dataTable" id="ReportTemplateDetails" width="100%" style="height:auto" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th width="20%"></th>
+                                        <th>Id</th>
+                                        <th> Row Number</th>
+                                        <th> ColumnNo</th>
+                                        <th> Parameter Name</th>
+                                        <th> Fixed Value</th>
+                                        <th>Prefix Value</th>
+                                        <th>Post Fix Value</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        var ReportTemplateId = $('#ReportTemplateId').val();
+        $('.Tabledata').on("change", function () {
+            var ReportTempId = $("#ReportTempId2").val();
+            var Parameter = $("#Parameter2").val();
+            getChartTemplateDetailData(ReportTempId, Parameter)
+        });
+
+        getChartTemplateData(ReportTemplateId,'');
+    });
+    function getChartTemplateData(ReportTemplateId, Parameter) {
+                $("#ReportTemplateDetails").DataTable().clear().draw();
+                $("#ReportTemplateDetails").DataTable().destroy();
+        var URL = "/Template/ReportTemplateDetailsData?ReportTemplateId=" + ReportTemplateId + '&Parameter=' + Parameter;
+            $('#ReportTemplateDetails').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns":
+                      [{ "data": "ReportTemplateDetailID", "render": function (data) { return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditReportTemplateDetails", "Template")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>"; }, },
+                     { "data": "ReportTemplateDetailID" },
+                     { "data": "RowNumber" },
+                     { "data": "ColumnNumber" },
+                     { "data": "ParameterName" },
+                     { "data": "FixedValue" },
+                     { "data": "PrefixValue" },
+                     { "data": "PostfixValue" },
+                     ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+
+                buttons: [
+                    {
+                        extend: 'pdf',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'excel',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'print',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'colvis',
+                        columns: ':not(.noVis)'
+                    }
+                ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Report Template Details',
+                    height: 700,
+                    width: 1200,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+    function DeleteDetailTable(Id) {
+        var TableName = "ReportTemplateDetails";
+        var URL = '/Login/DeleteDatabyId?TableName=' + TableName + '&Id=' + Id;
+        $.ajax({
+            url: URL,
+            dataType: 'HTML',
+            success: function (returnData) {
+                console.log(returnData)
+                var A = []
+                A = JSON.parse(returnData)
+
+                var Status = A["hasError"];
+                var Msg = A["message"];
+                if (Status == true) {
+                    $("#DeleteMessge").append(Msg);
+                    location.reload();
+                }
+                else {
+                    console.log(Msg)
+                    console.log(Status)
+                    $("#DeleteMessge").append(Msg);
+                }
+            },
+
+        });
+    }
+</script>

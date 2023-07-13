@@ -1,0 +1,126 @@
+﻿@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Common;
+@using KnowledgeApp_Test.Models.Template;
+
+@{
+    ViewBag.Title = "DownloadTemplateReport";
+}
+@{
+    DropdownListSevices ds = new DropdownListSevices();
+    List<ReportTemplate> Template = ds.ReportTemplateddl();
+    List<Unit> Unit = ds.GetUnitddl();
+}
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">Download Report From Template</h3>
+    </div>
+</div><div class="row">
+    <div class="col-md-12">
+
+    </div>
+</div>
+<div id="GridDiv" class="s-DataGrid ">
+    @*<div class="grid-title"><div class="title-text" style="margin-top:10px">Download Report From Template</div></div>*@
+    <div class=" row">
+        <div class="col-md-5 col-sm-9 col-xs-12">
+            <div class="msgBox alert-warning form-group" style="padding:5px">
+                <span id="alertMsg"></span>
+                <button type="button" class="close" onclick="hideAlert()" aria-label="close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="form-group col-md-12">
+                <div class="col-sm-5">Unit ID</div>
+                <div class="col-sm-7">
+                    @Html.DropDownList("UnitId", new SelectList(Unit, "UnitId", "UnitName"),"Select Unit", new {@class="form-control ddl",@id= "UnitId" })
+              
+                </div>
+            </div>
+            <div class="form-group col-md-12">
+                <div class="col-sm-5">Template</div>
+                <div class="col-sm-7">
+                    @Html.DropDownList("Template", new SelectList(Template, "ReportTemplateId", "ReportTemplateName"), "Select Template", new { @class = "form-control ddl",@Id= "Template" })
+                    @*<select class="form-control parameter" id="tempId" asp-items="@(new SelectList(Model,"Id","Name"))">
+            <option value="-1">--Select Template--</option>
+        </select>*@
+                </div>
+            </div>
+            <div class="form-group col-md-12">
+                <div class="col-sm-5">
+                    Select Report Date
+                </div>
+                <div class="col-sm-7">
+                    <input id="reportdate" type="text" class="form-control date" />
+                </div>
+            </div>
+            <div class="col-sm-4 col-sm-offset-4">
+                <button class="form-control btn btn-primary" id="startRendering" onclick="RenderReport()">Render Report</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(".msgBox").hide();
+    function hideAlert() {
+        $(".msgBox").hide();
+    }
+    function showAlert() {
+        $(".msgBox").show();
+    }
+    function alertmsg(msg) {
+        $("#alertMsg").html(msg);
+    }
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+    });
+
+    function RenderReport() {
+        
+        //alert("comming");
+        hideAlert();
+        var tempid = $("#Template").val();
+        var unit = $("#UnitId").val();
+        var reportDate = $("#reportdate").val();
+       
+        console.log(tempid, unit, reportDate)
+        if (tempid == "" || reportDate == "")
+        {
+            alertmsg("Please select data properly");
+            showAlert();
+            return 0;
+        }
+        console.log("59");
+        //var formData = new FormData();
+        
+        //formData.append("UnitId", unit);
+        //console.log("UnitId", unit);
+        //formData.append("TempId", tempid);
+        //formData.append("ReportDate", reportDate);
+        //console.log(formData);
+        var Url = '/Parameters/RenderData?UnitId=' + unit + '&TempId=' + tempid + '&ReportDate=' + reportDate;
+       
+        $.ajax({
+            url: Url,
+            type: "POST",
+            success: function (data) {
+                ;
+                if (data.success == true) {
+                    window.location.href = "DownloadExcel?UnitId=" + unit + "&TempId=" + tempid + "&ReportDate=" + reportDate;
+                } else {
+                    alertmsg(data.responseText);
+                    showAlert();
+                }
+            }
+        });
+    }
+
+
+</script>

@@ -1,0 +1,315 @@
+﻿@model KnowledgeApp_Test.Models.Stoppages.Stoppage
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Stoppages
+@using KnowledgeApp_Test.Models.Administration
+@{ Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unit = ds.GetUnitddl();
+    List<CrushingSeason> crushingSeasons = ds.GetCrushingSeasonddl();
+    List<StoppageStation> stoppageStations = ds.GetStoppageStationddl();
+    List<StoppageSparesProcess> stoppageSparesProcesses = ds.GetStoppageSparesProcessddl();
+    List<StoppageActionTaken> actionTaken = ds.StoppageActionTakenddl();
+    List<StoppageDefect> stoppageDefect = ds.StoppageDefectddl();
+    List<StoppageType> stoppageType = ds.StoppageTypeddl();
+    var Id = "Stoppage";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditStoppage", "Stoppages", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-2">
+                @Html.HiddenFor(m => m.StoppageId)
+                Stoppage Type
+            </div>
+            <div class="col-md-10">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.StoppageType, new SelectList(stoppageType, "StoppageTypeId", "StoppageTypeName"), "Select Stoppage Type", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Unit
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-3">Crushing Season</div>
+                    <div class="col-md-9">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.CrushingSeasonId, new SelectList(crushingSeasons, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl ", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!---Stoppage Date-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Stoppage Date
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.StoppageDate, new { Value = Model.StoppageDate.ToString("dd-MM-yyyy"), @class = "form-control date", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        DateSerial
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DateSerial, new { @class = "form-control Tint", @readOnly = "Readonly", @onkeypress = "javascript:return isNumber(event)" })
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!--StoppageStart-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Stoppage Start
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.StoppageStart, new { Value = Model.StoppageStart.ToString("dd-MM-yyyy"), @class = "form-control date time", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @*<input type="time" class="form-control time" id="startTime" name="StartTime" />*@
+
+                            @Html.TextBoxFor(m => m.StartTime, new { Value = Model.StoppageDate.ToString("HH:ss"), @type = "time", @class = "form-control time", @id = "startTime" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- StoppageTill-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Stoppage Till
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.StoppageTill, new { Value = Model.StoppageTill.ToString("dd-MM-yyyy"), @class = "form-control date time", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+
+
+                    <div class="col-md-4"></div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+
+                            @*<input type="time" id="timeEnd" class="form-control time" name="EndTime" />*@
+                            @Html.TextBoxFor(m => m.EndTime, new { Value = Model.StoppageTill.ToString("HH:ss"), @type = "time", @Id = "timeEnd", @Class = "form-control time" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!--StoppageStation-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Station
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.StationId, new SelectList(stoppageStations, "StationId", "StationName"), "Select Stoppage Station", new { @class = "form-control ddl", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-3">Duration</div>
+                    <div class="col-md-9">
+                        <div>
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.Duration, new { @class = "form-control Sint", @readOnly = "Readonly", @onkeypress = "javascript:return isNumber(event)" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--DurationHour-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Duration Hour
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DurationHour, new { @class = "form-control", @maxlength = "10" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-3">
+                        Remarks
+                    </div>
+                    <div class="col-md-9">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Remarks, new { @class = "form-control", @readOnly = "Readonly", @maxlength = "255" })
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!--StoppageSparesProcess-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Spares Process
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.SpareProcessId, new SelectList(stoppageSparesProcesses, "SpareProcessId", "SpareProcessName"), "Select Stoppage Process", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-3">Stoppage Defect</div>
+                    <div class="col-md-9">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.DefectId, new SelectList(stoppageDefect, "DefectId", "DefectName"), "Select Defect", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--StoppageActionTaken-->
+        <div class="row">
+            <div class="col-md-2">
+                Action Type
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.ActionId, new SelectList(actionTaken, "ActionId", "ActionName"), "Select Action Type", new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.StoppageId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+            GetDatedi()
+            $(".time").on('change', function () {
+
+                GetDatedi()
+
+            });
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy', maxDate: '+0D', });
+
+            if ($("#StoppageDate").val() == '01-01-0001') {
+
+                $("#StoppageDate").val('');
+            }
+            if ($("#StoppageStart").val() == '01-01-0001') {
+                $("#StoppageStart").val('');
+            }
+            if ($("#StoppageTill").val() == '01-01-0001') {
+                $("#StoppageTill").val('');
+            }
+
+        });
+        function GetDatedi() {
+
+            var startTime = $("#startTime").val();
+            var StartDate = $("#StoppageStart").val();
+            var timeEnd = $("#timeEnd").val();
+            var EndDate = $("#StoppageTill").val();
+            if (StartDate != "01-01-0001" && StartDate != "" && EndDate != "01-01-0001" && EndDate != "") {
+                var Url = '/Stoppages/DateDiff?StartDate=' + StartDate + '&SatrtTime=' + startTime + '&EndDate=' + EndDate + '&EndTime=' + timeEnd;
+                $.ajax({
+                    url: Url,
+                    success: function (jsonData) {
+                        let data = jsonData.data;
+                        console.log(data)
+                        //var result = data;
+                        var Diffsec = data[0];
+                        var TotalHourse = data[1];
+                        var Days = data[2];
+                        var diffhours = data[3];
+                        var diffminute = data[4];
+                        var totalMin = data[5];
+                        $("#Duration").val(totalMin);
+                        $("#DurationHour").val(TotalHourse + ' h:' + diffminute + ' m');
+                    }
+
+                });
+            }
+        }
+    </script>

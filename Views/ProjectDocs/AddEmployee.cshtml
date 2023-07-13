@@ -1,0 +1,104 @@
+﻿@model KnowledgeApp_Test.Models.ProjectDocs.Employee
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<PlantDepartment> Employee = ds.PlantDepartmentddl();
+    var Id = "Employee";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true ||right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddEmployee", "ProjectDocs", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Plant Department
+            </div>
+
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.EmployeeId)
+                    @Html.DropDownListFor(m => m.PlantDepartmentId, new SelectList(Employee, "PlantDepartmentId", "DepartmentName"), "Select Department", new { @class = "form-control ddl", @id = "PlantDepartment2", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Employee Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.EmployeeCode, new { @class = "form-control", @maxlength = "50", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Employee Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.EmployeeName, new { @class = "form-control", @maxlength = "40" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Employee Class
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.EmployeeClass, new { @class = "form-control", @maxlength = "50" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Is Approver
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsApprover, new { @class = "form-control" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="btn-group">
+                    @if (Model.EmployeeId == 0 && right[0].BtnAdd == true)
+                    {
+                         <button class="form-control bg-success">Save</button>
+                    }
+                    else if(right[0].btnEdit == true)
+                    {
+                         <button class="form-control bg-primary">Update</button>
+                    }
+                </div>
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+
+        });
+    </script>

@@ -1,0 +1,224 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.PlantPerformance
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Plant Performance";
+    DropdownListSevices Ds = new DropdownListSevices();
+    List<Unit> unit = Ds.GetUnitddl();
+    List<Shift> shift = Ds.Shiftddl();
+    List<Employee> employee = Ds.Employeeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Plant Performance</h3>
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditPlantPerformance", "PlantData")')"><i class="fa fa-plus"></i>  New Plant Performance</a>
+    }
+    <hr />
+
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl ", @Id = "Unit2" })
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="form-group">
+                Shift
+                @Html.DropDownListFor(m => m.ShiftId, new SelectList(shift, "ShiftId", "ShiftName"), "Select Shift", new { @class = "form-control ddl", @id = "Shift2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Process Head
+                @Html.DropDownListFor(m => m.ProcessHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Process Head", new { @class = "form-control ddl", @id = "ProcessHead2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Section Head
+                @Html.DropDownListFor(m => m.SectionHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Section Head", new { @class = "form-control ddl", @id = "SectionHead2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Department Head
+                @Html.DropDownListFor(m => m.DepartmentHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "select Department Head", new { @class = "form-control ddl", @id = "DepartmentHead2" })
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered table-responsive" id="PlantPerfomance" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th>UnitName</th>
+                            <th>LogDate</th>
+                            <th>Shift Name</th>
+                            <th>Log Hour</th>
+                            <th>Cane Crushed</th>
+                            <th>Sugar Bagged</th>
+                            <th>Fbd Air Temperature</th>
+                            <th>Exhaust Temperature</th>
+                            <th>Imbition Percent</th>
+                            <th>Process Head Employee Code</th>
+                            <th>Section Head Employee Code</th>
+                            <th>Department Head Employee Code</th>
+                            <th>Process Head Id</th>
+                            <th>Section Head Id</th>
+                            <th>Department Head Id</th>
+                            <th>Shift Id</th>
+                            <th>Unit Id</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    } 
+}
+
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option ",
+                allowClear: true,
+                theme: "classic"
+            });
+
+            $(".ddl").on('change', function () {
+                var Unit = $("#Unit2").val();
+                var Shift = $("#Shift2").val();
+                var ProcessHead = $("#ProcessHeadId2").val();
+                var SectionHead = $("#SectionHeadId2").val();
+                var DepartmentHead = $("#DepartmentHeadId2").val();
+                getPlantPerformance(Unit, Shift, ProcessHead, SectionHead, DepartmentHead)
+            });
+
+
+            getPlantPerformance('', '', '', '', '', '', '')
+        });
+
+        function getPlantPerformance(Unit, Shift, ProcessHead, SectionHead, DepartmentHead) {
+            var URL = '/PlantData/PlantPerformanceData?Unit=' + Unit + '&Shift=' + Shift + '&ProcessHead=' + ProcessHead + '&SectionHead=' + SectionHead + '&DepartmentHead=' + DepartmentHead;
+            $("#PlantPerfomance").DataTable().clear().draw();
+            $("#PlantPerfomance").DataTable().destroy();
+            $('#PlantPerfomance').DataTable({
+                "ajax": {
+                    "url": URL,
+                    "type": "post",
+                    "datatype": "json"
+                },
+                "columns": [{ "data": "PlantPerformanceId", "render": function (data) { return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditPlantPerformance", "PlantData")/" + data + "')><i class='fa fa-pencil'></i></a>}@if(right[0].btnDelete==true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}"; }, },
+                { "data": "PlantPerformanceId" },
+                { "data": "UnitUnitName" },
+                { "data": "LogDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "ShiftShiftName" },
+                { "data": "LogHour" },
+                { "data": "CaneCrushed" },
+                { "data": "SugarBagged" },
+                { "data": "FbdAirTemperature" },
+                { "data": "ExhaustTemperature" },
+                { "data": "ImbitionPercent" },
+                { "data": "ProcessHeadEmployeeCode" },
+                { "data": "SectionHeadEmployeeCode" },
+                    { "data": "DepartmentHeadEmployeeCode" },
+                    { "data":"ProcessHeadId"},
+                { "data": "SectionHeadId" },
+                { "data": "DepartmentHeadId" },
+                { "data": "ShiftId" },
+                    { "data": "UnitId" },],
+                "serverSide": "true",
+                "order": [0, "asc"],
+                 "processing": "true",
+                columnDefs: [
+                    {
+                        targets: 1,
+                        className: 'noVis'
+                    }],
+                dom: 'Blfrtip',
+                buttons: [
+                    {
+                        orientation: 'landscape',
+                        pageSize: 'LEGAL',
+                        extend: 'pdf',
+                        action: newexportaction,
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+                        }
+
+                    },
+                    {
+                        extend: 'excel',
+                        action: newexportaction,
+                        exportOptions: {
+                            columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+                        }
+                    },
+                    {
+                        extend: 'print',
+                        newexportaction
+                    },
+
+                ],
+                "language":
+                {
+                    "processing": "Processing Please Wait.....",
+                    "emptyTable": "No data found......"
+                }
+            });
+
+        }
+
+        function PopupForm(url)
+        {
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Plant Perfomance',
+                    height: 700,
+                    width: 1000,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+        }
+    </script>

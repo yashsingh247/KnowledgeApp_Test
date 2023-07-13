@@ -1,0 +1,83 @@
+﻿@model IEnumerable<KnowledgeApp_Test.Models.Report.TPTReports>
+
+<div id="accordion">
+    @{
+        foreach (var item in Model.Select(a => a.UnitUnitName).Distinct())
+        {
+            <h3>Unit Id : @item</h3>
+            <div>
+                <table class="table table-bordered Report" id="ParemetertypeReport" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+
+                            <th>Unit </th>
+                            <th>Parameter Code</th>
+                            <th>Revision Name</th>
+                            <th>Parameter Name</th>
+                            <th>Target Value</th>
+                            <th>Actual</th>
+                            <th>Deviation(+/-)</th>
+                            <th>Deviation(%)</th>
+
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.Where(a => a.UnitUnitName.Equals(@item)))
+                        {
+                            <tr>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.UnitUnitName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.ParameterCode)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => i.RevisionName) </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.Target)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.DeviationOfSubstract)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.DeviationOfPercents)
+                                </td>
+
+
+                            </tr>
+
+                        }
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    }
+</div>
+<script>
+    $(document).ready(function () {
+        $('.Report').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                'excel', 'pdf', 'print'
+            ]
+        });
+    });
+    $(function () {
+        $("#accordion").accordion({
+            heightStyle: "content"
+
+        });
+    });
+</script>

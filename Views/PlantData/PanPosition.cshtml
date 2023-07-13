@@ -1,0 +1,198 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.PanPosition
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Pan Position";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<Unit> unit = DS.GetUnitddl();
+    List<Employee> employee = DS.Employeeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h3 style="color:#0090d9;">Pan Position</h3>
+
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddreditPanPosition", "PlantData")')"><i class="fa fa-plus"></i> New Pan Position</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @Id = "Unit2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Process Head
+                @Html.DropDownListFor(m => m.ProcessHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Process Head", new { @class = "form-control ddl", @id = "ProcessHead2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Section Head
+                @Html.DropDownListFor(m => m.SectionHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Section Head", new { @class = "form-control ddl", @id = "SectionHead2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Department Head
+                @Html.DropDownListFor(m => m.DepartmentHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), " Select Department Head", new { @class = "form-control ddl", @id = "DepartmentHead2" })
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="PanPosition" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th>Unit Name</th>
+                            <th width="5%">Analysis Date</th>
+                            <th width="5%">Shift Id</th>
+                            <th width="5%">Process Head Code</th>
+                            <th width="5%">Section Head Code</th>
+                            <th width="5%">Department Head Code</th>
+                            <th width="5%">Process Head Id</th>
+                            <th width="5%">Section Head Id</th>
+                            <th width="5%">Department Head Id</th>
+                            <th width="5%">UnitId</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+     $(".ddl").select2({
+            placeholder: "select Option ",
+            allowClear: true,
+            theme: "classic"
+        });
+
+        $(".ddl").on('change', function () {
+            var Unit = $("#Unit2").val();
+            var ProcessHead = $("#ProcessHead2").val();
+            var SectionHead = $("#SectionHead2").val();
+            var DepartmentHead = $("#DepartmentHead2").val();
+            getPanPositionData(Unit, ProcessHead, SectionHead, DepartmentHead)
+        });
+        getPanPositionData('','','','')
+    });
+
+    function getPanPositionData(Unit,ProcessHead, SectionHead, DepartmentHead) {
+        var URL = '/PlantData/PanPositionData?Unit=' + Unit +  '&ProcessHead=' + ProcessHead + '&SectionHead=' + SectionHead + '&DepartmentHead=' + DepartmentHead;
+        $("#PanPosition").DataTable().clear().draw();
+        $("#PanPosition").DataTable().destroy();
+        $('#PanPosition').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "PanPositionId", "render": function (data) { return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddreditPanPosition", "PlantData")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "PanPositionId" },
+                { "data": "UnitUnitName" },
+                { "data": "AnalysisDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "ShiftId" },
+                { "data": "ProcessHeadEmployeeCode" },
+                { "data": "SectionHeadEmployeeCode" },
+                { "data": "DepartmentHeadEmployeeCode" },
+                { "data": "ProcessHeadId" },
+                { "data": "SectionHeadId" },
+                { "data": "DepartmentHeadId" },
+                { "data": "UnitId" },
+            ],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Pan Position',
+                    height: 700,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+</script>
+
+
+
+

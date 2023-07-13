@@ -1,0 +1,248 @@
+﻿@model KnowledgeApp_Test.Models.ProjectDocs.DocumentRegistration
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> Unit = ds.GetUnitddl();
+    List<DocumentClass> DocumentClass = ds.DocumentClassddl();
+    List<Employee> Employee = ds.Employeeddl();
+    List<DocumentSubClass> documentSubClasses = ds.DocumentSubClassddl();
+    List<PlantDepartment> PlantDepartment = ds.PlantDepartmentddl();
+    List<PlantSubDepartment> PlantSubDepartment = ds.PlantSubDepartmentddl();
+    List<ApprovalStatus> ApprovalStatus = ds.ApprovalStatusddl();
+    var Id = "Document Registration";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+    using (Html.BeginForm("AddDocumentRegistration", "ProjectDocs", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6">
+                            Document Number
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.HiddenFor(m => m.DocumentRegistrationId)
+                                @Html.TextBoxFor(m => m.DocumentNumber, new { @class = "form-control", @maxlength = "45", @required = "required" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            Unit
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.DropDownListFor(m => m.UnitId, new SelectList(Unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl ", @Id = "Unit2" })
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            Document Type
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.DocumentType, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            Document Owner
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.DropDownListFor(m => m.DocumentOwnerId, new SelectList(Employee, "EmployeeId", "EmployeeName"), "Select Documents Owner", new { @class = "form-control ddl", @id = "DocumentOwner2" })
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            Document Sub Class
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.DropDownListFor(m => m.DocumentSubClassId, new SelectList(documentSubClasses, "DocumentSubClassId", "SubClassName"), "Select Sub class", new { @class = "form-control ddl", @id = "DocumentSubClass2" })
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            Document Sub Department
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.DropDownListFor(m => m.DocumentSubDepartmentId, new SelectList(PlantSubDepartment, "PlantSubDepartmentId", "SubDepartmentName"), "Select Sub DEpartment", new { @class = "form-control ddl ", @Id = "DocumentSubDepartment2" })
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            Document File
+                        </div>
+                        <div class="col-md-6">
+                            @Html.HiddenFor(m => m.ImagePath)
+                            @Html.TextBoxFor(m => m.DocumentFile, new { @type = "file", RequiredAccept = ".xlsx, .xls" })
+
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6">
+                            Document Date
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.DocumentDate, new { Value = Model.DocumentDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            Subject
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.Subject, new { @class = "form-control", @Maxlength = "100" })
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            Document Class
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.DropDownListFor(m => m.DocumentClassId, new SelectList(DocumentClass, "DocumentClassId", "ClassName"), "Select Class", new { @class = "form-control ddl", @Id = "DocumentClass2" })
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            Preamble
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.Preamble, new { @class = "form-control", @maxlength = "100" })
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            Document Department
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.DropDownListFor(m => m.DocumentDepartmentId, new SelectList(PlantDepartment, "PlantDepartmentId", "DepartmentName"), "Select Department", new { @class = "form-control ddl", @id = "DocumentDepartment2" })
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-3">
+                Document DocumentApprover
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.DocumentApproverId, new SelectList(Employee, "EmployeeId", "EmployeeName"), "Select Document Approver", new { @Class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12"></div>
+            <div class="col-md-12">
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-6">
+                            Document Approver Date
+                        </div>
+                        @*@Id = "ApproverDate"*@
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.DocumentApproverDate, new { Value = Model.DocumentApproverDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="row">
+                        <div class="col-md-4">
+                            Approval Status
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                @Html.HiddenFor(m => m.ApprovalStatus, new { @Class = "form-control ddl" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.DocumentRegistrationId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-success">Update</button>
+                }
+
+
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy', maxDate: '+0D', });
+            if ($("#DocumentDate").val() == '01-01-0001') {
+                $('#DocumentDate').datepicker('setDate', 'today');
+            }
+            if ($("#DocumentApproverDate").val() == '01-01-0001') {
+                $('#DocumentApproverDate').datepicker('setDate', 'today');
+            }
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+
+
+        });
+    </script>

@@ -1,0 +1,74 @@
+﻿    @model IEnumerable<KnowledgeApp_Test.Models.Report.MassecuiteConditioningData>
+
+<div id="accordion">
+    @{
+        foreach (var item in Model.Select(a => a.AnalysisDate).Distinct())
+        {
+            <h3>Date: @item</h3>
+            <div>
+                <table class="table table-bordered Report " id="ParemetertypeReport" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+
+                            <th>Clarification Name </th>
+                            <th>Shift6To2</th>
+                            <th>Shift2To10</th>
+                            <th>Shift10To6</th>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var i in Model.Where(a => a.AnalysisDate.Equals(@item)))
+                        {
+                            <tr>
+
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.MassecuiteConditioningName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.Shift6To2)
+                                </td>
+
+                                <td>@Html.DisplayFor(modelItem => i.Shift2To10) </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.Shift10To6)
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    }
+</div>
+<script language="javascript">
+    $(document).ready(function () {
+        $(document).ready(function () {
+            $('.Report').DataTable({
+                dom: 'Blfrtip',
+                buttons: [
+                    'excel', 'pdf', 'print'
+                ]
+            });
+        });
+        $(function () {
+            $("#accordion").accordion({
+                heightStyle: "content"
+
+            });
+        });
+
+    });
+</script>
+

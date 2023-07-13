@@ -1,0 +1,84 @@
+﻿@model KnowledgeApp_Test.Models.Stoppages.StoppageSparesProcess
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Stoppages
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<StoppageStation> stoppageStation = ds.GetStoppageStationddl();
+    ViewBag.Title = "Stoppage Spares Process";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditStoppageSparesProcess", "Stoppages", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Spare Process Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.SpareProcessId)
+                    @Html.TextBoxFor(m => m.SpareProcessCode, new { @class = "form-control", @maxlength = "4" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Spare Process Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.SpareProcessName, new { @class = "form-control", @maxlength = "40", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Is Process
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsProcess, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Stoppage Station
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.StationId, new SelectList(stoppageStation, "StationId", "StationName"), "Select Station", new { @class = "form-control ddl" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.SpareProcessId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select OPtion",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

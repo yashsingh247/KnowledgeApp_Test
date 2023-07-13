@@ -1,0 +1,177 @@
+﻿@model KnowledgeApp_Test.Models.TPT.TptPower
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    ViewBag.Title = "Tpt Power";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<ParameterUnit> parameterUnit = DS.GetParameterUnitddl();
+    List<Parameter> parameter = DS.GetParemeterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Tpt Power</h3>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+        <div class="col-md-2">
+            @if (right[0].BtnAdd == true)
+            {
+                <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditTptPower", "TPT")')"><i class="fa fa-plus"></i> Add Tpt Power</a>
+            }
+        </div>
+       
+    </div>
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-3">
+            <div class="form-group">
+                Parameter Unit
+                @Html.DropDownListFor(m => m.ParameterUnitId, new SelectList(parameterUnit, "ParameterUnitId", "ParameterUnitName"), "Select Parameter Unit ", new { @class = "form-control ddl", @id = "ParameterUnit2" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                Parameter
+                @Html.DropDownListFor(m => m.ParameterId, new SelectList(parameter, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @id = "Parameter2" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="tptPower" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th>Tpt Power Code</th>
+                            <th>Tpt Power Name</th>
+                            <th>Parameter Type</th>
+                            <th>Formula</th>
+                            <th>Parameter Unit Name</th>
+                            <th>Descriptive Formula</th>
+                            <th>Parameter Parameter Name</th>
+                            <th>Parameter Id</th>
+                            <th>Parameter Unit Id</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $(".ddl").on('change', function () {
+            var Parameter = $("#Parameter2").val();
+            var ParameterUnit = $("#ParameterUnit2").val();
+            getTptPowerData(Parameter, ParameterUnit)
+        });
+
+            getTptPowerData('', '')
+
+    });
+
+    function getTptPowerData(Parameter, ParameterUnit) {
+        var URL='/TPT/TptPowerData?Parameter=' + Parameter + '&ParameterUnit=' + ParameterUnit;
+        $("#tptPower").DataTable().clear().draw();
+        $("#tptPower").DataTable().destroy();
+        $('#tptPower').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "TptPowerParameterId", "render": function (data) { return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditTptPower", "TPT")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "TptPowerParameterId" },
+                { "data": "TptPowerCode" },
+                { "data": "TptPowerName" },
+                { "data": "ParameterType" },
+                { "data": "Formula" },
+                { "data": "ParameterUnitParameterUnitName" },
+                { "data": "DescriptiveFormula" },
+                { "data": "ParameterParameterName" },
+                { "data": "ParameterId" },
+                { "data": "ParameterUnitId" },],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'print',
+                    action: newexportaction,
+                },
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Tpt Power',
+                    height: 700,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+</script>

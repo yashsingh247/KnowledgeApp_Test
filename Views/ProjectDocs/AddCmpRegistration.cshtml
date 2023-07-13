@@ -1,0 +1,771 @@
+﻿@model KnowledgeApp_Test.Models.ProjectDocs.CmpRegistration
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> Unit = ds.GetUnitddl();
+    List<Employee> Employee = ds.Employeeddl();
+    List<PlantDepartment> PlantDepartment = ds.PlantDepartmentddl();
+    List<PlantSubDepartment> PlantSubDepartment = ds.PlantSubDepartmentddl();
+    var Id = "Cmp Registration";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+
+    using (Html.BeginForm("AddCmpRegistration", "ProjectDocs", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <dic class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            RegistrationNumber
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.HiddenFor(m => m.CmpRegistrationId)
+                            @Html.TextBoxFor(m => m.RegistrationNumber, new { @Class = "form-control", @maxlength = "50", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </dic>
+            </div>
+            <div class="col-md-6">
+                <dic class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Registration Date
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.RegistrationDate, new { Value = Model.RegistrationDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+                        </div>
+                    </div>
+                </dic>
+            </div>
+        </div>
+        <!--Unit-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Unit
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.UnitId, new SelectList(Unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl ", @Id = "Unit2" })
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Subject
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Subject, new { @Class = "form-control", @maxlength = "500" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!---Status-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Status
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Status, new { @Class = "form-control", @maxlength = "200" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        ProposedActivity
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ProposedActivity, new { @Class = "form-control", @maxlength = "2000" })
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!--ExpectedImprovement-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Expected Improvement
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ExpectedImprovement, new { @class = "form-control", @maxlength = "500" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">Other Implications</div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.OtherImplications, new { @class = "form-control", @maxlength = "500" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <!-- IsDrawingAtached -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Is Drawing Atached
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsDrawingAtached)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        CostOfChange
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.CostOfChange, new { @class = "form-control", @onkeypress = "javascript:return isNumber(event)", @oninput = "validatetwodecimal(this)" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- IsDrawingAtached -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        IsDrawingAtached
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsEstimationAttached)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Roi
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Roi, new { @class = "form-control", @maxlength = "50" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- IsRoiCalculationAttached -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        IsRoiCalculationAttached
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsRoiCalculationAttached)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        ProposalDrawnFrom
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ProposalDrawnFrom, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- IsTrainingRequired -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        IsTrainingRequired
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsTrainingRequired)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Intiator
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.IntiatorId, new SelectList(Employee, "EmployeeId", "EmployeeName"), "Select Intiator", new { @class = "form-control ddl" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!--Remarks-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Remarks
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Remarks, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">DrawingDocument</div>
+                    <div class="col-md-8">
+
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DrawingDocument, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!--RoiCalculationDocument-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        RoiCalculationDocument
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.RoiCalculationDocument, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">IsImplemented</div>
+                    <div class="col-md-1">
+
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsImplemented)
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!--Document Type-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        DocumentType
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DocumentType, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">Preamble</div>
+                    <div class="col-md-8">
+
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Preamble, new { @class = "form-control", @Maxlength = "2000" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- ImpactQuantity -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        ImpactQuantity
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.ImpactQuantity)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        ImpactQuantityDetail
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ImpactQuantityDetail, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- IsImpactOnSafety -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Is Impact On Safety
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsImpactOnSafety)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Impactc On Safety Detail
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ImpactOnSafetyDetail, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- IsImpactOnEnvironment -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        IsImpactOnEnvironment
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsImpactOnEnvironment)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        ImpactOnEnvironmentDetail
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ImpactOnEnvironmentDetail, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- IsImpactOnFoodSafety -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        IsImpactOnFoodSafety
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsImpactOnFoodSafety)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        ImpactOnFoodSafetyDetail
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ImpactOnFoodSafetyDetail, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- IsLegalRequirement -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        IsLegalRequirement
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsLegalRequirement)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        LegalRequirementDetail
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.LegalRequirementDetail, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TrainingDetail -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        TrainingDetail
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.TrainingDetail, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        IsBudgetTaken
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsBudgetTaken)
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!--BudgetDetail-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        BudgetDetail
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.BudgetDetail, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">EstimationDocument</div>
+                    <div class="col-md-8">
+
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.EstimationDocument, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Document Department-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Document Department
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.DocumentDepartmentId, new SelectList(PlantDepartment, "PlantDepartmentId", "DepartmentName"), "Select  DocumentDepartment", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">Document Sub Department</div>
+                    <div class="col-md-8">
+
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.DocumentSubDepartmentId, new SelectList(PlantSubDepartment, "PlantSubDepartmentId", "SubDepartmentName"), "Select Sub Department", new { @class = "form-control ddl" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- IsSanctionRequired -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        IsSanctionRequired
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsSanctionRequired)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        NatureOfExpenditure
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.NatureOfExpenditure, new { @class = "form-control", Maxlength = "100" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!--BudgetProvisionAmount-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        DocumentType
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.BudgetProvisionAmount, new { @class = "form-control", @onkeypress = "javascript:return isNumber(event)", @oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">PresentProposalAmount</div>
+                    <div class="col-md-8">
+
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.PresentProposalAmount, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!--BalanceSanctionAmount-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        BalanceSanctionAmount
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.BalanceSanctionAmount, new { @class = "form-control", @onkeypress = "javascript:return isNumber(event)", @oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">FuntionLocationInPlant</div>
+                    <div class="col-md-8">
+
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.FuntionLocationInPlant, new { @class = "form-control", @Maxlength = "100" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!--SanctionDate-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        SanctionDate
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.SanctionDate, new { Value = Model.SanctionDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">RoiDocumentType</div>
+                    <div class="col-md-8">
+
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.RoiDocumentType, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!--SanctionDate-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        EstimateDocumentType
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.EstimateDocumentType, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.CmpRegistrationId == 0 || right[0].btnView == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+
+                else if(right[0].btnView == true)
+                {
+                    <button class="form-control bg-primary">Update</button>
+
+                }
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select Cmp Registration ",
+                allowClear: true,
+                theme: "classic"
+            });
+
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy', });
+            if ($("#RegistrationDate").val() == '01-01-0001') {
+                $('#RegistrationDate').datepicker('setDate', 'today');
+            }
+            if ($("#SanctionDate").val() == '01-01-0001') {
+                $('#SanctionDate').datepicker('setDate', 'today');
+            }
+
+            $("#DocumentSubClassId").on('change', function () {
+                var SpecialAnalysisType = $("#DocumentSubClassId").val();
+                getSpecialParameter(SpecialAnalysisType)
+            });
+
+        });
+    </script>

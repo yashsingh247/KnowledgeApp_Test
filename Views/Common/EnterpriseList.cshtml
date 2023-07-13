@@ -1,0 +1,138 @@
+﻿@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    ViewBag.Title = "Enterprise";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+        <a class="btn btn-success addclass" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddEditEnterprise", "Common")')"><i class="fa fa-plus"></i> Add New Enterprise</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table id="enterprise" class="utable table-bordered  display table" cellspacing="0" width="100%">
+                        <thead>
+                            <tr class="bg-light">
+                                <th></th>
+                                <th class="EnterpriseId1">EnterpriseId</th>
+                                <th class="EnterpriseName">EnterpriseName</th>
+                                <th class="AddressLine1">AddressLine1</th>
+                                <th class="AddressLine2">AddressLine2</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    }
+
+    <script>
+    $(document).ready(function () {
+        dataTable = $('#enterprise').DataTable({
+            "ajax": {
+                "url": "/Common/EnterpriseData",
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [
+                {
+                    "data": "EnterpriseId", "render": function (data) {
+                        return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm RoEdit' onclick=PopupForm('@Url.Action("AddEditEnterprise", "Common")/" + data + "')><i class='fa fa-pencil'></i> </a> }@if (right[0].btnDelete == true) { <a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash roDel'></i> </a>}";
+                },
+                },
+                { "data": "EnterpriseId" },
+                { "data": "EnterpriseName" },
+                { "data": "AddressLine1" },
+                { "data": "AddressLine2" },
+
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+
+
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            },
+        });
+    });
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Enterprise Details',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+
+
+
+    </script>
+}
+
+

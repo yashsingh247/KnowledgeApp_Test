@@ -1,0 +1,400 @@
+﻿@model KnowledgeApp_Test.Models.Parameters.Parameter
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Parameters;
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    Layout = null;
+}
+@{
+    ViewBag.Title = "Parameter";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<ParameterType> parameterType = dropdownListSevices.GetParemeterTypeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditParameter", "Parameters", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Parameter Code
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.HiddenFor(m => m.ParameterId)
+                            @Html.TextBoxFor(m => m.ParameterCode, new { @Class = "form-control Smint Code", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Parameter Name
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ParameterName, new { @Class = "form-control", @maxlength = "40" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Parameter Type
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.ParameterTypeId, new SelectList(parameterType, "ParameterTypeId", "ParameterTypeName"), "Select Parameter Type", new { @class = "form-control ddl", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        IS Discontinued
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.Discontinued)
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        IS User Defined
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsUserDefined)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Is Previous Day
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsPreviousDay)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Is Stoppage Parameter
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsStoppageParameter)
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Prevous Day Parameter Id
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.PrevousDayParameterId, new { @Class = "form-control", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Maximum Value
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.MaximumValue, new { @Class = "form-control", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        After Decimal Digit
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.AfterDecimalDigit, new { @Class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Print Before Decimal Digit
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.PrintBeforeDecimalDigit, new { @Class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Print After Decimal Digit
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.PrintAfterDecimalDigit, new { @Class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        To Date Type
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.TodateType, new { @Class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Average Basis Parameter Id
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.AverageBasisParameterId, new { @Class = "form-control", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Formula
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Formula, new { @Class = "form-control", @maxlength = "255" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        To date Formula
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.TodateFormula, new { @Class = "form-control", @maxlength = "255" })
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Descriptive Formula
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DescriptiveFormula, new { @Class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Descriptive Todate Formula
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DescriptiveTodateFormula, new { @Class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Calculation Level
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.CalculationLevel, new { @Class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Is Stock Parameter
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsStockParameter)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Uom
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Uom, new { @Class = "form-control", @maxlength = "10" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Is Brix Weight Parameter
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsBrixWeightParameter)
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Is Calculated On Brix Weight
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsCalculatedOnBrixWeight)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Is Hourly Entry
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsHourlyEntry)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Is Additional Entry
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            @Html.CheckBoxFor(m => m.IsAdditionalEntry)
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        Average Basis Parameter
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.AverageBasisParameter, new { @Class = "form-control Smint", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.ParameterId == 0 && right[0].BtnAdd==true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+
+            </div>
+
+        </div>
+    }
+}
+    <script>
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Entry Type",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

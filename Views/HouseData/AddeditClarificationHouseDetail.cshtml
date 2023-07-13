@@ -1,0 +1,82 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.ClarificationHouseDetail
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@using KnowledgeApp_Test.Models.HouseData
+
+@{
+    Layout = null;
+    ViewBag.Title = "Clarification House";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Clarification> clarifications = ds.Clarificationddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+    var SId = @ViewBag.ClarificationHouse;
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditClarificationHouseDetail", "HouseData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    SerialNo
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.ClarificationHouseDetailID)
+                    @Html.HiddenFor(m => m.ClarificationHouseId, new { Value = @ViewBag.ClarificationHouse })
+                    @Html.TextBoxFor(m => m.SerialNo, new { @class = "form-control", @maxlength = "80", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    Clarification
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.ClarificationID, new SelectList(clarifications, "ClarificationId", "ClarificationName"), "Select Clarification", new { @class = "form-control ddl", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    ClarificationValue
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ClarificationValue, new { @class = "form-control", oninput = "validatetwodecimal(this)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.ClarificationHouseDetailID == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+
+                }
+
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

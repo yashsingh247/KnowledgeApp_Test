@@ -1,0 +1,440 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.MassecuiteStock
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    Layout = null;
+    ViewBag.Title = "Massecuite Stock";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unit = ds.GetUnitddl();
+    List<Shift> shift = ds.Shiftddl();
+    List<Employee> employee = ds.Employeeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditMassecuiteStock", "HouseData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+            @Html.Raw(@ViewBag.Alert)
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <dic class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Analysis Date
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.HiddenFor(m => m.MassecuiteStockId)
+                            @Html.TextBoxFor(m => m.AnalysisDate, new { Value = Model.AnalysisDate.ToString("dd-MM-yyyy"), @Class = "form-control date", @required = "required" })
+                        </div>
+                    </div>
+                </dic>
+            </div>
+            <div class="col-md-6">
+                <dic class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Unit
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl Tabledata", @required = "required" })
+                        </div>
+                    </div>
+                </dic>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Shift
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.ShiftId, new SelectList(shift, "ShiftId", "ShiftName"), "Select shift", new { @class = "form-control ddl", required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            ShiftRcvA
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ShiftRcvA, new { @Class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!---DroppA-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        DroppA
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DroppA, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        CuredA
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.CuredA, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!--BalA-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        BalA
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.BalA, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">ShiftRcvA1</div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ShiftRcvA1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+        <!-- DroppA1 -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        DroppA1
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DroppA1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        CuredA1
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.CuredA1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!--BalA1-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        BalA1
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.BalA1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">ShiftRcvB</div>
+                    <div class="col-md-8">
+                        <div>
+                            <div class="form-group">
+                                @Html.TextBoxFor(m => m.ShiftRcvB, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!--DroppB-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        DroppB
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DroppB, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        CuredB
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.CuredB, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!--BalB-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        BalB
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.BalB, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">Shift Rcv C1</div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ShiftRcvC1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!--DroppC1-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        DroppC1
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DroppC1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Cured C1
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.CuredC1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!--BalC1-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        BalC1
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.BalC1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Cured C1
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ShiftRcvC, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!--DroppC-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        DroppC
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.DroppC, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        CuredC
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.CuredC, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!--BalC-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        BalC
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.BalC, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Process Head
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.ProcessHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Process Head", new { @class = "form-control ddl", @Id = "ProcessHeadId2" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!---SectionHead-->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Section Head
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.SectionHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Section Head", new { @class = "form-control ddl", @Id = "SectionHead2" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Department Head
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.DepartmentHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Department Head", new { @class = "form-control ddl", @Id = "DepartmentHead2" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.MassecuiteStockId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if (right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+            $(".ddl").select2({
+                placeholder: "select Option ",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#AnalysisDate").val() == '01-01-0001') {
+
+                $("#AnalysisDate").val('');
+            }
+
+        });
+    </script>

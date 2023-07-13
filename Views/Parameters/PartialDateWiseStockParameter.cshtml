@@ -1,0 +1,65 @@
+﻿@model IEnumerable<KnowledgeApp_Test.Models.Parameters.DateWiseStockParameter>
+<div id="accordion">
+    @{
+        foreach (var item in Model.Select(a => a.ParameterTypeName).Distinct())
+        {
+            <h3>ParameterTypeName : @item</h3>
+            <div>
+                <table class="table table-bordered" id="ParemetertypeReport" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>
+                                ParameterTypeName
+                            </th>
+                            <th>
+                                ParameterTypeName
+                            </th>
+                            <th>
+                                Day Value
+                            </th>
+                        
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.Where(a => a.ParameterTypeName.Equals(@item)))
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.ParameterTypeName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.ParameterName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.DayValue)
+                                </td>
+                                
+
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    }
+</div>
+
+<script language="javascript">
+    $(function () {
+        $("#accordion").accordion({
+            heightStyle: "content"
+
+        });
+    });
+
+</script>
+

@@ -1,0 +1,84 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.Mill
+@using KnowledgeApp_Test.Models.Administration
+@using KnowledgeApp_Test.Services
+@{
+    Layout = null;
+    ViewBag.Title = "Mill";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+    using (Html.BeginForm("AddeditMill", "PlantData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Mill Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.MillId)
+                    @Html.TextBoxFor(m => m.MillCode, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Mill Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.MillName, new { @class = "form-control", @maxlength = "20" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Mill Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(model => model.MillType, new List<SelectListItem>
+                {
+                    new SelectListItem { Text = "Texmaco", Value = "1" },
+                    new SelectListItem { Text = "WIL", Value = "2" }
+               }, "Select MillType",
+           new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                @if (Model.MillId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+            </div>
+
+        </div>
+    }
+}
+    <script>
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Mill Type",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#MillCode").val() == 0) {
+                $("#MillCode").val('');
+
+
+            }
+        });
+    </script>

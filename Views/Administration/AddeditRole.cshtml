@@ -1,0 +1,84 @@
+﻿@model KnowledgeApp_Test.Models.Administration.Role
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Common
+@{
+    Layout = null;
+    DropdownListSevices Ds = new DropdownListSevices();
+    List<Unit> unit = Ds.GetUnitddl();
+}
+<style>
+    .multiselect-container > li > a > label > input[type="checkbox"] {
+        margin-right: -18px;
+    }
+</style>
+
+
+@using (Html.BeginForm("AddeditRole", "Administration", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+{
+    <div class="row">
+        <div class="col-md-4">
+            Role Name
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.HiddenFor(m=>m.RoleId)
+                @Html.TextBoxFor(m => m.RoleName, new { @class = "form-control", @maxlength = "200", @required = "required" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Units
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                
+                @Html.DropDownListFor(model => model.Units, new SelectList(unit, "UnitId", "UnitName"),"Select Unit", new {@class= "form-control" ,@PlaceHolder ="Select Unit", multiple = "multiple" })
+                
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="btn-group">
+                @if (Model.RoleId == 0)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+            </div>
+        </div>
+
+    </div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        //$('#Units').multiselect({
+        //    //placeholder: "select Unit",
+        //    includeSelectAllOption: true,
+        //    //title:"select Unit"
+        //}); 
+        $("#Units").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            includeSelectAllOption: true,
+            multiple: true,
+            theme: "classic"
+        });
+
+    });
+
+    
+    
+
+   
+
+</script>

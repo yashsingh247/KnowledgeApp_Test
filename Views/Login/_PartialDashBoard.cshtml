@@ -1,0 +1,71 @@
+﻿@{
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div id="chartContainer"></div>
+        </div>
+    </div>
+</div>
+<script>
+ window.onload = function ()
+    {
+    var result = @Html.Raw(ViewBag.DataPoints);
+     var dataPoints = [];
+     var dataPoints1 = [];
+     var dataPoints2 = [];
+     var dataPoints3 = [];
+     for (var i = 0; i < result.length; i++)
+     {
+         dataPoints.push({ x: new Date(result[i].EntryDate), y: parseFloat(result[i].Rupapur) });
+         dataPoints1.push({ x: new Date(result[i].EntryDate), y: parseFloat(result[i].Ajbapur) });
+         dataPoints2.push({ x: new Date(result[i].EntryDate), y: parseFloat(result[i].Hariawan) });
+         dataPoints3.push({ x: new Date(result[i].EntryDate), y: parseFloat(result[i].Loni) });
+     }
+
+    var chart = new CanvasJS.Chart("chartContainer", {
+    animationEnabled: true,
+    title: {
+        text: "Unit Wise Recovery",
+
+    },
+    data: [
+        {
+            xValueFormatString: "YYYY",
+            yValueFormatString: "#,##0.0\"%\"",
+            showInLegend: true,
+            type: "spline",
+            name: "Rupapur",
+            dataPoints: dataPoints,
+        },
+        {
+            xValueFormatString: "YYYY",
+            yValueFormatString: "#,##0.0\"%\"",
+            showInLegend: true,
+            type: "spline",
+            name: "Ajbapur",
+            dataPoints: dataPoints1,
+        },
+        {
+            xValueFormatString: "YYYY",
+            yValueFormatString: "#,##0.0\"%\"",
+            showInLegend: true,
+            type: "spline",
+            name: "Hariawan",
+            dataPoints: dataPoints2,
+        },
+        {
+            xValueFormatString: "YYYY",
+            yValueFormatString: "#,##0.0\"%\"",
+            showInLegend: true,
+            type: "spline",
+            name: "Loni",
+            dataPoints: dataPoints3,
+        }
+    ]
+});
+chart.render();
+
+};
+</script>

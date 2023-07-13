@@ -1,0 +1,102 @@
+﻿
+@model IEnumerable<KnowledgeApp_Test.Models.Report.IAADStatus>
+
+<div id="accordion">
+    @{
+        foreach (var item in Model.Select(a => a.UnitUnitName).Distinct())
+        {
+            <h3>Unit Name : @item</h3>
+            <div>
+                <table class="table table-bordered Report" id="ParemetertypeReport" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Unit </th>
+                            <th>Registration Number</th>
+                            <th>Registration Date</th>
+                            <th>Subject</th>
+                            <th>Approval Status</th>
+                            <th>Unit Head Approval Date</th>
+                            <th>Unit Head Comment</th>
+                            <th>Technical Coordinator Approval Date</th>
+                            <th>Technical Coordinator Comment</th>
+                            <th>Ctt Engineer Approval Date</th>
+                            <th>Ctt Engineer Comment</th>
+                            <th>Ctt Process Approval Date</th>
+                            <th>Ctt Process Comment</th>
+                            <th>Final Authority Approval Date</th>
+                            <th>Final Authority Comment</th>
+
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.Where(a => a.UnitUnitName.Equals(@item)))
+                        {
+                            <tr>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.UnitUnitName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.RegistrationNumber)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => i.RegistrationDate)</td>
+                                <td>@Html.DisplayFor(modelItem => i.Subject)</td>
+                                <td>@Html.DisplayFor(modelItem => i.ApprovalStatus)</td>
+                                <td>@Html.DisplayFor(modelItem => i.UnitHeadApprovalDate)</td>
+                                <td>@Html.DisplayFor(modelItem => i.UnitHeadComment)</td>
+                                <td>@Html.DisplayFor(modelItem => i.TechnicalCoordinatorApprovalDate)</td>
+                                <td>@Html.DisplayFor(modelItem => i.TechnicalCoordinatorComment)</td>
+                                <td>@Html.DisplayFor(modelItem => i.CTT_EngineerApprovalDate)</td>
+                                <td>@Html.DisplayFor(modelItem => i.CTT_EngineerComment)</td>
+                                <td>@Html.DisplayFor(modelItem => i.CTT_ProcessApprovalDate)</td>
+                                <td>@Html.DisplayFor(modelItem => i.CTT_ProcessComment)</td>
+                                <td>@Html.DisplayFor(modelItem => i.FinalAuthorityApprovalDate)</td>
+                                <td>@Html.DisplayFor(modelItem => i.FinalAuthorityComment)</td>
+
+                            </tr>
+
+                        }
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    }
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.Report').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                'excel', 'pdf', 'print'
+            ]
+        });
+    });
+    $(function () {
+        $("#accordion").accordion({
+            heightStyle: "content"
+
+        });
+    });
+
+</script>

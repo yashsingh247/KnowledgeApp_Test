@@ -1,0 +1,114 @@
+﻿@model KnowledgeApp_Test.Models.Parameters.ParameterType
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+}
+@{
+    ViewBag.Title = "Parameter Type";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<EntryType> entryTypelist = dropdownListSevices.GetEntryTypeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditParameterType", "Parameters", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Parameter Type Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.ParameterTypeId)
+                    @Html.TextBoxFor(m => m.ParameterTypeName, new { @Class = "form-control", @required = "required", @maxlength = "30" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Is Computed
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsComputed)
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Parameter Type Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ParameterTypeCode, new { @Class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Is Stoppage Type
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsStoppageType)
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Is Stock Type
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsStockType)
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Entry Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.EntryTypeId, new SelectList(entryTypelist, "EntryTypeId", "EntryTypeName"), "Select Entry Type", new { @class = "form-control ddl" })
+
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.ParameterTypeId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+
+            </div>
+
+        </div>
+    }
+}
+    <script>
+        $(document).ready(function () {
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+            $(".ddl").select2({
+                placeholder: "select ",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

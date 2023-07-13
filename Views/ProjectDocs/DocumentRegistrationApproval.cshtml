@@ -1,0 +1,174 @@
+﻿@model KnowledgeApp_Test.Models.ProjectDocs.DocumentRegistrationApproval
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Document Registration Approval";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> Unit = ds.GetUnitddl();
+    List<Employee> Employee = ds.Employeeddl();
+    List<ApprovalStatus> ApprovalStatus = ds.ApprovalStatusddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+   
+        <div class="row">
+            <div class="col-sm-12">
+                <h3 style="color:#0090d9;">Document Registration Approval</h3>
+            </div>
+        </div>
+        <hr />
+        if (right[0].btnView == true)
+        {
+        <div class="row" style="background-color: #f0f3f5">
+            <div class="col-md-3">
+                <div class="form-group">
+                    Unit
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(Unit, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl ", @Id = "Unit2" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    Document Approver
+                    @Html.DropDownListFor(m => m.DocumentApproverId, new SelectList(Employee, "EmployeeId", "EmployeeName"), "select DocumentApprover", new { @class = "form-control ddl", @id = "DocumentApprover2" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    ApprovalStatus
+                    @Html.DropDownListFor(m => m.ApprovalStatus, new SelectList(ApprovalStatus, "ApprovalStatusID", "ApprovalStatusName"), "selectList ApprovalStatus", new { @class = "form-control ddl ", @Id = "ApprovalStatus2" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="DRegistrationApproval" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th width="15%"></th>
+                                <th>Id</th>
+                                <th>Document Number</th>
+                                <th>Unit Name</th>
+                                <th>Subject</th>
+                                <th>DocumentType</th>
+                                <th>Document Approver Name</th>
+                                <th>Document Approver Date</th>
+                                <th>Approval Status</th>
+                                <th>Document Approver Id</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        }
+    }
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+            $(".ddl").on('change', function () {
+                var Unit = $("#Unit2").val();
+                var DocumentApprover = $("#DocumentApprover2").val();
+                var ApprovalStatus = $("#ApprovalStatus2").val();
+                GetDocumentRegistrationApproval(Unit, DocumentApprover, ApprovalStatus)
+            });
+            GetDocumentRegistrationApproval('','','');
+    });
+
+    function GetDocumentRegistrationApproval(Unit, DocumentApprover, ApprovalStatus) {
+
+        var URL = '/ProjectDocs/DocumentRegistrationApprovalData?Unit=' + Unit + '&DocumentApprover=' + DocumentApprover + '&ApprovalStatus=' + ApprovalStatus ;
+        $("#DRegistrationApproval").DataTable().clear().draw();
+        $("#DRegistrationApproval").DataTable().destroy();
+        $('#DRegistrationApproval').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                  "data": "DocumentRegistrationId", "render": function (data) {return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddDocumentRegistrationApproval", "ProjectDocs")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>";},},
+                { "data": "DocumentRegistrationId" },
+                { "data":"DocumentNumber"},
+                { "data": "UnitUnitName" },
+                { "data": "Subject" },
+                { "data": "DocumentType" },
+                { "data": "DocumentApproverEmployeeName" },
+                { "data": "DocumentApproverDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); }  },
+                { "data": "ApprovalStatus" },
+                { "data": "DocumentApproverId" },
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    title: 'Document Registration Approval',
+
+                    extend: 'pdf',
+                },
+                {
+                    title: 'Document Registration Approval',
+                    extend: 'excel',
+                },
+                {
+                    title: 'Document Registration Approval',
+                    extend: 'print',
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Document Registration Approval Details',
+                    height: 550,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+    </script>

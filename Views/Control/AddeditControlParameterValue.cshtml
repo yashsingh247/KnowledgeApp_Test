@@ -1,0 +1,83 @@
+﻿@model KnowledgeApp_Test.Models.Control.ControlParameterValue
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Control;
+@using KnowledgeApp_Test.Models.Common;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+}
+@{
+    ViewBag.Title = "Control Parameter Value";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<ControlParameter> controlParameterlist = dropdownListSevices.GetControlParameterddl();
+    List<Unit> Unitlist = dropdownListSevices.GetUnitddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/login/Access");
+
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditControlParameterValue", "Control", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Parameter:
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.ControlParameterValueId)
+                    @Html.DropDownListFor(m => m.ParameterId, new SelectList(controlParameterlist, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @required = "Required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Unit:
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(Unitlist, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @required = "Required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Parameter Value:
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ParameterValue, new { @class = "form-control", @maxlength = "1000" })
+                </div>
+
+            </div>
+        </div><div class="row">
+            <div class="col-md-2">
+                @if (Model.ControlParameterValueId == 0 && right[0].BtnAdd==true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

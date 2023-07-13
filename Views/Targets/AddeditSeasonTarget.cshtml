@@ -1,0 +1,103 @@
+﻿@model KnowledgeApp_Test.Models.Targets.SeasonTarget
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> Unitlist = ds.GetUnitddl();
+    List<Parameter> Parameter = ds.GetParemeterddl();
+    List<CrushingSeason> CrushingSeason = ds.GetCrushingSeasonddl();
+    ViewBag.Title = "Season Target";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true) 
+{
+    using (Html.BeginForm("AddeditSeasonTarget", "Targets", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { onsubmit = "return SubmitForm(this)" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Crushing Season
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.SeasonTargetId)
+                    @Html.DropDownListFor(m => m.CrushingSeasonId, new SelectList(CrushingSeason, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl", @required = "required" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(Unitlist, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Parameter
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.ParameterId, new SelectList(Parameter, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Target Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.TargetValue, new { @class = "form-control", oninput = "validatetwodecimal(this)", onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Actual Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ActualValue, new { @class = "form-control", oninput = "validatetwodecimal(this)", onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                @if (Model.SeasonTargetId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({ placeholder: "select Option ", allowClear: true, theme: "classic" });
+        });
+
+    </script>

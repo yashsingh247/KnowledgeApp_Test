@@ -1,0 +1,85 @@
+﻿@model IEnumerable<KnowledgeApp_Test.Models.Report.MillLog>
+
+<div id="accordion">
+    @{
+        foreach (var item in Model.Select(a => a.UnitUnitName).Distinct())
+        {
+            <h3>Unit Name : @item</h3>
+            <div>
+                <table class="table table-bordered Report" id="ParemetertypeReport" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Mill Parameter Code</th>
+                            <th>Mill Parameter Name</th>
+                            <th>Mill Name</th>
+                            <th>Log Date</th>
+                            <th>Position ShortName</th>
+                            <th>Location ShortName</th>
+                            <th>Time</th>
+                            <th>Value</th>
+
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.Where(a => a.MillParameterCode.Equals(@item)))
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.MillParameterCode)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => i.MillParameterName) </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.MillName)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.LogDate)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => i.PositionShortName)</td>
+
+                                <td>@Html.DisplayFor(modelItem => i.LocationShortName)</td>
+                                <td>@Html.DisplayFor(modelItem => i.LogHour)</td>
+                                <td>@Html.DisplayFor(modelItem => i.LogValue)</td>
+
+                            </tr>
+
+                        }
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    }
+</div>
+<script language="javascript">
+    $(document).ready(function () {
+        $(document).ready(function () {
+            $('.Report').DataTable({
+                dom: 'Blfrtip',
+                buttons: [
+                    'excel', 'pdf', 'print'
+                ]
+            });
+        });
+        $(function () {
+            $("#accordion").accordion({
+                heightStyle: "content"
+
+            });
+        });
+
+    });
+    </script>
+

@@ -1,0 +1,139 @@
+﻿@model KnowledgeApp_Test.Models.TPT.TptPowerMonthly
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.TPT
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices DS = new DropdownListSevices();
+    List<TptRevision> tptRevision = DS.TptRevisionddl();
+    List<TptPower> tptParameter = DS.TptPowerddl();
+    var Id = "Tpt Power Monthly";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+    using (Html.BeginForm("AddeditTptPowerMonthly", "TPT", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+
+        <div class="row">
+            <div class="col-md-4">
+                Tpt Year
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.TptPowerMonthlyId)
+                    @Html.TextBoxFor(m => m.TptYear, new { @class = "form-control Sint", @onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Tpt Month
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.TptMonth, new { @class = "form-control Sint", @onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-md-4">
+                Revision
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.RevisionId, new SelectList(tptRevision, "RevisionId", "RevisionName"), "Select Revision", new { @class = "form-control ddl Tabledata", @id = "RevisionId2", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Tpt Power Parameter
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.TptPowerParameterId, new SelectList(tptParameter, "TptPowerParameterId", "TptPowerName"), "Select Tpt Parameter", new { @class = "form-control ddl Tabledata", @id = "TptParameterId2", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Target
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Target, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Actual
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Actual, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Last Year Actual
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.LastYearActual, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="btn-group">
+                    @if (Model.TptPowerMonthlyId == 0 && right[0].btnEdit == true)
+                    {
+                        <button class="form-control bg-success">Save</button>
+                    }
+                    else if(right[0].btnEdit == true)
+                    {
+                        <button class="form-control bg-info">Update</button>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#TptYear").val() == 0) {
+                $("#TptYear").val('');
+            }
+            if ($("#TptMonth").val() == 0) {
+                $("#TptMonth").val('');
+            }
+        });
+    </script>

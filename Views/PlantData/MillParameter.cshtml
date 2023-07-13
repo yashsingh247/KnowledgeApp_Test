@@ -1,0 +1,145 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.MillParameter
+@using KnowledgeApp_Test.Models.Administration
+@using KnowledgeApp_Test.Services
+@{
+    ViewBag.Title = "Mill Parameter";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+
+
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditMillParameter", "PlantData")')"><i class="fa fa-plus"></i> Add New Mill Parameter</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="MillParameter" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th width="5%">Mill Parameter Code</th>
+                            <th>Mill Parameter Name</th>
+                            <th width="5%">Flag</th>
+                            <th width="5%">Is Applicable For Wil</th>
+                            <th width="5%">Is TwoHourly</th>
+                            <th>Short Name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        getMillParameterData()
+    });
+
+    function getMillParameterData() {
+        var URL = '/PlantData/MillParameterData';
+        $("#MillParameter").DataTable().clear().draw();
+        $("#MillParameter").DataTable().destroy();
+       $('#MillParameter').DataTable({
+            "ajax": {
+               "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{ "data": "MillParameterId", "render": function (data) { return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditMillParameter", "PlantData")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "MillParameterId" },
+                { "data": "MillParameterCode" },
+                { "data": "MillParameterName" },
+                { "data": "Flag" },
+                { "data": "IsApplicableForWil", render: function (data, type, row) { if (data == true) { return '<input type="checkbox" disabled="true"  checked  >'; } return '<input type="checkbox" disabled="true" readonly="true">'; }, },
+                { "data": "IsTwoHourly" ,render: function (data, type, row) { if (data == true) { return '<input type="checkbox" disabled="true"  checked  >'; } return '<input type="checkbox" disabled="true" readonly="true">'; }, },
+                  { "data": "ShortName" }, ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+           buttons: [
+               {
+
+
+                   extend: 'pdf',
+                   action: newexportaction,
+               },
+               {
+
+                   extend: 'excel',
+                   action: newexportaction,
+               },
+               {
+
+                   extend: 'print',
+                   action: newexportaction,
+               },
+               {
+                   extend: 'colvis',
+                   columns: ':not(.noVis)'
+               }
+           ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Mill Parameter Details',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+
+
+</script>
+

@@ -1,0 +1,248 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.MillLog
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "MillLog";
+    DropdownListSevices Ds = new DropdownListSevices();
+    List<MillParameter> millParameter = Ds.MillParameterddl();
+    List<Mill> mill = Ds.Millddl();
+    List<Unit> unit = Ds.GetUnitddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+    using (Html.BeginForm("AddeditMilllog", "PlantData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.MillLogId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-4">
+                Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.MillLogId, new { @id = "MillLogId2" })
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Document Number
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DocumentNumber, new { @class = "form-control Code", @onkeypress = "javascript:return isNumber(event)", @required = "required" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Log Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.LogDate, new { Value = Model.LogDate.ToString("dd-MM-yyyy"), @class = "form-control date", @required = "required" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Log Hour
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.TextBoxFor(m => m.LogHour, new { @class = "form-control Sint", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Mill Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.TextBoxFor(m => m.MillType, new { @class = "form-control Code", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Entry Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.TextBoxFor(m => m.EntryType, new { @class = "form-control Code", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Details
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditMilllogDetails", "PlantData")')"><i class="fa fa-plus"></i> Add New Mill Log Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+@if(right[0].btnView)
+{ 
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-group">
+                Mill Parameter
+                @Html.DropDownList("MillParameter", new SelectList(millParameter, "MillParameterId", "MillParameterName"), "Select Mill Parameter", new { @class = "form-control ddl TableData", @Id = "MillParameter2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Mill
+                @Html.DropDownList("Mill", new SelectList(mill, "MillId", "MillName"), "Select Mill", new { @class = "form-control ddl TableData", @Id = "MillId2" })
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="MillLogDetails" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="20%"></th>
+                            <th>Id</th>
+                            <th>Serial</th>
+                            <th>Mill Parameter Name</th>
+                            <th>Mill Name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+   }
+
+
+
+    <script>
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        if ($("#LogDate").val() == '01-01-0001') {
+
+            $("#LogDate").val('');
+        }
+        if ($("#DocumentNumber").val()==0) {
+            $("#DocumentNumber").val('');
+        }
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        var MillLogId = $("#MillLogId2").val();
+        $(".TableData").on('change', function () {
+            var MillParameter = $("#MillParameter2").val();
+            var Mill = $("#MillId2").val();
+            getMilLogDetailData(MillLogId,MillParameter, Mill)
+        });
+        getMilLogDetailData(MillLogId,'','')
+    });
+    function getMilLogDetailData(MillLogId,MillParameter, Mill) {
+        var URL ='/PlantData/MilllogDetailsData?MillLogId=' + MillLogId + '&MillParameter=' + MillParameter + '&Mill=' + Mill;
+        $("#MillLogDetails").DataTable().clear().draw();
+        $("#MillLogDetails").DataTable().destroy();
+        $('#MillLogDetails').DataTable({
+            "ajax": {
+               "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{ "data": "MillLogDetailID", "render": function (data) { return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditMilllogDetails", "PlantData")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>";},},
+                { "data": "MillLogDetailID" },
+                { "data": "SerialNumber" },
+                { "data": "MillParameterName" },
+                { "data": "MillName" },],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: ['excel', 'pdf', 'print',
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Mill Log Details',
+                    height: 700,
+                    width: 1000,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+    </script>

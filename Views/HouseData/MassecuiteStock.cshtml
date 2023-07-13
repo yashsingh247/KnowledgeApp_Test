@@ -1,0 +1,252 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.MassecuiteStock
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.HouseData
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Massecuite Stock";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> units = ds.GetUnitddl();
+    List<Employee> employee = ds.Employeeddl();
+    List<Shift> shift = ds.Shiftddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Massecuite Stock</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditMassecuiteStock", "HouseData")')"><i class="fa fa-plus"></i> New Massecuite Stock</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.Unit, new SelectList(units, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl TableData", @Id = "Unit2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                AnalysisDate
+                @Html.TextBoxFor(m => m.AnalysisDate, new { @class = "form-control TableData date", @Id = "AnalysisDate2", })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                <br />
+                @Html.TextBoxFor(m => m.AnalysisDate, new { @class = "form-control TableData date", @Id = "AnalysisDate3" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Shift
+                @Html.DropDownListFor(m => m.Shift, new SelectList(shift, "ShiftId", "ShiftName"), "Select Shift", new { @class = "form-control ddl TableData", @Id = "Shift2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Process Head
+                @Html.DropDownListFor(m => m.ProcessHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Process Head", new { @class = "form-control ddl TableData", @Id = "ProcessHeadId2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Section Head
+                @Html.DropDownListFor(m => m.SectionHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Section Head", new { @class = "form-control ddl TableData", @Id = "SectionHeadId2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Department Head
+                @Html.DropDownListFor(m => m.DepartmentHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Department Head", new { @class = "form-control ddl TableData", @Id = "DepartmentHeadId2" })
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="MassecuiteStock" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="35%"></th>
+                            <th width="2%">Id</th>
+                            <th width="5%">Unit Name</th>
+                            <th width="5%">Analysis Date</th>
+                            <th width="2%">Shift RcvA</th>
+                            <th width="2%">Dropp A</th>
+                            <th width="2%">Cured A</th>
+                            <th width="2%">Bal A</th>
+                            <th width="2%">Shift RcvA1</th>
+                            <th width="2%">Dropp A1</th>
+                            <th width="2%">Cured A1</th>
+                            <th width="2%">Bal A1</th>
+                            <th width="2%">Shift RcvB</th>
+                            <th width="2%">Dropp B</th>
+                            <th width="2%">Cured B</th>
+                            <th width="2%">Bal B</th>
+                            <th width="2%">Shift RcvC1</th>
+                            <th width="2%">Dropp C1</th>
+                            <th width="2%">Cured C1</th>
+                            <th width="2%">Bal C1</th>
+                            <th width="2%">Shift RcvC</th>
+                            <th width="2%">Dropp C</th>
+                            <th width="2%">Cured C</th>
+                            <th width="2%">Bal C</th>
+                            <th width="1%">Department Head Id</th>
+                            <th width="1%">Process Head Id</th>
+                            <th width="1%">Section Head Id</th>
+                            <th width="1%">Shift Id</th>
+                            <th width="1%">Unit Id</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Option ",
+            allowClear: true,
+            theme: "classic"
+        });
+        $(".date").datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".TableData").on('change', function () {
+            var Unit = $("#Unit2").val();
+            var Shift = $("#Shift2").val();
+            var ProcessHead = $("#ProcessHeadId2").val();
+            var SectionHead = $("#SectionHeadId2").val();
+            var Department = $("#DepartmentHeadId2").val();
+            var AnalysisDate2 = $("#AnalysisDate2").val();
+            var AnalysisDate3 = $("#AnalysisDate3").val();
+            MassecuiteStock(Unit,Shift, ProcessHead, SectionHead, Department, AnalysisDate2, AnalysisDate3)
+        });
+
+        MassecuiteStock('', '', '', '','','','')
+    });
+    function MassecuiteStock(Unit, Shift, ProcessHeadId, SectionHeadId, DepartmentHeadId, AnalysisDate2, AnalysisDate3) {
+        var Url = '/HouseData/MassecuiteStockData?Unit=' + Unit + '&Shift=' + Shift + '&AnalysisDate2=' + AnalysisDate2 + '&AnalysisDate3=' + AnalysisDate3 + '&ProcessHeadId=' + ProcessHeadId + '&SectionHeadId=' + SectionHeadId + '&DepartmentHeadId=' + DepartmentHeadId;
+        $("#MassecuiteStock").DataTable().clear().draw();
+        $("#MassecuiteStock").DataTable().destroy();
+        $('#MassecuiteStock').DataTable({
+            "ajax": {
+                "url": Url,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "MassecuiteStockId", "render": function (data) {
+                        return "@if (right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditMassecuiteStock", "HouseData")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "MassecuiteStockId" },
+                { "data": "UnitName" },
+                { "data": "AnalysisDate" , 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "ShiftRcvA" },
+                { "data": "DroppA" },
+                { "data": "CuredA" },
+                { "data": "BalA" },
+                { "data": "ShiftRcvA1" },
+                { "data": "DroppA1" },
+                { "data": "CuredA1" },
+                { "data": "BalA1" },
+                { "data": "ShiftRcvB" },
+                { "data": "DroppB" },
+                { "data": "CuredB" },
+                { "data": "BalB" },
+                { "data": "ShiftRcvC1" },
+                { "data": "DroppC1" },
+                { "data": "CuredC1" },
+                { "data": "BalC1" },
+                { "data": "ShiftRcvC" },
+                { "data": "DroppC" },
+                { "data": "CuredC" },
+                { "data": "BalC" },
+                { "data": "DepartmentHeadId" },
+                { "data": "ProcessHeadId" },
+                { "data": "SectionHeadId" },
+                { "data": "ShiftId" },
+                { "data": "UnitId" },
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Massecuite Stock',
+                    height: 700,
+                    width: 1200,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+</script>
+
+
+

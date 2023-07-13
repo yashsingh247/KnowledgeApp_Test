@@ -1,0 +1,85 @@
+﻿@model IEnumerable<KnowledgeApp_Test.Models.Report.Auditlog>
+
+<div id="accordion">
+    @{
+        foreach (var item in Model.Select(a => a.TableNames).Distinct())
+        {
+            <h3>Unit Id : @item</h3>
+            <div>
+                <table class="table table-bordered Report" id="ParemetertypeReport" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Table Name</th>
+                            <th>UserId</th>
+                            <th>User Name</th>
+                            <th>Action</th>
+                            <th>ChangedOn</th>
+                            <th>RowId</th>
+                            <th>Module</th>
+                            <th>Page</th>
+                            <th>Changes</th>
+
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.Where(a => a.TableNames.Equals(@item)))
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.TableNames)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.AuditLogID)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => i.UserName)</td>
+                                <td>@Html.DisplayFor(modelItem => i.Action)</td>
+                                <td>@Html.DisplayFor(modelItem => i.ChangedOn)</td>
+                                <td>@Html.DisplayFor(modelItem => i.RowId)</td>
+                                <td>@Html.DisplayFor(modelItem => i.Module)</td>
+                                <td>@Html.DisplayFor(modelItem => i.Page)</td>
+                                <td>@Html.DisplayFor(modelItem => i.Changes)</td>
+
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    }
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+
+        $('.Report').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                'excel', 'pdf', 'print'
+            ]
+        });
+    });
+    $(function () {
+        $("#accordion").accordion({
+            heightStyle: "content"
+
+        });
+    });
+
+
+</script>
+

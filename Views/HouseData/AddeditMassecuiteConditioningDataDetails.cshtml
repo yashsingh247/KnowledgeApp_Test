@@ -1,0 +1,80 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.MassecuiteConditioningDataDetails
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.HouseData
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<MassecuiteConditioning> massecuiteConditionings = ds.MassecuiteConditioningddl();
+    ViewBag.Title = "Massecuite Conditioning Data";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+    var dataId = @ViewBag.MassecuiteConditioningData;
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditMassecuiteConditioningDetailsData", "HouseData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                SerialNo
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.MassecuiteConditioningDataDetailsId)
+                    @Html.HiddenFor(m => m.MassecuiteConditioningDataId, new { Value = dataId })
+                    @Html.TextBoxFor(m => m.SerialNo, new { @class = "form-control", @onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Massecuite Conditioning
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.MassecuiteConditioningID, new SelectList(massecuiteConditionings, "MassecuiteConditioningId", "MassecuiteConditioningName"), "Select MassecuiteConditioning", new { @class = "form-control ddl", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                AnalysisValue
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.AnalysisValue, new { @class = "form-control", @oninput = "validatetwodecimal(this)" })
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.MassecuiteConditioningDataDetailsId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+
+                }
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option ",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#SerialNo").val() == 0) {
+                $("#SerialNo").val('');
+            }
+        });
+    </script>

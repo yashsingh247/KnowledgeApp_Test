@@ -1,0 +1,176 @@
+﻿@model KnowledgeApp_Test.Models.BenchMarking.BenchMarkParameter
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Bench Mark Parameter";
+}
+@{
+
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<ParameterUnit> parameterUnit = dropdownListSevices.GetParameterUnitddl();
+    List<Parameter> ParameterList = dropdownListSevices.GetParemeterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditBenchMarkParameter", "BenchMarking")')"><i class="fa fa-plus"></i> Add New Bench Mark Parameter</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5;">
+        <div class="col-md-3">
+            <div class="form-group">
+                Parameter
+                @Html.DropDownListFor(m => m.Parameter, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @Id = "Parameter2" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                Parameter Unit
+                @Html.DropDownListFor(m => m.ParameterUnit, new SelectList(parameterUnit, "ParameterUnitId", "ParameterUnitName"), "Select Parameter Unit", new { @class = "form-control ddl", @Id = "ParameterUnit2" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="Bench" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th width="10%">"Bench Mark Code</th>
+                            <th width="15%">Bench Mark Name</th>
+                            <th>Bench Mark Type</th>
+                            <th width="15%">Parameter Name</th>
+                            <th width="15%">Parameter Unit Name</th>
+                            <th>Parameter Unit Id</th>
+                            <th>Parameter Id</th>
+                            <th>Row Number</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $(".ddl").select2({
+            placeholder: "select ",
+            allowClear: true,
+            theme: "classic"
+        });
+
+        $(".ddl").on('change', function () {
+            var Parameter = $("#Parameter2").val();
+            var ParameterUnit = $("#ParameterUnit2").val();
+            GetBenchData(Parameter, ParameterUnit)
+        });
+
+        GetBenchData()
+    });
+    function GetBenchData(Parameter, ParameterUnit) {
+        $("#Bench").DataTable().clear().draw();
+        $("#Bench").DataTable().destroy();
+        var URL = '/BenchMarking/BenchMarkParameterData?Parameter=' + Parameter + '&ParameterUnit=' + ParameterUnit;
+        dataTable = $('#Bench').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+             "columns": [
+                 { "data": "BenchMarkParameterId", "render": function (data) {return "@if (right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditBenchMarkParameter", "BenchMarking")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}"; },},
+                 { "data": "BenchMarkParameterId" },
+                 { "data": "BenchMarkCode" },
+                 { "data": "BenchMarkName" },
+                 { "data": "BenchMarkType" },
+                 { "data": "ParameterName" },
+                 { "data": "ParameterUnitName"},
+                 { "data": "ParameterUnitId"},
+                 { "data": "ParameterId" },
+                 { "data": "RowNumber" },],
+
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+    }
+
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'New Bench Mark Parameter',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+</script>
+
+

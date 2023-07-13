@@ -1,0 +1,161 @@
+﻿@model KnowledgeApp_Test.Models.Control.ControlParameter
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Control;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+}
+@{
+    ViewBag.Title = "Control Parameter";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<ControlParameterGroup> parameterGroupList = dropdownListSevices.GetParameterGroupddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditControlParameter", "Control", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { onsubmit = "return SubmitForm(this)" }))
+    {
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Parameter Code
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.HiddenFor(m => m.ParameterId)
+                            @Html.TextBoxFor(m => m.ParameterCode, new { @class = "form-control", @maxlength = "100" })
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Parameter Name
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ParameterName, new { @class = "form-control", @maxlength = "30" })
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Parameter Description
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ParameterDescription, new { @class = "form-control", @maxlength = "100" })
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Parameter Group
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.ParameterGroupId, new SelectList(parameterGroupList, "ParameterGroupId", "ControlParameterGroupName"), "Select Parameter Group", new { @class = "form-control ddl", @required = "required" })
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Serial Order
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.SerialOrder, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Parameter Type
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ParameterType, new { @class = "form-control", @required = "required", @maxlength = "15" })
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        Parameter Width
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ParameterWidth, new { @class = "form-control", @onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="btn-group">
+                    @if (Model.ParameterId == 0 && right[0].BtnAdd==true)
+                    {
+                        <button class="form-control bg-success">Save</button>
+                    }
+                    else if(right[0].btnEdit == true)
+                    {
+                        <button class="form-control bg-info">Update</button>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#SerialOrder").val() == 0) {
+                $("#SerialOrder").val('');
+            }
+        });
+    </script>

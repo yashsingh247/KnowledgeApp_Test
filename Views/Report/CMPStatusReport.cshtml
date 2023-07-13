@@ -1,0 +1,110 @@
+﻿@model KnowledgeApp_Test.Models.Report.CMPStatus
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "SugarDayTransactionReport";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unitlist = ds.GetUnitddl();
+    List<SugarGodown> SugarGodansList = ds.SugarGodownddl();
+}
+@*<style>
+    body {
+        padding-top: 50px;
+        background-color: #34495e;
+    }
+
+    .hiddenRow {
+        padding: 0 !important;
+    }
+</style>*@
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">
+            CMP Status Report
+        </h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit:
+            @Html.DropDownList("UnitId", new SelectList(unitlist, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            EntryDate:
+            @Html.TextBoxFor(m => m.EnteryDate1, new { @Class = "form-control date Tabledata" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <br />
+            @Html.TextBoxFor(m => m.EnteryDate2, new { @Class = "form-control date Tabledata" })
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div id="myChart" class="col-md-12 col-xs-12">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script language="javascript">
+
+    $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+    if ($("#EnteryDate1").val() == '01-01-0001') {
+        $('#EnteryDate1').datepicker('setDate', 'today');
+    }
+    if ($("#EnteryDate2").val() == '01-01-0001') {
+        $('#EnteryDate2').datepicker('setDate', 'today');
+    }
+    $(document).ready(function () {
+        ;
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $('.Tabledata').on("change", function () {
+
+            var Unit = $("#Unit2").val();
+            var EntryDate = $("#EnteryDate1").val();
+            var EntyryDate2 = $("#EnteryDate2").val();
+            if (EntryDate == "" && EntyryDate2 != "") {
+
+                alert("Please select Date ");
+                $("#Entrydate2").val('');
+                $("#Entrydate1").focus()
+            }
+            else {
+
+                $.ajax({
+                    url: "@Url.Action("PartialCMPStatusReport", "Report")",
+                    dataType: 'HTML',
+                    data: { unit: Unit, Entrydate: EntryDate, Entrydate2: EntyryDate2 },
+                    asycs: false,
+                    success: function (returnData) {
+                        $("#myChart").html(returnData);
+
+                    }
+                });   
+            }
+            $('#myChart').show();
+
+        });
+
+    });
+
+
+</script>
+
+

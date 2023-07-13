@@ -1,0 +1,259 @@
+﻿@model KnowledgeApp_Test.Models.SpecialAnalysis.SpecialAnalysis
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.SpecialAnalysis
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<SpecialAnalysisType> specialAnalysisType = ds.GetSpecialAnalysisTypeddl();
+    List<SpecialAnalysisParameter> specialAnalysisP = ds.GetSpecialAnalysisParameterddl();
+    ViewBag.Title = "Special Analysis";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditSpecialAnalysis", "SpecialAnalysis", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    @if (Model.SpecialAnalysisId == 0 && right[0].BtnAdd == true)
+                    {
+                        <button class="form-control bg-success">Save</button>
+                    }
+                    else if (right[0].btnEdit == true)
+                    {
+                        <button class="form-control bg-info">Update</button>
+                    }
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Analysis Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.HiddenFor(m => m.SpecialAnalysisId, new { @Id = "Id" })
+                    @Html.TextBoxFor(m => m.AnalysisDate, new { Value = Model.AnalysisDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Special Analysis Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.DropDownListFor(m => m.SpecialAnalysisTypeId, new SelectList(specialAnalysisType, "SpecialAnalysisTypeId", "SpecialAnalysisTypeName"), "Select Analysis Type", new { @class = "form-control ddl", @id = "SpecialAnalysisType2" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Entry User Id
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.EntryUserId, new { @class = "form-control Code", @onkeypress = "javascript:return isNumber(event)" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Entry Date
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.EntryDate, new { Value = Model.EntryDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Details
+            </div>
+            @if (Model.SpecialAnalysisId != 0 && right[0].BtnAdd == true)
+            {
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditSpecialAnalysisDetails", "SpecialAnalysis")')"><i class="fa fa-plus"></i> New Special Analysis Detail</a>
+
+                    </div>
+                </div>
+            }
+        </div>
+        if (right[0].btnView == true)
+        {
+            <div class="row">
+                <div class="col-md-4"></div>
+                <div class="col-md-8">
+                    Special Analysis Parameter
+                    <div class="form-group">
+
+                        @Html.DropDownList("Sepecial", new SelectList(specialAnalysisP, "SpecialAnalysisParameterId", "SpecialAnalysisParameterName"), "Select Analysis Parameter", new { @class = "form-control ddl", @id = "SpecialAnalysisParameter2" })
+                    </div>
+
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-3"></div>
+                <div class="col-md-9">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="Detail" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th width="15%"></th>
+                                    <th>Id</th>
+                                    <th>Serial No</th>
+                                    <th>SpecialAnalysis Parameter Name</th>
+                                    <th>Analysis value</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+}
+<script>
+    $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+    if ($("#AnalysisDate").val() == '01-01-0001')
+    {
+        $('#AnalysisDate').datepicker('setDate', 'today');
+    }
+    if ($("#EntryDate").val() == '01-01-0001')
+    {
+        $('#EntryDate').datepicker('setDate', 'today');
+    }
+    //$('.date').datepicker('setDate', 'today');
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select ",
+            allowClear: true,
+            theme: "classic"
+        });
+        var SpecialAnlysis = $("#Id").val();
+        $("#SpecialAnalysisParameter2").on('change', function () {
+            var Parameter = $("#SpecialAnalysisParameter2").val();
+            getDetailData(SpecialAnlysis, Parameter)
+        });
+
+        getDetailData(SpecialAnlysis,'')
+    });
+    function getDetailData(SpecialAnlysis, Parameter) {
+
+        var URL = '/SpecialAnalysis/SpecialAnalysisDetailsData?SpecialAnalysisParameter=' + Parameter+'&Specilanalysis=' + SpecialAnlysis;
+        $("#Detail").DataTable().clear().draw();
+        $("#Detail").DataTable().destroy();
+        $('#Detail').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{"data": "SpecialAnalysisDetilsId", "render": function (data) { return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditSpecialAnalysisDetails", "SpecialAnalysis")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>"; },},
+            { "data": "SpecialAnalysisDetilsId" },
+            { "data": "SerialNumber" },
+            { "data":"SpecialAnalysisParameterName"},
+            { "data":"AnalysisValue"}],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: ['excel', 'pdf', 'print',
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+
+
+
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Special Analysis Details',
+                    height: 600,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+    function DeleteDetailTable(Id) {
+        var TableName = "SpecialAnalysisDetails";
+        var URL = '/Login/DeleteDatabyId?TableName=' + TableName + '&Id=' + Id;
+        $.ajax({
+            url: URL,
+            dataType: 'HTML',
+            //data: { UserId: UserId, Unit: unitId, Role: Role },
+            //asycs: false,
+            success: function (returnData) {
+                console.log(returnData)
+                var A = []
+                A = JSON.parse(returnData)
+
+                var Status = A["hasError"];
+                var Msg = A["message"];
+                if (Status == true) {
+                    $("#DeleteMessge").append(Msg);
+                    location.reload();
+
+                }
+                else {
+                    console.log(Msg)
+                    console.log(Status)
+                    $("#DeleteMessge").append(Msg);
+                }
+            },
+
+        });
+    }
+
+
+
+
+
+</script>

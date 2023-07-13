@@ -1,0 +1,94 @@
+﻿@model List<KnowledgeApp_Test.Models.Administration.UserRoles>
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-bordered dataTable" id="Rolelist" width="100%" cellspacing="0" style="text-align:center">
+                <thead>
+                    <tr style="text-align:center">
+                        <th style="text-align:center">
+                            
+                        </th>
+                        <th style="text-align:center">
+                            RoleName
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        <tr id="tr_@i">
+                            <td>
+                                
+                                @Html.CheckBoxFor(m=>m[i].IsSelect,new { id = "" + @i + "_Select",@class="checkbox" })
+                            </td>
+                            <td>
+                                @Html.HiddenFor(m => m[i].MaippingId, new { id = "" + @i + "_UserRoleId" })
+                                @Html.HiddenFor(m => m[i].UserId, new { id = "" + @i + "_UserId" })
+                                @Html.HiddenFor(m => m[i].RoleId, new { id = "" + @i + "_RoleId" })
+                                @Html.DisplayFor(m => m[i].RoleName)
+                            </td>
+                         </tr>
+                     }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+</div>
+<script>
+    $(document).ready(function () {
+        Selected()
+        roledata()
+        
+        $(".checkbox").on("change", function ()
+        {
+          
+            roledata()
+
+        });
+
+    });
+
+    function roledata()
+    {
+        
+        var Role = "0";
+        var UserId = "0";
+        for (let i = 0; i <= ("#Rolelist tbody tr").length; i++)
+        {
+            
+            if ($("#" + i + "_Select").is(':checked'))
+            {
+                
+                UserId = $("#" + i + "_UserId").val();
+                Role =  Role + "," + $("#" + i + "_RoleId").val();
+            }
+           
+        }
+        console.log(Role)
+        console.log(UserId)
+        bindlist(Role)
+        Allform(UserId, Role)
+
+    }
+    function Selected()
+    {
+        
+        for (let i = 0; i <= $("#Rolelist tbody tr").length; i++) {
+
+            if ($("#" + i + "_UserId").val() > 0) {
+                debugger
+                $("#" + i + "_Select").attr('checked', 'checked')
+                
+            }
+
+        }
+    }
+
+
+
+
+
+   
+
+
+</script>

@@ -1,0 +1,211 @@
+﻿@model KnowledgeApp_Test.Models.Parameters.Parameter
+@using KnowledgeApp_Test.Models.Administration
+@using KnowledgeApp_Test.Services;
+
+@using KnowledgeApp_Test.Models.Parameters;
+@{
+    ViewBag.Title = "Parameter";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<ParameterType> parameterType = dropdownListSevices.GetParemeterTypeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditParameter","Parameters")')"><i class="fa fa-plus"></i> Add New Parameter</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    <div class="row" style="background-color: #e7e7e7;">
+        <div class="col-md-3">
+            <div class="form-group">
+                Parameter Type
+                @Html.DropDownListFor(m => m.ParameterTypeId, new SelectList(parameterType, "ParameterTypeId", "ParameterTypeName"), "select Parameter", new { @class = "form-control ddl", @Id = "ParameterType2" })
+            </div>
+        </div>
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="Paremeter" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                            <th> Parameter Id</th>
+                            <th> Parameter Code</th>
+                            <th> Parameter Name</th>
+                            <th>Parameter Type Name</th>
+                            <th>Discontinued</th>
+                            <th>Is UserDefined</th>
+                            <th>Is Previous Day</th>
+                            <th>Is Stoppage Parameter</th>
+                            <th>Previous Day Parameter Id</th>
+                            <th>Maximum Value</th>
+                            <th>Minimum Value</th>
+                            <th>Default Value</th>
+                            <th>Before Decimal Digit</th>
+                            <th>After Decimal Digit</th>
+                            <th>Print Before Decima lDigit</th>
+                            <th>Print After Decimal Digit</th>
+                            <th>To date Type</th>
+                            <th>Average Basis Parameter Id</th>
+                            <th>Formula</th>
+                            <th>Todate Formula</th>
+                            <th>Descriptive Formula</th>
+                            <th>Descriptive To date Formula</th>
+                            <th>Calculation level</th>
+                            <th>Is Stock Parameter</th>
+                            <th>Is BrixWeight Parameter</th>
+                            <th>Is Calculated On Brix Weight</th>
+                            <th>Uom</th>
+                            <th>Is Hourly Entry</th>
+                            <th>Is Additional Entry</th>
+                            <th>Average Basis Parameter</th>
+                            <th>Parameter Type Id</th>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+<script>
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Entry Type",
+            allowClear: true,
+            theme: "classic"
+        });
+
+        $("#ParameterType2").on('change', function ()
+        {
+
+            var ParameterType = $("#ParameterType2").val();
+
+            GetParameterData(ParameterType);
+        });
+        GetParameterData();
+    })
+    function GetParameterData(ParameterType) {
+        $("#Paremeter").DataTable().clear().draw();
+        $("#Paremeter").DataTable().destroy();
+        var URL = '/Parameters/ParameterData?ParameterType=' + ParameterType,
+            dataTable = $('#Paremeter').DataTable({
+            "ajax": {
+                "url":URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [
+                {"data": "ParameterId", "render": function (data) {return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditParameter", "Parameters")/" + data + "')><i class='fa fa-pencil'></i> </a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i> </a>}"; },},
+                { "data": "ParameterId" },
+                { "data": "ParameterCode" },
+                { "data": "ParameterName" },
+                { "data": "ParameterTypeParameterTypeName" },
+                { "data": "Discontinued", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "IsUserDefined", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "IsPreviousDay", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "IsStoppageParameter", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "PrevousDayParameterId" },
+                { "data": "MaximumValue" },
+                { "data": "MinimumValue" },
+                { "data": "DefaultValue" },
+                { "data": "BeforeDecimalDigit" },
+                { "data": "AfterDecimalDigit" },
+                { "data": "PrintBeforeDecimalDigit" },
+                { "data": "PrintAfterDecimalDigit" },
+                { "data": "TodateType" },
+                { "data": "AverageBasisParameterId" },
+                { "data": "Formula"},
+                { "data": "TodateFormula"},
+                { "data": "DescriptiveFormula" },
+                { "data":"DescriptiveTodateFormula"},
+                { "data": "CalculationLevel" },
+                { "data": "IsStockParameter", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "IsBrixWeightParameter", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "IsCalculatedOnBrixWeight", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "Uom" },
+                { "data": "IsHourlyEntry", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "IsAdditionalEntry", render: function (data, type, row) { if (data === true) { return '<input type="checkbox" class="editor-active" checked>'; } else { return '<input type="checkbox" class="editor-active" >'; } return data; }, },
+                { "data": "AverageBasisParameter" },
+                { "data":"ParameterTypeId"},
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+                buttons: [
+                    {
+                        title: 'Parameter',
+                        extend: 'pdfHtml5',
+                        orientation: 'landscape',
+                        pageSize: 'LEGAL',
+                        extend: 'pdf',
+                        action: newexportaction,
+                        exportOptions: {
+                            columns: [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31]
+                        }
+                    },
+                    {
+                        title: 'Parameter',
+                        extend: 'excel',
+                        action: newexportaction,
+                    },
+                    {
+                        title: 'Parameter',
+                        extend: 'print',
+                        action: newexportaction,
+                    },
+                ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Parameter Details',
+                    height: 900,
+                    width: 1200,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+</script>

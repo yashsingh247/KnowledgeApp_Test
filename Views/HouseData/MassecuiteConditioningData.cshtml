@@ -1,0 +1,198 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.MassecuiteConditioningData
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.HouseData
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Massecuite Conditioning Data";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Shift> shift = ds.Shiftddl();
+    List<Employee> employee = ds.Employeeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Massecuite Conditioning Data</h3>
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditMassecuiteConditioningData", "HouseData")')"><i class="fa fa-plus"></i> New Massecuite Conditioning Data</a>
+    }
+    <hr />
+
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-group">
+                Shift
+                @Html.DropDownListFor(m => m.ShiftId, new SelectList(shift, "ShiftId", "ShiftName"), "Select Shift", new { @class = "form-control ddl", @Id = "Shift2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Process Head
+                @Html.DropDownListFor(m => m.ProcessHeadEmployeeName, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Process Head", new { @class = "form-control ddl", @Id = "ProcessHead2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Section Head
+                @Html.DropDownListFor(m => m.SectionHeadEmployeeName, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Section Head", new { @class = "form-control ddl", @Id = "SectionHead2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Department Head
+                @Html.DropDownListFor(m => m.DepartmentHeadEmployeeName, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Department Head", new { @class = "form-control ddl", @Id = "DepartmentHead2" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="MassecuiteConditioningData" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th with="15%"></th>
+                            <th>Id</th>
+                            <th>Shift Name</th>
+                            <th>Process Head Employee Name</th>
+                            <th>Section Head Employee Name</th>
+                            <th> Department Head Employee Name</th>
+                            <th> Department Head Id</th>
+                            <th> Analysis Date</th>
+                            <th> Process Head Id</th>
+                            <th> Section Head Id</th>
+                            <th>Shift Id</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Option ",
+            allowClear: true,
+            theme: "classic"
+        });
+
+        $(".ddl").on('change', function () {
+            var Shift = $("#Shift2").val();
+            var ProcessHead = $("#ProcessHead2").val();
+            var SectionHead = $("#SectionHead2").val();
+            var DepartmentHead = $("#DepartmentHead2").val();
+            MassecuiteConditioningData(Shift, ProcessHead, SectionHead, DepartmentHead)
+        });
+
+        MassecuiteConditioningData('', '', '', '')
+    });
+    function MassecuiteConditioningData(Shift, ProcessHead, SectionHead, DepartmentHead) {
+        var Url = '/HouseData/MassecuiteConditioningDataData?Shift=' + Shift + '&ProcessHead=' + ProcessHead + '&SectionHead=' + SectionHead + '&DepartmentHead=' + DepartmentHead;
+
+          $("#MassecuiteConditioningData").DataTable().clear().draw();
+          $("#MassecuiteConditioningData").DataTable().destroy();
+         $('#MassecuiteConditioningData').DataTable({
+            "ajax": {
+                "url": Url,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "MassecuiteConditioningDataId", "render": function (data) {
+                        return "@if (right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditMassecuiteConditioningData", "HouseData")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "MassecuiteConditioningDataId" },
+                { "data": "ShiftShiftName" },
+                { "data": "ProcessHeadEmployeeName" },
+                { "data": "SectionHeadEmployeeName" },
+                { "data": "DepartmentHeadEmployeeName" },
+                { "data": "DepartmentHeadId" },
+                { "data": "AnalysisDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "ProcessHeadId" },
+                { "data": "SectionHeadId" },
+                { "data": "ShiftId" },
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+             buttons: [
+                 {
+                     extend: 'pdf',
+                     action: newexportaction,
+                 },
+                 {
+                     extend: 'excel',
+                     action: newexportaction,
+                 },
+                 {
+                     extend: 'print',
+                     action: newexportaction,
+                 },
+                 {
+                     extend: 'colvis',
+                     columns: ':not(.noVis)'
+                 }
+             ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Massecuite Conditioning data',
+                    height: 500,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+
+    }
+
+</script>
+
+
+
+
+
+
+
+

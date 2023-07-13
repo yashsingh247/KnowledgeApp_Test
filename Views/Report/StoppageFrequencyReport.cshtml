@@ -1,0 +1,171 @@
+﻿@model IEnumerable<KnowledgeApp_Test.Models.Report.StopPage>
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "SugarDayTransactionReport";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unitlist = ds.GetUnitddl();
+}
+<style>
+    body {
+        padding-top: 50px;
+        background-color: #34495e;
+    }
+
+    .hiddenRow {
+        padding: 0 !important;
+    }
+</style>
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">
+            Mill Log Report
+        </h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit:
+            @Html.DropDownList("UnitId", new SelectList(unitlist, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Date :
+            <input type="date" class="form-control Tabledata" id="entrydate">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <br />
+            <input type="date" class="form-control Tabledata" id="entrydate2">
+        </div>
+    </div>
+</div>
+
+<div id="accordion">
+    @{
+        foreach (var item in Model.Select(a => a.UnitUnitName).Distinct())
+        {
+            <h3>Unit Id : @item</h3>
+            <div>
+                <table class="table table-bordered Report" id="ParemetertypeReport" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Unit </th>
+                            <th>Mill Parameter Code</th>
+                            <th>Mill Parameter Name</th>
+                            <th>Mill Name</th>
+                            <th>Log Date</th>
+                            <th>Position ShortName</th>
+                            <th>Location ShortName</th>
+                            <th>Time</th>
+                            <th>Value</th>
+
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.Where(a => a.UnitUnitName.Equals(@item)))
+                        {
+                            <tr>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.UnitUnitName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.StationCode)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => i.StationName) </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.TotalTime)
+                                </td>
+
+                                <td>
+                                    @Html.DisplayFor(modelItem => i.Frequency)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => i.DepartmentName)</td>
+
+
+                            </tr>
+
+                        }
+                    </tbody>
+                    <tfoot>
+
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        }
+    }
+</div>
+
+<script language="javascript">
+    ;
+    $(document).ready(function () {
+        ;
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $('.Tabledata').on("change", function () {
+            
+            var Unit = $("#Unit2").val();
+            var EntryDate = $("#entrydate").val();
+            var EntyryDate2 = $("#entrydate2").val();
+            ;
+            var Url = 'StoppageFrequencyReport?entrydate=' + EntryDate + '&entrydate2=' + EntyryDate2 + '&Unit=' + Unit;
+            console.log(Unit, EntryDate, EntyryDate2)
+            console.log(Url)
+            window.location.href = Url;
+        });
+
+    });
+    $(document).ready(function () {
+        $('.Report').DataTable({
+            dom: 'Blfrtip',
+            buttons: [
+                'excel', 'pdf', 'print'
+            ]
+        });
+    });
+    $(function () {
+        $("#accordion").accordion({
+            heightStyle: "content"
+
+        });
+    });
+
+</script>
+
+
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>StoppageFrequencyReport</title>
+</head>
+<body>
+    <div>
+    </div>
+</body>
+</html>

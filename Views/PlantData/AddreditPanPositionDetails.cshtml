@@ -1,0 +1,88 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.PanPositionDetail
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.PlantData
+@{
+    Layout = null;
+
+    DropdownListSevices DS = new DropdownListSevices();
+    List<Pan> pan = DS.Panddl();
+    var SId = @ViewBag.PanPosition;
+}
+
+
+@using (Html.BeginForm("AddreditPanPositionDetails", "PlantData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+{
+    <div class="row">
+        <div class="col-md-4">
+            Serial Number
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.HiddenFor(m => m.PanPositionDetailID)
+                @Html.HiddenFor(m => m.PanPositionID, new { Value = @ViewBag.PanPosition })
+                @Html.TextBoxFor(m => m.SerialNumber, new { @class = "form-control Code", @required = "required", onkeypress = "javascript:return isNumber(event)" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Pan
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.DropDownListFor(m => m.PanID, new SelectList(pan, "PanId", "PanName"), "Select Pan", new { @class = "form-control ddl", @required = "required" })
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            Pan Value
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.PanValue, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    <div class="row">
+        <div class="col-md-2">
+            @if (Model.PanPositionDetailID == 0)
+            {
+                <button class="form-control bg-success">Save</button>
+            }
+            else
+            {
+                <button class="form-control bg-info">Update</button>
+            }
+
+
+        </div>
+
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+       
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        if ($("#SerialNumber").val()==0) {
+            $("#SerialNumber").val('');
+        }
+
+    });
+</script>
+
+

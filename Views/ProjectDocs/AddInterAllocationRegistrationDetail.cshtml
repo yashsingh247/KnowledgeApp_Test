@@ -1,0 +1,151 @@
+﻿@model KnowledgeApp_Test.Models.ProjectDocs.InterAllocationRegistrationDetail
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Administration
+
+@{
+    Layout = null;
+    // var SId = @ViewBag.AlloctionRegistrationId;
+    var Id = "Inter Allocation Registration";
+  
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion>right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true)
+{
+    using (Html.BeginForm("AddInterAllocationRegistrationDetail", "ProjectDocs", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    SerialNo
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.InterAllocationRegistrationDetailId)
+                    @Html.HiddenFor(m => m.InterAlocationRegistrationId, new { Value = @ViewBag.AlloctionRegistrationId })
+                    @Html.TextBoxFor(m => m.SerialNumber, new { @class = "form-control Sint", @onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    Flag
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Flag, new { @class = "form-control Tint", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    Equipment
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Equipment, new { @class = "form-control", @maxlength = "100" })
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    Activity
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Activity, new { @class = "form-control", @maxlength = "100" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    BudgetAmount
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.BudgetAmount, new { @class = "form-control", oninput = "validatetwodecimal(this)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    ActualAmount
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ActualAmount, new { @class = "form-control", oninput = "validatetwodecimal(this)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    SavedAmount
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.SavedAmount, new { @class = "form-control", oninput = "validatetwodecimal(this)" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    Reason
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Reason, new { @class = "form-control", @maxlength = "500" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.InterAllocationRegistrationDetailId == 0)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else
+                {
+                    <button class="form-control bg-primary">Update</button>
+                }
+
+            </div>
+
+        </div>
+    }
+
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#SerialNumber").val() == 0) {
+                $("#SerialNumber").val('');
+            }
+
+        });
+    </script>
+

@@ -1,0 +1,186 @@
+﻿@model KnowledgeApp_Test.Models.Lab.Stock
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Stock";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Unit> Unitlist = dropdownListSevices.GetUnitddl();
+    List<CrushingSeason> crushingSeasons = dropdownListSevices.GetCrushingSeasonddl();
+    List<Parameter> ParameterList = dropdownListSevices.GetParemeterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditStock","Lab")')"><i class="fa fa-plus"></i> Add Stock</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+
+    <div class="row" style="background-color:#e7e7e7;">
+        <div class="col-md-3">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.UnitId, new SelectList(Unitlist, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl Table", @Id = "Unit2" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                Parameter
+                @Html.DropDownListFor(m => m.ParameterId, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl Table", @Id = "Parameter2" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                Crushing Season
+                @Html.DropDownListFor(m => m.CrushingSeasonId, new SelectList(crushingSeasons, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl Table", @Id = "CrushingSeason2" })
+            </div>
+        </div>
+
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="Stock" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th width="5%">Stock Id</th>
+                            <th width="10%">Entry Date</th>
+                            <th width="15%">Unit Name</th>
+                            <th width="15%">Parameter Name</th>
+                            <th width="10%">Crushing Season Name</th>
+                            <th width="5%">Day Value</th>
+                            <th width="5%">Crushing Season  Id</th>
+                            <th width="5%">Parameter Id</th>
+                            <th width="5%">Unit Id</th>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $(".ddl").select2({
+            allowClear: true,
+            theme: "classic",
+            placeholder:"Select Option"
+        });
+        $(".ddl").on('change', function ()
+        {
+            var CrushingSeason = $("#CrushingSeason2").val();
+            var Parameter = $("#Parameter2").val();
+            var Unit = $("#Unit2").val();
+
+            getStock(Unit, Parameter, CrushingSeason)
+        });
+        getStock('','','')
+    });
+    function getStock(Unit, Parameter, CrushingSeason) {
+        $("#Stock").DataTable().clear().draw();
+        $("#Stock").DataTable().destroy();
+        var URL = '/Lab/StockData?Unit=' + Unit + '&Parameter=' + Parameter + '&CrushingSeason=' + CrushingSeason;
+            dataTable = $('#Stock').DataTable({
+                "ajax":
+                {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+                "columns":
+                    [
+                     { "data": "StockId", "render": function (data) {return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditStock", "Lab")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}"; },},
+                     { "data": "StockId"},
+                     { "data": "EntryDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                     { "data": "UnitName" },
+                     { "data": "ParameterName" },
+                     { "data": "CrushingSeasonName"},
+                     { "data": "DayValue"},
+                     { "data": "CrushingSeasonId" },
+                     { "data": "ParameterId" },
+                        { "data": "UnitId" },
+                  ],
+
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+                buttons: [
+                    {
+                        extend: 'pdf',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'excel',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'print',
+                        action: newexportaction,
+                    },
+                    {
+                        extend: 'colvis',
+                        columns: ':not(.noVis)'
+                    }
+                ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+
+
+    }
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'New Stock',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+</script>
+

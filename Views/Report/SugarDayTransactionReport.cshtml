@@ -1,0 +1,92 @@
+﻿@model KnowledgeApp_Test.Models.Report.SugarWeekTransaction
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "SugarDayTransactionReport";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unitlist = ds.GetUnitddl();
+    List<SugarGodown> SugarGodansList = ds.SugarGodownddl();
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">Sugar Transaction Report</h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit:
+            @Html.DropDownList("UnitId", new SelectList(unitlist, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Sugar Godown:
+            @Html.DropDownList("SugarGodownID", new SelectList(SugarGodansList, "SugarGodownID", "GodownNumber"), "select SugarGodown", new { @class = "form-control ddl Tabledata", @Id = "SugarGodownID" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            EntryDate:
+            <input type="text" class="form-control date" id="entrydate">
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            <br />
+            <input type="Text" class="form-control date" id="entrydate2">
+        </div>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div id="myChart" class="col-md-12 col-xs-12">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script language="javascript"> 
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $('.Tabledata').on("change", function () {
+
+            var Unit = $("#Unit2").val();
+            var SugarGodownID = $("#SugarGodownID").val();
+            var EntryDate = $("#entrydate").val();
+            var EntyryDate2 = $("#entrydate2").val();
+
+             $.ajax({
+                    url: "@Url.Action("PartialSugarDayTransactionReport", "Report")",
+                    dataType: 'HTML',
+                 data: { EntryDate: EntryDate, EntyryDate2: EntyryDate2, SugarGodownID: SugarGodownID, Unit: Unit  },
+                    asycs: false,
+                    success: function (returnData) {
+                        
+                            $("#myChart").html(returnData);
+
+                    }
+                });
+             
+                $('#myChart').show();
+                  
+        });
+
+    });
+
+</script>
+
+

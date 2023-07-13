@@ -1,0 +1,165 @@
+﻿@model KnowledgeApp_Test.Models.Administration.Users
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Services
+@{
+    Layout = null;
+    DropdownListSevices DS = new DropdownListSevices();
+    List<Unit> unit = DS.GetUnitddl();
+    var USerId = @Session["UserId"];
+
+}
+
+
+@using (Html.BeginForm("AddeditUsers", "Administration", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+{
+    <div class="row">
+        <div class="col-md-4">
+            User name
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.HiddenFor(m => m.UserId)
+                @Html.HiddenFor(m => m.InsertUserId, new { @Value = USerId })
+                @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @maxlength = "200", @required = "required" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Display Name
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.DisplayName, new { @class = "form-control", @maxlength = "200", @required = "required" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Email
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control", Type = "Email", @maxlength = "200" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            User Image
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.UserImage, new { Type = "File" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            PassWord
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.PassWord, new { @class = "form-control", Type = "Password", @Id = "Password" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Confirm PassWord
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.ConfirmPassWord, new { @class = "form-control", Type = "Password", @Id = "ConfirmPassWord" })
+                <Label ID="Label1"></Label>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Source
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @Html.TextBoxFor(m => m.Source, new { @class = "form-control", @Value = "Site", @readonly = "Readonly" })
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            Unit
+        </div>
+        <div class="col-md-8">
+            <div class="form-group">
+                @if (Model.UserId == 0)
+                {
+                    @Html.DropDownListFor(model => model.units, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control", @PlaceHolder = "Select Unit", multiple = "multiple" })
+                }
+                else
+                {
+                    @Html.DropDownListFor(model => model.units, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new {Value=@ViewBag.UnitId, @class = "form-control", @PlaceHolder = "Select Unit", multiple = "multiple" })
+                }
+            </div>
+
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="btn-group">
+                @if (Model.UserId == 0)
+                {
+                    <button class="form-control bg-success btnd">Save</button>
+                }
+                else
+                {
+                    <button class="form-control bg-info btnd" id="Update">Update</button>
+                }
+
+            </div>
+        </div>
+
+    </div>
+}
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        $("#units").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            includeSelectAllOption: true,
+            multiple: true,
+            theme: "classic"
+        });
+    });
+
+        $('#ConfirmPassWord').on('keyup', function () {
+
+            var password = $('#Password').val();
+            var confirmPassword = $('#ConfirmPassWord').val();
+            if (password != confirmPassword) {
+                $('#Label1').html("Password does not match !").css("color", "red");
+                $('.btnd').prop("disabled", true);
+
+
+
+            }
+            else {
+
+
+                $('#Label1').html("Password match !").css("color", "green");
+
+                $('.btnd').prop("disabled", false);
+            }
+        });
+    
+
+</script>

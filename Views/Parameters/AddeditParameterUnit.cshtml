@@ -1,0 +1,78 @@
+﻿@model KnowledgeApp_Test.Models.Parameters.ParameterUnit
+@using KnowledgeApp_Test.Models.Administration
+@using KnowledgeApp_Test.Services;
+@{
+    Layout = null;
+    ViewBag.Title = "Parameter Unit";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditParameterUnit", "Parameters", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Parameter Unit Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.ParameterUnitId)
+                    @Html.TextBoxFor(m => m.ParameterUnitCode, new { @Class = "form-control", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Parameter Unit Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ParameterUnitName, new { @Class = "form-control", @maxlength = "25" })
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Data Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DataType, new { @Class = "form-control", @onkeypress = "javascript:return isNumber(event)" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.ParameterUnitId == 0 && right[0].BtnAdd==true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            if ($("#ParameterUnitCode").val() == 0) {
+                $("#ParameterUnitCode").val('');
+            }
+        });
+    </script>

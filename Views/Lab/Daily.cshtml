@@ -1,0 +1,206 @@
+﻿@model KnowledgeApp_Test.Models.Lab.Daily
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Common;
+@using KnowledgeApp_Test.Models.Parameters;
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Daily";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Unit> UnitList = dropdownListSevices.GetUnitddl();
+    List<CrushingSeason> CrushingSeasonsList = dropdownListSevices.GetCrushingSeasonddl();
+    List<Parameter> ParameterList = dropdownListSevices.GetParemeterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+    var Todate = DateTime.Now.ToString();
+}
+@if (right.Count == 0 || right == null)
+{
+     Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditDaily","Lab")')"><i class="fa fa-plus"></i> New Daily</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                Entry Date from
+
+                @Html.TextBoxFor(m => m.EntryDate, new { @class = "form-control tabledata date", @Id = "EntryDate3", })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                EntryDate To
+                @Html.TextBoxFor(m => m.EntryDate, new { @class = "form-control tabledata date", @ID = "EntryDate4" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.Unit, new SelectList(UnitList, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl tabledata", @Id = "Unit2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Parameter
+                @Html.DropDownListFor(m => m.Parameter, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl tabledata", @Id = "Parameter2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Crushing Season
+                @Html.DropDownListFor(m => m.CrushingSeason, new SelectList(CrushingSeasonsList, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl tabledata", @Id = "CrushingSeason2" })
+            </div>
+        </div>
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="Daily" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th>EntryDate</th>
+                            <th>UnitName</th>
+                            <th>Parameter Name</th>
+                            <th>Crushing Season Name</th>
+                            <th>Day Value</th>
+                            <th>Crushing Season Id</th>
+                            <th>Parameter Id</th>
+                            <th>Unit Id</th>
+                            <th>To date Value</th>
+                            <th>Prev Day Value</th>
+                            <th>Prev To date Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.date').datepicker({dateFormat:'dd-mm-yy'});
+        $('.date').datepicker('setDate', 'today');
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+
+
+        $('.tabledata').on('change', function () {
+            var Unit = $("#Unit2").val();
+            var Parameter = $("#Parameter2").val();
+            var CrushingSeason = $("#CrushingSeason2").val();
+            var EntryDate3 = $("#EntryDate3").val();
+            var EntryDate4 = $("#EntryDate4").val();
+
+            getDaily(EntryDate3, EntryDate4, Unit, Parameter,CrushingSeason)
+        });
+        getDaily($("#EntryDate3").val(), $("#EntryDate4").val(),'','')
+    });
+
+    function getDaily(EntryDate, EntryDate2, Unit, Parameter, CrushingSeason) {
+        var URL = '/Lab/DailyData?EntryDate=' + EntryDate + '&EntryDate2=' + EntryDate2 + '&Unit=' + Unit + '&Parameter=' + Parameter + '&CrushingSeason=' + CrushingSeason;
+        $("#Daily").DataTable().clear().draw();
+        $("#Daily").DataTable().destroy();
+       $('#Daily').DataTable({
+            "ajax": {
+             "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+        "columns": [{
+            "data": "DailyId", "render": function (data) {return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditDaily", "Lab" ) /" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}" ;},},
+           { "data" : "DailyId" },
+          { "data" : "EntryDate" , 'render' : function (jsonDate) { var date=new Date(parseInt(jsonDate.substr(6))); var month=("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+          { "data" :"UnitName"},
+          { "data" : "ParameterName" },
+          { "data" : "CrushingSeasonName" },
+          { "data" :"DayValue"},
+          { "data" : "CrushingSeasonId" },
+          { "data" : "ParameterId" },
+          { "data" : "UnitId" },
+          { "data" : "TodateValue" },
+          { "data" : "PrevDayValue" },
+          { "data" : "PrevTodateValue" },],
+          "serverSide" : "true" ,
+          "order" : [0, "asc" ],
+          "processing" : "true" ,
+          columnDefs: [
+          {
+          targets: 1,
+          className: 'noVis'
+          }],
+          dom: 'Bfrtip' ,
+
+           buttons: [
+               {
+                   extend: 'pdf',
+                   action: newexportaction,
+               },
+               {
+                   extend: 'excel',
+                   action: newexportaction,
+               },
+               {
+                   extend: 'print',
+                   action: newexportaction,
+               },
+               {
+                   extend: 'colvis',
+                   columns: ':not(.noVis)'
+               }
+           ],
+          "language" :
+          {
+          "processing" : "Processing Please Wait....." ,
+          "emptyTable" : "No data found......"
+          }
+          });
+          }
+          function PopupForm(url) {
+          console.log(url)
+          var formDiv=$('<div/>');
+                $.get(url)
+                    .done(function (response) {
+                        formDiv.html(response);
+                        Popup = formDiv.dialog({
+                            autoOpen: true,
+                            resizable: false,
+                            title: 'Fill Daily Details',
+                            height: 700,
+                            width: 700,
+                            close: function () {
+                                Popup.dialog('destroy').remove();
+                            }
+
+                        });
+                    });
+            }
+
+
+</script>

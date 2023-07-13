@@ -1,0 +1,172 @@
+﻿@model KnowledgeApp_Test.Models.ProjectDocs.InterAllocationApproval
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Common
+@{
+    ViewBag.Title = "InterAllocationApproval";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> Unit = ds.GetUnitddl();
+    List<Employee> Employee = ds.Employeeddl();
+    List<ApprovalStatus> ApprovalStatus = ds.ApprovalStatusddl();
+    List<ApprovalStatus> RejectStatus = ds.RejectStatus();
+}
+<div class="row">
+    <div class="col-sm-12">
+
+        <h3 style="color:#0090d9;">Inter Allocation Approval</h3>
+
+    </div>
+</div>
+<hr />
+<div class="row" style="background-color: #f0f3f5">
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit
+            @Html.DropDownListFor(m => m.UnitId, new SelectList(Unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl ", @Id = "Unit2" })
+        </div>
+    </div>
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Intiator
+            @Html.DropDownListFor(m => m.IntiatorId, new SelectList(Employee, "EmployeeId", "EmployeeName"), "Select Intiator", new { @class = "form-control ddl", @id = "Intiator2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Approval Status
+            @Html.DropDownListFor(m => m.ApprovalStatus, new SelectList(ApprovalStatus, "ApprovalStatusID", "ApprovalStatusName"), "Select ApprovalStatus", new { @class = "form-control ddl", @id = "ApprovalStatus2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Rejected Status
+            @Html.DropDownListFor(m => m.RejectedStatus, new SelectList(RejectStatus, "ApprovalStatusID", "ApprovalStatusName"), "Select RejectedStatus", new { @class = "form-control ddl", @Id = "RejectedStatus2" })
+        </div>
+    </div>
+
+</div>
+<div class="row" style="background-color: #f0f3f5">
+    <div class="col-md-12">
+        <div class="form-group">
+
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="InterAllocationApproval" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Registration Number</th>
+                        <th>Registration Date</th>
+                        <th>Unit Name</th>
+                        <th>Subject</th>
+                        <th>Intiator EmployeeName</th>
+                        <th>Approval Status</th>
+                        <th>Approved Status</th>
+                        <th>Intiator Id</th>
+                        <th>Rejected Status</th>
+                        <th>Unit Id</th>
+
+                    </tr>
+                </thead>
+                <tbody id="tbody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+            $(".ddl").select2({
+                placeholder: "select ",
+                allowClear: true,
+                theme: "classic"
+            });
+        $(".ddl").on('change', function () {
+                var UnitId = $("#Unit2").val();
+                var IntiatorId = $("#Intiator2").val();
+                var ApprovalStatus = $("#ApprovalStatus2").val();
+            var RejectedStatus = $("#RejectedStatus2").val();
+            console.log(UnitId, IntiatorId, ApprovalStatus, RejectedStatus)
+                getInterAllocationApprovalData(UnitId, IntiatorId, ApprovalStatus, RejectedStatus)
+            });
+        getInterAllocationApprovalData("","","","");
+    });
+
+    function getInterAllocationApprovalData(UnitId, IntiatorId, ApprovalStatus, RejectedStatus) {
+        
+        var URL = '/ProjectDocs/InterAllocationApprovalData?Unit=' + UnitId + "&IntiatorId=" + IntiatorId + "&ApprovalStatus=" + ApprovalStatus + "&RejectedStatus" + RejectedStatus;
+        $('#InterAllocationApproval').DataTable().clear().draw();
+        $("#InterAllocationApproval").DataTable().destroy();
+        $('#InterAllocationApproval').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [
+                { "data":"InterAlocationRegistrationId"},
+                { "data": "RegistrationNumber" },
+                { "data": "RegistrationDate",'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "UnitUnitName" },
+                { "data": "Subject" },
+                { "data": "IntiatorEmployeeName" },
+                { "data": "ApprovalStatus" },
+                { "data": "ApprovedStatus" },
+                { "data": "IntiatorId" },
+                { "data": "RejectedStatus" },
+                { "data": "UnitId" },
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+
+                   
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+        }
+
+
+</script>
+
+
+

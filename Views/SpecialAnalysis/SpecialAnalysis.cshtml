@@ -1,0 +1,158 @@
+﻿@model KnowledgeApp_Test.Models.SpecialAnalysis.SpecialAnalysis
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.SpecialAnalysis
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Special Analysis";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<SpecialAnalysisType> specialAnalysisType = ds.GetSpecialAnalysisTypeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditSpecialAnalysis", "SpecialAnalysis")')"><i class="fa fa-plus"></i> Add New Special Analysis</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                Special Analysis Type
+                @Html.DropDownListFor(m => m.SpecialAnalysisTypeId, new SelectList(specialAnalysisType, "SpecialAnalysisTypeId", "SpecialAnalysisTypeName"), "select Special Analysis Type", new { @class = "form-control ddl", @id = "SpecialAnalysisType2" })
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="SpecialAnalysis" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th>Analysis Date</th>
+                            <th>Special Analysis Type Name</th>
+                            <th>Entry User Id</th>
+                            <th>Entry Date</th>
+                            <th>Special Analysis Type Id</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Special Analysis Type ",
+            allowClear: true,
+            theme: "classic"
+        });
+
+        $("#SpecialAnalysisType2").on('change', function () {
+            var SpecialAnalysisType = $("#SpecialAnalysisType2").val();
+            GetSpecialAnalysisTypeData(SpecialAnalysisType)
+        });
+        GetSpecialAnalysisTypeData("");
+    });
+
+    function GetSpecialAnalysisTypeData(SpecialAnalysisType) {
+        $("#SpecialAnalysis").DataTable().clear().draw();
+        $("#SpecialAnalysis").DataTable().destroy();
+        var URL = '/SpecialAnalysis/SpecialAnalysisData?SpecialAnalysisType=' + SpecialAnalysisType;
+        $('#SpecialAnalysis').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "SpecialAnalysisId", "render": function (data) {return "@if (right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditSpecialAnalysis", "SpecialAnalysis")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "SpecialAnalysisId" },
+                { "data": "AnalysisDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data":"SpecialAnalysisTypeName"},
+                { "data":"EntryUserId"},
+                { "data": "EntryDate",'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+                { "data": "SpecialAnalysisTypeId" },],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Special Analysis ',
+                    height: 600,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+</script>

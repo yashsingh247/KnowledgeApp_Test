@@ -1,0 +1,103 @@
+﻿@model KnowledgeApp_Test.Models.ProjectDocs.DocumentSubClass
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<DocumentClass> DocumentClass = ds.DocumentClassddl();
+    var Id = "Document Sub Class";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+    using (Html.BeginForm("AddDocumentSubClass", "ProjectDocs", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Document  Class Id
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.DocumentSubClassId)
+                    @Html.DropDownListFor(m => m.DocumentClassId, new SelectList(DocumentClass, "DocumentClassId", "ClassName"), "Select Class", new { @class = "form-control ddl", @id = " DocumentClassId2", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Sub Class Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.SubClassCode, new { @class = "form-control Tint", @required = "required", @onkeypress = "javascript:return isNumber(event)" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Sub Class Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.SubClassName, new { @class = "form-control", @maxlength = "40" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Short Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ShortCode, new { @class = "form-control", @maxlength = "4" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.DocumentSubClassId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-primary">Update</button>
+                }
+
+
+            </div>
+
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $(".ddl").select2({
+                placeholder: "select document sub class",
+                allowclear: true,
+                theme: "classic"
+            });
+            if ($("#SubClassCode").val() == 0) {
+                $("#SubClassCode").val('');
+            }
+            $("#documentsubclassid").on('change', function () {
+                var documentclassid = $("#documentclassid2").val();
+                getdocumentsubclassdata(documentclassid)
+            });
+            getdocumentsubclassdata("");
+        });
+    </script>

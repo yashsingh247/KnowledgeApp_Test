@@ -1,0 +1,88 @@
+﻿@model KnowledgeApp_Test.Models.SpecialAnalysis.SpecialAnalysisDetails
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.SpecialAnalysis
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<SpecialAnalysisType> specialAnalysisType = ds.GetSpecialAnalysisTypeddl();
+    List<SpecialAnalysisParameter> specialAnalysisP = ds.GetSpecialAnalysisParameterddl();
+    var Id = "Special Analysis";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+
+}
+    @if (right.Count == 0 || right == null)
+    {
+        Response.Redirect("/Login/Access");
+    }
+    @if (right[0].BtnAdd == true)
+    {
+        using (Html.BeginForm("AddeditSpecialAnalysisDetails", "SpecialAnalysis", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+        {
+            <div class="row">
+                <div class="col-md-4">
+                    Serial Number
+
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        @*@Html.HiddenFor(m=>m.SpecialAnalysisTypeId)*@
+                        @Html.HiddenFor(m => m.SpecialAnalysisDetilsId)
+                        @Html.HiddenFor(m => m.SpecialAnalysisId, new { Value = @ViewBag.SpecialAnalysis })@*suresh_11102022*@
+                        @Html.TextBoxFor(m => m.SerialNumber, new { @class = "form-control", @onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    Special Analysis Parameter
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        @Html.DropDownListFor(m => m.SpecialAnalysisParameterID, new SelectList(specialAnalysisP, "SpecialAnalysisParameterId", "SpecialAnalysisParameterName"), "Select Analysis Parameter", new { @class = "form-control ddl" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    Analysis Value
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        @Html.TextBoxFor(m => m.AnalysisValue, new { @class = "form-control", @onkeypress = "javascript:return isNumber(event)", @oninput = "validatetwodecimal(this)" })
+
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    @if (Model.SpecialAnalysisDetilsId == 0)
+                    {
+                        <button class="form-control bg-success">Save</button>
+                    }
+                    else
+                    {
+                        <button class="form-control bg-info">Update</button>
+                    }
+                </div>
+            </div>
+        }
+    }
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $(".ddl").select2({
+                    placeholder: "Select Option",
+                    allowClear: true,
+                    theme: "classic"
+                });
+                if ($("#SerialNumber").val() == 0) {
+                    $("#SerialNumber").val('');
+
+                }
+            });
+        </script>
+

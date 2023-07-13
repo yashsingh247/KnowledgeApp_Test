@@ -1,0 +1,296 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.ChemicalConsumption
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.HouseData
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Chemical Consumption";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Chemical> chemicals = ds.Chemicalddl();
+    List<Unit> unit = ds.GetUnitddl();
+    List<Shift> shift = ds.Shiftddl();
+    List<Employee> employee = ds.Employeeddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditChemicalConsumption", "HouseData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    @if (Model.ChemicalConsumptionId == 0 && right[0].BtnAdd == true)
+                    {
+                        <button class="form-control bg-success">Save</button>
+                    }
+                    else if (right[0].btnEdit == true)
+                    {
+                        <button class="form-control bg-info">Update</button>
+
+                    }
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                ConsumptionDate
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.ChemicalConsumptionId, new { @Id = "ChemicalConsumptionId" })
+                    @Html.TextBoxFor(m => m.ConsumptionDate, new { Value = Model.ConsumptionDate.ToString("dd-MM-yyyy"), @class = "form-control date", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Unit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl", @required = "required" })
+
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Shift
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.ShiftId, new SelectList(shift, "ShiftId", "ShiftName"), "Select Shift", new { @class = "form-control ddl", @required = "required" })
+
+                </div>
+
+            </div>
+        </div><div class="row">
+            <div class="col-md-4">
+                ProcessHead
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.ProcessHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Process Head", new { @class = "form-control ddl" })
+
+                </div>
+
+            </div>
+        </div><div class="row">
+            <div class="col-md-4">
+                Section Head
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.SectionHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Section Head", new { @class = "form-control ddl" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Department Head
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.DepartmentHeadId, new SelectList(employee, "EmployeeId", "EmployeeName"), "Select Department Head", new { @class = "form-control ddl", @Id = "DepartmentHead2" })
+
+                </div>
+
+            </div>
+        </div>
+            <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    Details
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @if (Model.ChemicalConsumptionId != 0 && right[0].BtnAdd == true)
+                    {
+                        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditChemicalConsumptionDetails", "HouseData")')"><i class="fa fa-plus"></i> New Chemical Consumption Details</a>
+                    }
+                </div>
+            </div>
+        </div>
+        if (right[0].btnView == true)
+        {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Chemical
+                            @Html.DropDownList("Chemical", new SelectList(chemicals, "ChemicalId", "ChemicalName"), "Select Chemical", new { @class = "form-control ddl", @Id = "Chemical2" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="ConsumtionDetails" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th width="15%"></th>
+                                        <th>Id</th>
+                                        <th>Srial number</th>
+                                        <th>Chemical Name</th>
+                                        <th>Issued Quantity</th>
+                                        <th>Consumed Quantity</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        }
+    }
+
+}
+
+
+
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+        $(".ddl").select2({
+            placeholder: "Select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        var ConsumptionId = $("#ChemicalConsumptionId").val();
+        $(".ddl").on('change', function () {
+
+            var ChemicalId = $("#Chemical2").val();
+            GetDetail(ChemicalId, ConsumptionId)
+        });
+
+        GetDetail('',ConsumptionId)
+    });
+    function GetDetail(ChemicalId, ConsumptionId)
+    {
+
+        var URL = '/HouseData/ChemicalConsumptionDetailsData?Chemical=' + ChemicalId + '&CunsumptionId=' + ConsumptionId ;
+        $("#ConsumtionDetails").DataTable().clear().draw();
+        $("#ConsumtionDetails").DataTable().destroy();
+        $("#ConsumtionDetails").DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{"data": "ChemicalConsumptionDetailID", "render": function (data) { return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditChemicalConsumptionDetails", "HouseData")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>";},},
+                { "data": "ChemicalConsumptionDetailID" },
+                { "data": "SerialNumber" },
+                { "data": "ChemicalName" },
+                { "data": "IssuedQuantity" },
+                { "data": "ConsumedQuantity" }],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+
+
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+        function PopupForm(url) {
+            var formDiv = $('<div/>');
+            $.get(url)
+                .done(function (response) {
+                    formDiv.html(response);
+                    Popup = formDiv.dialog({
+                        autoOpen: true,
+                        resizable: false,
+                        title: 'Fill Chemical Consumption Details',
+                        height: 700,
+                        width: 1200,
+                        close: function () {
+                            Popup.dialog('destroy').remove();
+                        }
+
+                    });
+                });
+        }
+        function DeleteDetailTable(Id) {
+            var TableName = "ChemicalConsumptionDetails";
+
+
+            var URL = '/Login/DeleteDatabyId?TableName=' + TableName + '&Id=' + Id;
+            $.ajax({
+                url: URL,
+                dataType: 'HTML',
+                //data: { UserId: UserId, Unit: unitId, Role: Role },
+                //asycs: false,
+                success: function (returnData) {
+                    console.log(returnData)
+                    var A = []
+                    A = JSON.parse(returnData)
+
+                    var Status = A["hasError"];
+                    var Msg = A["message"];
+                    if (Status == true) {
+                        $("#DeleteMessge").append(Msg);
+                        location.reload();
+
+                    }
+                    else {
+                        console.log(Msg)
+                        console.log(Status)
+                        $("#DeleteMessge").append(Msg);
+                    }
+                },
+
+            });
+        }
+
+
+
+    </script>

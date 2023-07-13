@@ -1,0 +1,100 @@
+﻿@model KnowledgeApp_Test.Models.PlantData.Position
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    ViewBag.Title = "Position";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<MillParameter> millParameter = DS.MillParameterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddreditPosition", "PlantData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-4">
+                Position Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.PositionId)
+                    @Html.TextBoxFor(m => m.PositionCode, new { @class = "form-control Sint", @onkeypress = "javascript:return isNumber(event)", @required = "required" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Position Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+
+                    @Html.TextBoxFor(m => m.PositionName, new { @class = "form-control", @maxlength = "60" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Mill Parameter
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.MillParameterId, new SelectList(millParameter, "MillParameterId", "MillParameterName"), "Select Mill Parameter", new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Short Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ShortName, new { @class = "form-control", @maxlength = "15" })
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="col-md-2">
+                <div class="btn-group">
+                    @if (Model.PositionId == 0 && right[0].BtnAdd==true)
+                    {
+                        <button class="form-control bg-success">Save</button>
+                    }
+                    else if(right[0].btnEdit)
+                    {
+                        <button class="form-control bg-info">Update</button>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+
+    }
+}
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $(".ddl").select2({
+                placeholder: "select Option ",
+                allowClear: true,
+                theme: "classic"
+            });
+            if ($("#PositionCode").val() == 0) {
+                $("#PositionCode").val('');
+            }
+
+        });
+    </script>

@@ -1,0 +1,142 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.ChemicalConsumptionDetails
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.HouseData
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.ProjectDocs
+@{
+    ViewBag.Title = "MassecuiteConditioningData";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Chemical> chemicals = ds.Chemicalddl();
+}
+@using (Html.BeginForm("AddeditChemicalConsumptionDetails", "HouseData", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+{
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h3 style="color:#0090d9;">ChemicalConsumptionDetails</h3>
+
+        </div>
+    </div>
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditChemicalConsumptionDetails","HouseData")')"><i class="fa fa-plus"></i> ChemicalConsumptionDetails</a>
+    <hr />
+
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    @*<div class="row">
+        <div class="col-md-2">
+            <div class="form-group">
+                Chemical
+                @Html.DropDownListFor(m => m.ChemicalConsumptionDetailID, new SelectList(chemicals, "ChemicalId", "ChemicalName"), new { @class = "form-control ddl", @Id = "Shift2" })
+            </div>
+        </div>
+
+    </div>*@
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="ChemicalConsumptionDetails" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th with="15%"></th>
+                            <th>Id</th>
+                            <th>Chemical Consumption ID</th>
+                            <th>Serial Number</th>
+                            <th>Chemical ID</th>
+                            <th> Issued Quantity</th>
+                            <th>Consumed Quantity</th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Option ",
+            allowClear: true,
+            theme: "classic"
+        });
+
+        $(".ddl").on('change', function () {
+            var chemicals = $("#Chemical2").val();
+           
+            ChemicalConsumptionDetails(chemicals)
+        });
+
+        ChemicalConsumptionDetails('chemicals ')
+    });
+    function MassecuiteConditioningData(Chemical) {
+        var Url = '/HouseData/ChemicalConsumptionDetailsData?chemicals=' + chemicals ;
+
+        $("#ChemicalConsumptionDetails").DataTable().clear().draw();
+        $("#ChemicalConsumptionDetails").DataTable().destroy();
+        $('#ChemicalConsumptionDetails').DataTable({
+            "ajax": {
+                "url": Url,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "ChemicalConsumptionDetailID", "render": function (data) {
+                        return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditChemicalConsumptionDetails", "HouseData")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>";},},
+                { "data": "ChemicalConsumptionDetailID" },
+                { "data": "ChemicalConsumptionID" },
+                { "data": "SerialNumber" },
+                { "data": "ChemicalID" },
+                { "data": "IssuedQuantity" },
+                { "data": "ConsumedQuantity" },
+             
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+            buttons: ['excel', 'pdf', 'print'],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Date Configuration Details',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+
+    }
+
+</script>
+
+
+
+
+
+

@@ -1,0 +1,156 @@
+﻿@model List<KnowledgeApp_Test.Models.Administration.RolePermisssion>
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table class="table table-bordered dataTable" id="Rolerights" width="100%" cellspacing="0" style="text-align:center">
+                <thead>
+                    <tr style="text-align:center">
+                        <th style="text-align:center">
+                            <input type="checkbox" class="check" id="All" onchange="checkall(this)" />All
+                        </th>
+                        <th class="hidden"></th>
+                        <th style="text-align:center">
+                            Form Name
+                        </th>
+                        <th style="display:none">
+                            Serial Number For Menu
+                        </th>
+                        <th style="text-align:center">
+                            Add
+                        </th>
+                        <th style="text-align:center">
+                            Edit
+                        </th>
+                        <th style="text-align:center">
+                            Delete
+                        </th>
+                        <th style="text-align:center">
+                            View
+                        </th>
+                        <th style="text-align:center">
+                            Excel
+                        </th>
+                        <th>
+                            Pdf
+                        </th>
+                        <th style="text-align:center">
+                            Search
+                        </th>
+
+                        <th style="text-align:center">
+                            Notification
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count(); i++)
+                    {
+                        <tr id="tr_@i">
+                            <td>
+                                @Html.CheckBoxFor(m => m[i].IsSelected, new { onchange = "CheckRow(" + @i + ")", id = "" + @i + "" })
+                                @*<input type="checkbox" class="check" id=@i>*@
+                            </td>
+                            <td>
+                               @Html.HiddenFor(m=>m[i].FormId)
+                               @Html.DisplayFor(m => m[i].FormName)
+                            </td>
+                            <td style="display:none">
+                                @Html.HiddenFor(m=>m[i].USerId)
+                                @Html.HiddenFor(m => m[i].SerialNumber)
+                                @Html.DisplayFor(m => m[i].SerialNumber)
+                            </td>
+                            <td>
+                                @Html.HiddenFor(m => m[i].MenuId)
+                                @Html.HiddenFor(m => m[i].SubMenuId)
+                                @Html.CheckBoxFor(m => m[i].BtnAdd, new { id = "" + @i + "_BtnAdd", onchange = "CheckallofRow(" + @i + ")" })
+                            </td>
+                            <td>
+                                @Html.HiddenFor(m => m[i].URL)
+                                @Html.CheckBoxFor(m => m[i].btnEdit, new { id = "" + @i + "_btnEdit", onchange = "CheckallofRow(" + @i + ")" })
+                            </td>
+                            <td>
+                                @Html.CheckBoxFor(m => m[i].btnDelete, new { id = "" + @i + "_btnDelete", onchange = "CheckallofRow(" + @i + ")" })
+                            </td>
+                            <td>
+                                @Html.CheckBoxFor(m => m[i].btnView, new { id = "" + @i + "_btnView", onchange = "CheckallofRow(" + @i + ")" })
+                            </td>
+                            <td>
+                                @Html.CheckBoxFor(m => m[i].btnExportExcel, new { id = "" + @i + "_btnExportExcel", onchange = "CheckallofRow(" + @i + ")" })
+                            </td>
+                            <td>
+                                @Html.CheckBoxFor(m => m[i].btnExportPdf, new { id = "" + @i + "_btnExportPdf", onchange = "CheckallofRow(" + @i + ")" })
+                            </td>
+                            <td>
+                                @Html.CheckBoxFor(m => m[i].btnSearch, new { id = "" + @i + "_btnSearch", onchange = "CheckallofRow(" + @i + ")" })
+                            </td>
+                            <td>
+                                @Html.CheckBoxFor(m => m[i].BtnNotification, new { id = "" + @i + "_BtnNotification", onchange = "CheckallofRow(" + @i + ")" })
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    $(document).ready(function () { 
+        for (let i = 0; i <= ("#Rolerights tbody tr").length; i++)
+        {
+            CheckallofRow(i)
+        }
+    });
+
+    function CheckallofRow(id)
+    {
+        if ($("#" + id + "_BtnAdd").is(':checked') || $("#" + id + "_btnEdit").is(':checked') || $("#" + id + "_btnDelete").is(':checked') || $("#" + id + "_btnView").is(':checked') || $("#" + id + "_btnExportExcel").is(':checked') || $("#" + id + "_btnExportPdf").is(':checked') || $("#" + id + "_btnSearch").is(':checked') || $("#" + id +"_BtnNotification").is(':checked'))
+        {
+            $("#" + id + "").prop('checked', true);
+        }
+        else
+        {
+            $("#" + id + "").prop('checked', false);
+        }
+    }
+    function checkall(e)
+    {
+       
+        var checkboxes = $('#Rolerights tr').length;
+        if (e.checked) {
+            for (var id = 0; id < checkboxes; id++) {
+                if ($("#" + id + "").prop('checked', true))
+                    $("#" + id + "_BtnAdd").prop('checked', true);
+                    $("#" + id + "_btnEdit").prop('checked', true);
+                    $("#" + id + "_btnDelete").prop('checked', true);
+                    $("#" + id + "_btnView").prop('checked', true);
+                    $("#" + id + "_btnExportExcel").prop('checked', true);
+                    $("#" + id + "_btnExportPdf").prop('checked', true);
+                    $("#" + id + "_btnSearch").prop('checked', true);
+                    $("#" + id + "_BtnNotification").prop('checked', true);
+            }
+        }
+        else
+        {
+            for (var id = 0; id < checkboxes; id++) {
+                if ($("#" + id + "").prop('checked', false))
+                    $("#" + id + "_BtnAdd").prop('checked', false);
+                    $("#" + id + "_btnEdit").prop('checked', false);
+                    $("#" + id + "_btnDelete").prop('checked', false);
+                    $("#" + id + "_btnView").prop('checked', false);
+                    $("#" + id + "_btnExportExcel").prop('checked', false);
+                    $("#" + id + "_btnExportPdf").prop('checked', false);
+                    $("#" + id + "_btnSearch").prop('checked', false);
+                    $("#" + id + "_BtnNotification").prop('checked', false); 
+            }
+        }
+       
+    }
+    
+
+</script >

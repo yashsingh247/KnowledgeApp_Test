@@ -1,0 +1,136 @@
+﻿@model KnowledgeApp_Test.Models.Control.ControlParameterGroup
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Control Parameter Group";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd)
+    {
+        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddEditControlParameterGroup", "Control")')"><i class="fa fa-plus"></i> Add New Brix Weight </a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-bordered dataTable" id="ControlParameterGroup" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th> Parameter Group Id</th>
+                        <th> Control Parameter Group Name</th>
+                        <th> Serial Order</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    }
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        getControlParameterDataData();
+    });
+    function getControlParameterDataData() {
+        dataTable = $('#ControlParameterGroup').DataTable({
+
+            "ajax": {
+                "url": "/Control/ControlParameterGroupData",
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [
+                {
+                    "data": "ParameterGroupId", "render": function (data) {
+                        return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddEditControlParameterGroup", "Control")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";
+                    },
+                },
+                { "data": "ParameterGroupId" },
+                { "data": "ControlParameterGroupName" },
+                { "data": "SerialOrder" },
+
+
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+
+            buttons: [
+                {
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'print',
+                    action: newexportaction,
+                },
+                {
+                    extend: 'colvis',
+                    columns: ':not(.noVis)'
+                }
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Control Parameter Group Details',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+</script>
+
+
+

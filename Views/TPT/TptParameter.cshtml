@@ -1,0 +1,229 @@
+﻿@model KnowledgeApp_Test.Models.TPT.TptParameter
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Parameters
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Tpt Parameter";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<ParameterUnit> parameterUnit = DS.GetParameterUnitddl();
+    List<Parameter> parameter = DS.GetParemeterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+
+            <h3 style="color:#0090d9;">Tpt Parameter</h3>
+
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditTptParameter", "TPT")')"><i class="fa fa-plus"></i> Add TPT Parameter</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-3">
+            <div class="form-group">
+                Parameter
+                @Html.DropDownListFor(m => m.ParameterId, new SelectList(parameter, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl", @id = "Parameter2" })
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="form-group">
+                Parameter Unit
+                @Html.DropDownListFor(m => m.ParameterUnitId, new SelectList(parameterUnit, "ParameterUnitId", "ParameterUnitName"), "Select Parameter Unit", new { @class = "form-control ddl", @id = "ParameterUnit2" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                Tex Parameter
+                @Html.DropDownListFor(m => m.TexParameterId, new SelectList(parameter, "ParameterId", "ParameterName"), "Select Tex Parameter", new { @class = "form-control ddl", @id = "TexParameter2" })
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                Wil Parameter
+                @Html.DropDownListFor(m => m.WilParameterId, new SelectList(parameter, "ParameterId", "ParameterName"), "Select Wil Parameter", new { @class = "form-control ddl", @id = "WilParameter2" })
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="TptParameter" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="35%"></th>
+                            <th>Id</th>
+                            <th>Parameter Code</th>
+                            <th>Parameter Name</th>
+                            <th>Is Input Parameter</th>
+                            <th>Data Type</th>
+                            <th>tpt Parameter Unit Name</th>
+                            <th>Formula</th>
+                            <th>Parameter Name</th>
+                            <th>Highlight Positive</th>
+                            <th>Deviation Percent</th>
+                            <th>Difference Value</th>
+                            <th>Consolidation Type</th>
+                            <th>Consolidation Parameter Id</th>
+                            <th>Calculation Level</th>
+                            <th>Precision</th>
+                            <th>Show On FinalTpt</th>
+                            <th>Report Type</th>
+                            <th>Display Order</th>
+                            <th>Tpt Serial</th>
+                            <th>Descriptive Formula</th>
+                            <th>Tex Parameter Name</th>
+                            <th>Wil Parameter Name</th>
+                            <th>Show On Output</th>
+                            <th>Output Row Number</th>
+                            <th>Output Serial</th>
+                            <th>Parameter Id</th>
+                            <th>Parameter UnitId</th>
+                            <th>Tex Parameter Id</th>
+                            <th>Wil Parameter Id</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $(".ddl").on('change', function () {
+            var Parameter = $("#Parameter2").val();
+            var ParameterUnit = $("#ParameterUnit2").val();
+            var TexParameter2 = $("#TexParameter2").val();
+            var WilParameter = $("#WilParameter2").val();
+            getTptParameterData(Parameter, ParameterUnit, TexParameter2, WilParameter)
+        });
+        getTptParameterData('', '', '', '')
+    });
+
+    function getTptParameterData(Parameter, ParameterUnit, TexParameter, WilParameter) {
+
+
+        var URL = '/TPT/TptParameterData?Parameter=' + Parameter + '&ParameterUnit=' + ParameterUnit + '&TexParameter=' + TexParameter + '&WilParameter=' + WilParameter;
+            $("#TptParameter").DataTable().clear().draw();
+            $("#TptParameter").DataTable().destroy();
+            $('#TptParameter').DataTable({
+                "ajax": {
+                    "url": URL,
+                    "type": "post",
+                    "datatype": "json"
+                },
+                "columns": [
+                    {"data": "TptParameterId", "render": function (data) { return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditTptParameter", "TPT")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnEdit == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                    { "data": "TptParameterId" },
+                    { "data": "ParameterCode" },
+                    { "data": "ParameterName" },
+                    { "data": "IsInputParameter", render: function (data, type, row) { if (data == true) { return '<input type="checkbox" disabled="true"  checked  >'; } return '<input type="checkbox" disabled="true" readonly="true">'; }, },
+                    { "data": "DataType" },
+                    { "data": "ParameterUnitParameterUnitName" },
+                    { "data": "Formula" },
+                    { "data": "ParameterParameterName" },
+                    { "data": "HighlightPositive", render: function (data, type, row) { if (data == true) { return '<input type="checkbox" disabled="true"  checked  >'; } return '<input type="checkbox" disabled="true" readonly="true">'; }, },
+                    { "data": "DeviationPercent" },
+                    { "data": "DifferenceValue" },
+                    { "data": "ConsolidationType" },
+                    { "data": "ConsolidationParameterId" },
+                    { "data": "CalculationLevel" },
+                    { "data": "Precision" },
+                    { "data": "ShowOnFinalTpt", render: function (data, type, row) { if (data == true) { return '<input type="checkbox" disabled="true"  checked  >'; } return '<input type="checkbox" disabled="true" readonly="true">'; }, },
+                    { "data": "ReportType" },
+                    { "data": "DisplayOrder" },
+                    { "data": "TpTptSerial" },
+                    { "data": "DescriptiveFormula" },
+                    { "data": "TexParameterParameterName" },
+                    { "data": "WilParameterParameterName" },
+                    { "data": "ShowOnOutput", render: function (data, type, row) { if (data == true) { return '<input type="checkbox" disabled="true"  checked  >'; } return '<input type="checkbox" disabled="true" readonly="true">'; }, },
+                    { "data": "OutputRowNumber" },
+                    { "data": "OutputSerial" },
+                    { "data": "ParameterId" },
+                    { "data": "ParameterUnitId" },
+                    { "data": "TexParameterId" },
+                    { "data": "WilParameterId" },],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+                buttons: [
+                    {
+
+                        extend: 'pdf',
+                        action: newexportaction,
+                    },
+                    {
+
+                        extend: 'excel',
+                        action: newexportaction,
+                    },
+                    {
+
+                        extend: 'print',
+                        action: newexportaction,
+                    },
+                ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Tpt Parameter',
+                    height: 700,
+                    width: 1300,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+</script>

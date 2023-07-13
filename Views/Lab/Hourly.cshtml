@@ -1,0 +1,195 @@
+﻿@model KnowledgeApp_Test.Models.Lab.Hourly
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Common;
+@using KnowledgeApp_Test.Models.Parameters;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Hourly";
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<Unit> UnitList = dropdownListSevices.GetUnitddl();
+    List<CrushingSeason> CrushingSeasonsList = dropdownListSevices.GetCrushingSeasonddl();
+    List<Parameter> ParameterList = dropdownListSevices.GetParemeterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+     Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditHourly", "Lab")')"><i class="fa fa-plus"></i> New Hourly</a>
+    }
+    <hr />
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+
+
+    <div class="row" style="background-color: #f0f3f5">
+        <div class="col-md-2">
+            <div class="form-group">
+                Entry Date from
+                @Html.TextBoxFor(m => m.EntryDate, new { @class = "form-control Tabledata date", @id = "EntryDate3" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                EntryDate To
+                @Html.TextBoxFor(m => m.EntryDate, new { @class = "form-control Tabledata date", @id = "EntryDate4" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Unit
+                @Html.DropDownListFor(m => m.UnitId, new SelectList(UnitList, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Parameter
+                @Html.DropDownListFor(m => m.ParameterId, new SelectList(ParameterList, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl Tabledata", @id = "Parameter2" })
+
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="form-group">
+                Crushing Season
+                @Html.DropDownListFor(m => m.CrushingSeasonId, new SelectList(CrushingSeasonsList, "CrushingSeasonId", "CrushingSeasonName"), "Select Crushing Season", new { @class = "form-control ddl Tabledata", @id = "CrushingSeason2" })
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="Hour" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>Id</th>
+                            <th>EntryDate</th>
+                            <th>UnitName</th>
+                            <th width="20%">ParameterName</th>
+                            <th>Crushing Season Name</th>
+                            <th>Day Value</th>
+                            <th>Crushing Season Id</th>
+                            <th>Parameter Id</th>
+                            <th>Unit Id</th>
+                            <th>Hour Value</th>
+                            <th>Prev Day Value</th>
+                            <th>Prev Hour Value</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+   $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+    $(document).ready(function () {
+        $(".ddl").select2({
+            Placeholder:"Select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $(".Tabledata").on('change', function () {
+
+            var Unit = $("#Unit2").val();
+            var Parameter = $("#Parameter2").val();
+            var CrushingSeason = $("#CrushingSeason2").val();
+            var EntryDate = $("#EntryDate3").val();
+            var EntryDate2 = $("#EntryDate4").val();
+            getHourly(EntryDate, EntryDate2, Unit, Parameter, CrushingSeason)
+        });
+
+        getHourly($("#EntryDate3").val(), $("#EntryDate4").val(), '', '', '')
+    });
+    function getHourly(EntryDate, EntryDate2, Unit, Parameter, CrushingSeason) {
+        $("#tbody").empty();
+
+        var URL = '/Lab/HourData?EntryDate=' + EntryDate + '&EntryDate2=' + EntryDate2 + '&Unit=' + Unit + '&Parameter=' + Parameter + '&CrushingSeason=' + CrushingSeason;
+            $("#Hour").DataTable().clear().draw();
+        $("#Hour").DataTable().destroy();
+        dataTable = $('#Hour').DataTable({
+            "ajax": {
+             "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+        "columns": [{
+            "data": "HourlyId", "render": function (data) {return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditHourly", "Lab")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>";},},
+            { "data": "HourlyId" },
+            { "data": "EntryDate", 'render': function (jsonDate) { var date = new Date(parseInt(jsonDate.substr(6))); var month = ("0" + (date.getMonth() + 1)).slice(-2); return ("0" + date.getDate()).slice(-2) + '-' + month + '-' + date.getFullYear(); } },
+            { "data":"UnitName"},
+            { "data": "ParameterName" },
+            { "data": "CrushingSeasonName" },
+            { "data":"DayValue"},
+            { "data": "CrushingSeasonId" },
+            { "data": "ParameterId" },
+            { "data": "UnitId" },
+            { "data": "HourValue" },
+            { "data": "PrevDayValue" },
+            { "data": "PrevHourValue" },],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+                    title: 'Hourly',
+                    extend: 'pdf',
+                },
+                {
+                    title: 'Hourly',
+                    extend: 'excel',
+                },
+                {
+                    title: 'Hourly',
+                    extend: 'print',
+                },
+            ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+    }
+            function PopupForm(url) {
+                console.log(url)
+                var formDiv = $('<div/>');
+                $.get(url)
+                    .done(function (response) {
+                        formDiv.html(response);
+                        Popup = formDiv.dialog({
+                            autoOpen: true,
+                            resizable: false,
+                            title: 'Fill Hourly',
+                            height: 700,
+                            width: 700,
+                            close: function () {
+                                Popup.dialog('destroy').remove();
+                            }
+
+                        });
+                    });
+            }
+
+
+    </script>
+

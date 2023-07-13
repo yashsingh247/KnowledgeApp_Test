@@ -1,0 +1,92 @@
+﻿@model KnowledgeApp_Test.Models.Report.TPTReports
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.TPT
+@using KnowledgeApp_Test.Models.Common
+
+
+@{
+    ViewBag.Title = "TPT Reports";
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> unitlist = ds.GetUnitddl();
+    List<TptRevision> TPTRevisionList = ds.TptRevisionddl();
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <h3 style="color:#0090d9;">TPT Reports</h3>
+    </div>
+</div>
+<hr />
+<div class="row">
+
+
+    <div class="col-md-2">
+        <div class="form-group">
+            Unit:
+            @Html.DropDownList("UnitId", new SelectList(unitlist, "UnitId", "UnitName"), "select Unit", new { @class = "form-control ddl Tabledata", @Id = "Unit2" })
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="form-group">
+            Revision:
+            @Html.DropDownList("RevisionId", new SelectList(TPTRevisionList, "RevisionId", "RevisionId"), "select RevisionName", new { @class = "form-control ddl Tabledata", @Id = "RevisionId" })
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            Report Selection :
+            <br />
+            <input type="radio" class="Tabledata radioBtnClass"  value="1"name="Tabledata"onclick="checkRadio(this)"> <label>Monthly</label>
+            <input type="radio" class="Tabledata radioBtnClass"  value="2"name="Tabledata"onclick="checkRadio(this)"><label>Weekly</label>
+            <input type="radio" class="Tabledata radioBtnClass"  value="3"name="Tabledata" onclick="checkRadio(this)"checked><label>Season</label>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group">
+            <div id="myChart" class="col-md-12 col-xs-12">
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script language="javascript">
+    $(document).ready(function () {
+
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $('.Tabledata').on("change", function () {
+            
+            var unit = $("#Unit2").val();
+            var RevisionID = $("#RevisionId").val();
+            if ($("input[type='radio'].radioBtnClass").is(':checked')) {
+                var CrushingSeasonid = $("input[type='radio'].radioBtnClass:checked").val();
+
+            }
+                $.ajax({
+                    url: "@Url.Action("PartialTPTReports", "Report")",
+                    dataType: 'HTML',
+                    data: { Unit: unit, RevisionID: RevisionID, CrushingSeasonid: CrushingSeasonid },
+                    asycs: false,
+                    success: function (returnData) {
+                        
+                        $("#myChart").html(returnData);
+
+                    }
+                });
+
+                $('#myChart').show();
+        });
+
+    });
+   
+</script>
+
+

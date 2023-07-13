@@ -1,0 +1,130 @@
+﻿@model KnowledgeApp_Test.Models.HouseData.MassecuiteConditioning
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.HouseData
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Massecuite Conditioning";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">@ViewBag.Title</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditMassecuiteConditioning", "HouseData")')"><i class="fa fa-plus"></i> New Massecuite Conditioning</a>
+    }
+    <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+        @Html.Raw(@ViewBag.Alert)
+    </div>
+    if (right[0].btnView == true)
+    {
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="MassecuiteConditioning" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th width="15%"></th>
+                            <th>ID</th>
+                            <th> Massecuite Conditioning Code</th>
+                            <th>Massecuite Conditioning Name</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    }
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        getMassecuiteConditioning()
+    });
+    function getMassecuiteConditioning() {
+        var Url = '/HouseData/MassecuiteData';
+         $("#MassecuiteConditioning").DataTable().clear().draw();
+         $("#MassecuiteConditioning").DataTable().destroy();
+      $('#MassecuiteConditioning').DataTable({
+            "ajax": {
+                "url": Url,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "MassecuiteConditioningId", "render": function (data) {return "@if (right[0].btnEdit == true){<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditMassecuiteConditioning", "HouseData")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true){<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                { "data": "MassecuiteConditioningId" },
+                { "data": "MassecuiteConditioningCode" },
+                { "data": "MassecuiteConditioningName" },
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+          buttons: [
+              {
+                  extend: 'pdf',
+                  action: newexportaction,
+              },
+              {
+
+                  extend: 'excel',
+                  action: newexportaction,
+              },
+              {
+
+                  extend: 'print',
+                  action: newexportaction,
+              },
+              {
+                  extend: 'colvis',
+                  columns: ':not(.noVis)'
+              }
+          ],
+         
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        console.log(url)
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Massecuite Conditioning',
+                    height: 500,
+                    width: 700,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+                });
+            });
+    }
+</script>
+
+
+

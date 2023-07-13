@@ -1,0 +1,233 @@
+﻿@model KnowledgeApp_Test.Models.Template.ChartTemplate
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Template;
+@using KnowledgeApp_Test.Models.Parameters;
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+}
+@{
+    ViewBag.Title = "Chart Template";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<ChartType> chartType = dropdownListSevices.ChartTypeddl();
+    List<ChartTemplate> chartTemplate = dropdownListSevices.ChartTemplateddl();
+    List<Parameter> parameter = dropdownListSevices.GetParemeterddl();
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/login/Access");
+}
+else if (right[0].BtnAdd == true || right[0].btnEdit == true)
+{
+    using (Html.BeginForm("AddeditChartTemplate", "Template", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { onsubmit = "return SubmitForm(this)" }))
+    {
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.ChartTemplateId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+
+                }
+                else if (right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-primary">Update</button>
+                }
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Chart Template Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.HiddenFor(m => m.ChartTemplateId)
+                    @Html.TextBoxFor(m => m.ChartTemplateName, new { @class = "form-control", @maxlength = "50" })
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                Chart Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.ChartType, new SelectList(chartType, "ChartTypeId", "ChartTypeName"), "Select ChartTemplate", new { @class = "form-control ddl" })
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4">
+                Template File Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.TemplateFileName, new { @class = "form-control", @maxlength = "80" })
+                </div>
+
+            </div>
+        </div>
+    }
+    if (right[0].btnView == true)
+    {
+        if (Model.ChartTemplateId != 0 && right[0].BtnAdd == true)
+        {
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditChartTemplateDetails", "Template")')"><i class="fa fa-plus"></i> New Chart Template Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group">
+                    @Html.DropDownList("ChartTemplate", new SelectList(chartTemplate, "ChartTemplateId", "ChartTemplateName"), "Select Chart Template", new { @class = "form-control ddl Tabledata", @id = "ChartTemplate2" })
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    @Html.DropDownList("Parameter", new SelectList(parameter, "ParameterId", "ParameterName"), "Select Parameter", new { @class = "form-control ddl Tabledata", @id = "Parameter2" })
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered dataTable" id="ChartTemDetails" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th width="25%"></th>
+                                <th>Serial Order</th>
+                                <th>Parameter Name</th>
+                                <th>ParameterType</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}
+<script>
+     $(document).ready(function () {
+
+        var ChartTemplateId = $('#ChartTemplateId').val();
+
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        getChartTemplateDetailData(ChartTemplateId,'')
+        $('.Tabledata').on("change", function () {
+            var ChartTemplate = $("#ChartTemplate2").val();
+            var Parameter = $("#Parameter2").val();
+            getChartTemplateDetailData(ChartTemplate, Parameter)
+        });
+    });
+  function getChartTemplateDetailData(ChartTemplate, Parameter)
+  {
+                    var URL = "/Template/ChartTemplateDetailsData?ChartTemplate=" + ChartTemplate + '&Parameter=' + Parameter;
+                    $("#ChartTemDetails").DataTable().clear().draw();
+                    $("#ChartTemDetails").DataTable().destroy();
+             $('#ChartTemDetails').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns":
+                [{ "data": "ChartTemplateDetailID", "render": function (data) { return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditChartTemplateDetails", "Template")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>"; }, },
+                    { "data": "SerialNumber" },
+                    { "data": "ParameterName" },
+                    { "data": "ParameterTypeName" },],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }],
+            dom: 'Blfrtip',
+
+                 buttons: [
+                     {
+                         extend: 'pdf',
+                         action: newexportaction,
+                     },
+                     {
+                         extend: 'excel',
+                         action: newexportaction,
+                     },
+                     {
+                         extend: 'print',
+                         action: newexportaction,
+                     },
+                     {
+                         extend: 'colvis',
+                         columns: ':not(.noVis)'
+                     }
+                 ],
+            "language":
+            {
+                "processing": "Processing Please Wait.....",
+                "emptyTable": "No data found......"
+            }
+        });
+
+    }
+    function PopupForm(url) {
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Chart Template Details',
+                    height: 500,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+                });
+            });
+    }
+    function DeleteDetailTable(Id) {
+        var TableName = "ChartTemplateDetails";
+        var URL = '/Login/DeleteDatabyId?TableName=' + TableName + '&Id=' + Id;
+        $.ajax({
+            url: URL,
+            dataType: 'HTML',
+            success: function (returnData) {
+                console.log(returnData)
+                var A = []
+                A = JSON.parse(returnData)
+
+                var Status = A["hasError"];
+                var Msg = A["message"];
+                if (Status == true) {
+                    $("#DeleteMessge").append(Msg);
+                    location.reload();
+                }
+                else {
+                    console.log(Msg)
+                    console.log(Status)
+                    $("#DeleteMessge").append(Msg);
+                }
+            },
+
+        });
+    }
+</script>
+

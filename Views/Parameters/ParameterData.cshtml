@@ -1,0 +1,369 @@
+﻿@model KnowledgeApp_Test.Models.Parameters.Parameter
+@using KnowledgeApp_Test.Services;
+@using KnowledgeApp_Test.Models.Parameters;
+@{
+    Layout = null;
+}
+
+@{
+    DropdownListSevices dropdownListSevices = new DropdownListSevices();
+    List<ParameterType> parameterType = dropdownListSevices.GetParemeterTypeddl();
+}
+<div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Parameter Code
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ParameterCode, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Parameter Name
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.ParameterName, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Parameter Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.DropDownListFor(m => m.ParameterTypeId, new SelectList(parameterType, "ParameterTypeId", "ParameterTypeName"), new { @class = "form-control ddl" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                IS Discontinued
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.Discontinued, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                IS User Defined
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsUserDefined, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Is Previous Day
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsPreviousDay, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Is Stoppage Parameter
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsStoppageParameter, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                PrevousDay Parameter Id
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.PrevousDayParameterId, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Maximum Value
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.MaximumValue, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                After Decimal Digit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.AfterDecimalDigit, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Print Before Decimal Digit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.PrintBeforeDecimalDigit, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Print After Decimal Digit
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.PrintAfterDecimalDigit, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                To Date Type
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.TodateType, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Average Basis Parameter Id
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.AverageBasisParameterId, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Formula
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Formula, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                To date Formula
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.TodateFormula, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Descriptive Formula
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DescriptiveFormula, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Descriptive Todate Formula
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.DescriptiveTodateFormula, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Calculation Level
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.CalculationLevel, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Is Stock Parameter
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsStockParameter, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Uom
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.Uom, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Is Brix Weight Parameter
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsBrixWeightParameter, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Is Calculated On Brix Weight
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsCalculatedOnBrixWeight, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Is Hourly Entry
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsHourlyEntry, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Is Additional Entry
+            </div>
+            <div class="col-md-1">
+                <div class="form-group">
+                    @Html.CheckBoxFor(m => m.IsAdditionalEntry, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="col-md-4">
+        <div class="row">
+            <div class="col-md-4">
+                Average Basis Parameter
+            </div>
+            <div class="col-md-8">
+                <div class="form-group">
+                    @Html.TextBoxFor(m => m.AverageBasisParameter, new { @Class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-md-8">
+        <div class="form-group">
+            <button class="form-control bg-success">Save</button>
+            <button class="form-control bg-info">Update</button>
+        </div>
+    </div>
+
+</div>

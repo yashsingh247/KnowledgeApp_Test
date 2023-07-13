@@ -1,0 +1,180 @@
+﻿@model KnowledgeApp_Test.Models.TPT.TptSeason
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.TPT
+@using KnowledgeApp_Test.Models.Administration
+@{
+    ViewBag.Title = "Tpt Season";
+    DropdownListSevices DS = new DropdownListSevices();
+    List<TptRevision> tptRevision = DS.TptRevisionddl();
+    List<TptParameter> tptParameter = DS.TptParameterddl();
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(@ViewBag.Title);
+}
+
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+else
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <h3 style="color:#0090d9;">Tpt Season</h3>
+        </div>
+    </div>
+    <hr />
+    if (right[0].BtnAdd == true)
+    {
+        <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddeditTptSeason", "TPT")')"><i class="fa fa-plus"></i> Add Tpt Season</a>
+    }
+        <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+            @Html.Raw(@ViewBag.Alert)
+        </div>
+    if (right[0].btnView == true)
+    {
+        <div class="row" style="background-color: #f0f3f5">
+            <div class="col-md-2">
+                <div class="form-group">
+                    Revision
+                    @Html.DropDownListFor(m => m.RevisionId, new SelectList(tptRevision, "RevisionId", "RevisionName"), "Select Revision", new { @class = "form-control ddl Tabledata", @id = "RevisionId2" })
+                </div>
+            </div>
+            <div class="col-md-2">
+                <div class="form-group">
+                    Tpt Parameter
+                    @Html.DropDownListFor(m => m.TptParameterId, new SelectList(tptParameter, "TptParameterId", "ParameterName"), "Select Tpt Parameter", new { @class = "form-control ddl Tabledata", @id = "TptParameterId2" })
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="TptSeason" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th width="45%"></th>
+                                <th width="5%">Id</th>
+                                <th width="5%">Tpt Year</th>
+                                <th width="5%">Revision Name</th>
+                                <th width="5%">Tpt Parameter Code</th>
+                                <th width="5%">Target</th>
+                                <th width="5%">Actual</th>
+                                <th width="5%">Last Year Actual</th>
+                                <th width="5%">Target Tex</th>
+                                <th width="5%">Taget Wil</th>
+                                <th width="5%">Actual Tex</th>
+                                <th width="5%">Actual Wil</th>
+                                <th width="5%">Tpt Parameter Id</th>
+                                <th width="5%">Revision Id</th>
+
+                            </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".ddl").select2({
+            placeholder: "select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        $(".ddl").on('change', function () {
+            var RevisionId = $("#RevisionId2").val();
+            var TptParameterId = $("#TptParameterId2").val();
+            getTptPowerData(RevisionId, TptParameterId)
+        });
+
+        getTptPowerData('', '')
+    });
+
+    function getTptPowerData(RevisionId, TptParameterId) {
+        var URL = '/TPT/TptSeasonData?tptRevision=' + RevisionId + '&tptParameter=' + TptParameterId;
+        $("#TptSeason").DataTable().clear().draw();
+        $("#TptSeason").DataTable().destroy();
+        $('#TptSeason').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "TptSeasonId", "render": function (data) { return "@if (right[0].btnEdit == true) {<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddeditTptSeason", "TPT")/" + data + "')><i class='fa fa-pencil'></i></a>}@if (right[0].btnDelete == true) {<a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete(" + data + ")><i class='fa fa-trash'></i></a>}";},},
+                    { "data": "TptSeasonId" },
+                    { "data": "TptYear" },
+                    { "data": "RevisionRevisionName" },
+                { "data": "TptParameterParameterCode" },
+                    { "data": "Target" },
+                    { "data": "Actual" },
+                    { "data": "LastYearActual" },
+                    { "data": "TargetTex" },
+                    { "data": "TagetWil" },
+                    { "data": "ActualTex" },
+                    { "data": "ActualWil" },
+                    { "data": "TptParameterId" },
+                    { "data": "RevisionId" },
+                    ],
+            columnDefs: [
+                {
+                    targets: 1,
+                    className: 'noVis'
+                }
+            ],
+            dom: 'Blfrtip',
+            buttons: [
+                {
+
+                    extend: 'pdf',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'excel',
+                    action: newexportaction,
+                },
+                {
+
+                    extend: 'print',
+                    action: newexportaction,
+                },
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+    function PopupForm(url) {
+        console.log(url)
+
+        var formDiv = $('<div/>');
+        $.get(url)
+            .done(function (response) {
+                formDiv.html(response);
+                Popup = formDiv.dialog({
+                    autoOpen: true,
+                    resizable: false,
+                    title: 'Fill Tpt Season',
+                    height: 700,
+                    width: 900,
+                    close: function () {
+                        Popup.dialog('destroy').remove();
+                    }
+
+                });
+            });
+    }
+
+
+</script>
+
+
+
+

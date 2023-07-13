@@ -1,0 +1,669 @@
+﻿@model KnowledgeApp_Test.Models.Sugar_Molasses.MolassesDayTransaction
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.Sugar_Molasses
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices DS = new DropdownListSevices();
+    List<MolassesTank> molassesTank = DS.MolassesTankddl();
+    List<Unit> unit = DS.GetUnitddl();
+    var Id = "Molasses Day Transaction";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true|| right[0].btnEdit == true)
+{
+
+    using (Html.BeginForm("AddeditMolassesDayTransaction", "Sugar_Molasses", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Molasses Tank
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.HiddenFor(m => m.MolassesDayTransactionId)
+                            @Html.DropDownListFor(m => m.MolassesTankId, new SelectList(molassesTank, "MolassesTankId", "TankNumber"), "Select Molasses Tank", new { @class = "form-control ddl Tabledata", @id = "SugarGodown2", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Unit
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.UnitId, new SelectList(unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl Tabledata", @id = "Unit2", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Transaction Date
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @if (Model.TransactionDate.ToString() != "01-01-01 00:00:00")
+                            {
+                                @Html.TextBoxFor(m => m.TransactionDate, new { Value = Model.TransactionDate.ToString("dd-MM-yyyy"), @class = "form-control date", @required = "required" })
+
+                            }
+                            else
+                            {
+                                @Html.TextBoxFor(m => m.TransactionDate, new { @class = "form-control date", @required = "required" })
+                            }
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Production
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Production, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Shifting In
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ShiftingIn, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Sales
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Sales, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Shifting Out
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ShiftingOut, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            In Temperature1
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.InTemperature1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            In Temperature2
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.InTemperature2, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            In Temperature3
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.InTemperature3, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            In Temperature4
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.InTemperature4, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            In Temperature5
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.InTemperature5, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Out Temperature1
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.OutTemperature1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Out Temperature2
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.OutTemperature2, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Out Temperature3
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.OutTemperature3, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Out Temperature4
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.OutTemperature4, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Out Temperature5
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.OutTemperature5, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Water In1
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.WaterIn1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Water In2
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.WaterIn2, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Water In3
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.WaterIn3, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Water In4
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.WaterIn4, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Water In5
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.WaterIn5, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Water Out1
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.WaterOut1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Water Out2
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.WaterOut2, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Water Out3
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.WaterOut3, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Water Out4
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.WaterOut4, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Water Out5
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.WaterOut5, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Molasses Temperature1
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.MolassesTemperature1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Molasses Temperature2
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.MolassesTemperature2, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Molasses Temperature3
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.MolassesTemperature3, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Molasses Temperature4
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.MolassesTemperature4, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Molasses Temperature5
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.MolassesTemperature5, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Brix
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Brix, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Trs
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Trs, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Production Temperature1
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ProductionTemperature1, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Production Temperature2
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ProductionTemperature2, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Production Temperature3
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ProductionTemperature3, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Production Temperature4
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ProductionTemperature4, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Production Temperature5
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.ProductionTemperature5, new { @class = "form-control", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Recirculation Hours
+
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.RecirculationHours, new { @class = "form-control Tint", onkeypress = "javascript:return isNumber(event)", oninput = "validatetwodecimal(this)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Water Spay Hours
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+
+                            @Html.TextBoxFor(m => m.WaterSpayHours, new { @class = "form-control Tint", onkeypress = "javascript:return isNumber(event)" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.MolassesDayTransactionId == 0 && right[0].BtnAdd == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-info">Update</button>
+                }
+
+
+            </div>
+        </div>
+    }
+}
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+            $('.date').datepicker({ dateFormat: 'dd-mm-yy' });
+
+
+            $(".ddl").select2({
+                placeholder: "select Option",
+                allowClear: true,
+                theme: "classic"
+            });
+        });
+    </script>

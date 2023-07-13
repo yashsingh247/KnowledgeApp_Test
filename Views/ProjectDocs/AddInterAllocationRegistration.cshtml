@@ -1,0 +1,306 @@
+﻿ @model KnowledgeApp_Test.Models.ProjectDocs.InterAllocationRegistration
+@using KnowledgeApp_Test.Services
+@using KnowledgeApp_Test.Models.ProjectDocs
+@using KnowledgeApp_Test.Models.PlantData
+@using KnowledgeApp_Test.Models.Common
+@using KnowledgeApp_Test.Models.Administration
+@{
+    Layout = null;
+    DropdownListSevices ds = new DropdownListSevices();
+    List<Unit> Unit = ds.GetUnitddl();
+    List<Employee> Employee = ds.Employeeddl();
+    List<PlantDepartment> PlantDepartment = ds.PlantDepartmentddl();
+    List<PlantSubDepartment> PlantSubDepartment = ds.PlantSubDepartmentddl();
+    var Id = "Inter Allocation Registration";
+    var tableid = "InterAllocationRegistrationDetails";
+    GeneralServices GS = new GeneralServices();
+    List<RolePermisssion> right = GS.ValidateForm(Id);
+}
+@if (right.Count == 0 || right == null)
+{
+    Response.Redirect("/Login/Access");
+}
+@if (right[0].BtnAdd == true || right[0].btnEdit==true)
+{
+    using (Html.BeginForm("AddInterAllocationRegistration", "ProjectDocs", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+    {
+        <div class="row">
+            <div class="col-md-2">
+                @if (Model.InterAlocationRegistrationId == 0 && right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-success">Save</button>
+                }
+                else if(right[0].btnEdit == true)
+                {
+                    <button class="form-control bg-primary">Update</button>
+                }
+
+            </div>
+
+        </div>
+        <div class="d-flex justify-content-center mt-3 login_container" id="DeleteMessge">
+            @Html.Raw(@ViewBag.Alert)
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            RegistrationNumber
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.HiddenFor(m => m.InterAlocationRegistrationId, new { @Id = "RegId" })
+                            @Html.TextBoxFor(m => m.RegistrationNumber, new { @class = "form-control", @maxlength = "50", @required = "required" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            RegistrationDate
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.RegistrationDate, new { Value = Model.RegistrationDate.ToString("dd-MM-yyyy"), @class = "form-control date" })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Unit
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.UnitId, new SelectList(Unit, "UnitId", "UnitName"), "Select Unit", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Subject
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Subject, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Intiator
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.IntiatorId, new SelectList(Employee, "EmployeeId", "EmployeeName"), "Select Intiator", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            Remarks
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.Remarks, new { @class = "form-control", @Maxlength = "500" })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            OldNumber
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.TextBoxFor(m => m.OldNumber, new { @class = "form-control", @Maxlength = "50" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            DocumentDepartment
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.DocumentDepartmentId, new SelectList(PlantDepartment, "PlantDepartmentId", "DepartmentName"), "Select Department", new { @class = "form-control ddl" })
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+                    Details
+                </div>
+            </div>
+            <div class="col-md-10">
+                <div class="form-group">
+                    @if(Model.InterAlocationRegistrationId!=0)
+                    { 
+                    <a class="btn btn-success" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddInterAllocationRegistrationDetail", "ProjectDocs")')"><i class="fa fa-plus"></i> New Inter Allocation Registration Details</a>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="form-group">
+
+                </div>
+            </div>
+            <div class="col-md-10">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="Details" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th width="20%"></th>
+                                        <th>Id</th>
+                                        <th>Srial number</th>
+                                        <th>Flag</th>
+                                        <th>Equipment</th>
+                                        <th>Activity</th>
+                                        <th>Budget Amount</th>
+                                        <th>Actual Amount</th>
+                                        <th>Saved Amount</th>
+                                        <th>Reason</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    }
+}
+    <script type="text/javascript">
+    $(document).ready(function () {
+        $('.date').datepicker({ dateFormat: 'dd-mm-yy', maxDate: '+0D', });
+        if ($("#RegistrationDate").val() == '01-01-0001') {
+            $('#RegistrationDate').datepicker('setDate', 'today');
+        }
+        $(".ddl").select2({
+            placeholder: "Select Option",
+            allowClear: true,
+            theme: "classic"
+        });
+        var RegId = $("#RegId").val();
+        InterAlocationRegistrationDetails(RegId)
+    });
+    function InterAlocationRegistrationDetails(RegId)
+    {
+        
+        var URL = '/ProjectDocs/InterAllocationRegistrationDetailData?RegistraionId=' + RegId ;
+        $("#Details").DataTable().clear().draw();
+        $("#Details").DataTable().destroy();
+        $('#Details').DataTable({
+            "ajax": {
+                "url": URL,
+                "type": "post",
+                "datatype": "json"
+            },
+            "columns": [{
+                "data": "InterAllocationRegistrationDetailId", "render": function (data) { return "<a class='btn btn-default btn-sm' onclick=PopupForm('@Url.Action("AddInterAllocationRegistrationDetail", "ProjectDocs")/" + data + "')><i class='fa fa-pencil'></i></a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=DeleteDetailTable(" + data + ")><i class='fa fa-trash'></i></a>"; },
+            },
+                { "data": "InterAllocationRegistrationDetailId" },
+                { "data": "SerialNumber" },
+                { "data": "Flag" },
+                { "data": "Equipment" },
+                { "data": "Activity" },
+                { "data": "BudgetAmount" },
+                { "data": "ActualAmount" },
+                { "data": "SavedAmount" },
+                { "data": "Reason" },],
+            //columnDefs: [
+            //    {
+            //        targets: 1,
+            //        className: 'noVis'
+            //    }
+            //],
+            dom: 'Blfrtip',
+            buttons: ['excel', 'pdf', 'print',
+              // {
+              //     extend: 'colvis',
+              //    columns: ':not(.noVis)'
+              //}
+            ],
+            "serverSide": "true",
+            "order": [0, "asc"],
+             "processing": "true",scrollX: true,scrollY: true,paging: true,
+            "language":
+            {
+                "processing": "Processing Please Wait....."
+            }
+        });
+    }
+        function PopupForm(url) {
+
+            console.log(url)
+
+            var formDiv = $('<div/>');
+            $.get(url)
+                .done(function (response) {
+                    formDiv.html(response);
+                    Popup = formDiv.dialog({
+                        autoOpen: true,
+                        resizable: false,
+                        title: 'Fill Inter Allocation Registration Details',
+                        height: 500,
+                        width: 900,
+                        close: function () {
+                            Popup.dialog('destroy').remove();
+                        }
+
+                    });
+                });
+        }
+    </script>
